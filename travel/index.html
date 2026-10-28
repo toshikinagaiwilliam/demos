@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>旅行会社向け 業務自動化デモ｜Nova Strategy</title>
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d2433;--sub:#5b6474;--line:#e3e1db;
+  --accent:#0f6e6e;--accent-weak:#e3f1f0;--warn:#a5520c;--warn-weak:#fbefe3;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#14171c;--card:#1c2027;--ink:#e8eaee;--sub:#a3abb8;--line:#2d333d;
+    --accent:#4fb8b2;--accent-weak:#18302f;--warn:#e9a462;--warn-weak:#33261a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",system-ui,sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+header{padding:28px 0 8px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.35;margin:6px 0 10px}
+.lead{color:var(--sub);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.chip{background:var(--accent-weak);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:13px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px}
+h2{font-size:19px;margin:0 0 4px}
+.step{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;padding:1px 8px;margin-right:8px;vertical-align:2px}
+.desc{color:var(--sub);margin:0 0 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+label.small{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
+textarea{min-height:230px;resize:vertical}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+button{font:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;padding:10px 18px}
+button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.total td{font-weight:700;border-bottom:none}
+.status{font-size:12px;border-radius:6px;padding:1px 7px;background:var(--warn-weak);color:var(--warn);white-space:nowrap}
+.check{background:var(--warn-weak);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13.5px}
+.check b{color:var(--warn)}
+.check ul{margin:4px 0 0;padding-left:20px}
+pre.mail{white-space:pre-wrap;font-family:inherit;font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0}
+.out h3{font-size:14px;margin:16px 0 6px}
+.out h3:first-child{margin-top:0}
+.placeholder{color:var(--sub);font-size:14px;border:1px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center}
+.busy{color:var(--accent);font-size:14px}
+.posts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.posts{grid-template-columns:1fr}}
+.post{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+.post .tag{font-size:12px;color:var(--accent);font-weight:700}
+.post p{white-space:pre-wrap;margin:6px 0 0;font-size:14px}
+.sched{margin-top:12px;font-size:13.5px;color:var(--sub)}
+.cta{background:var(--accent-weak);border:1px solid var(--accent);border-radius:14px;padding:20px;margin-top:24px}
+.cta h2{color:var(--accent)}
+.price{font-size:20px;font-weight:700;margin:6px 0}
+.note{font-size:12px;color:var(--sub);margin-top:24px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DEMO ｜ Nova Strategy</div>
+  <h1 id="title">旅行会社様向け<br>予約メールから、手配表・見積・返信まで</h1>
+  <p class="lead" id="lead">お客様からの予約・見積依頼のメールを貼り付けるだけで、手配表・見積・返信メールの下書きを作ります。SNSの投稿文づくりも自動化できます。</p>
+  <div class="chips" id="chips"></div>
+</header>
+
+<section class="card">
+  <h2><span class="step">1</span>予約メール → 手配表・見積・返信</h2>
+  <p class="desc">サンプルを選ぶか、実際のメールに近い文面を書き換えてお試しください。</p>
+  <div class="grid">
+    <div>
+      <div class="btns" id="samples"></div>
+      <label class="small" for="mail">お客様からのメール</label>
+      <textarea id="mail"></textarea>
+      <div style="margin-top:10px"><button class="primary" id="run">手配表と見積を作る</button></div>
+    </div>
+    <div class="out" id="out"><div class="placeholder">左のメールから、ここに手配表・見積・返信の下書きが表示されます</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="step">2</span>ツアー情報1行 → SNS投稿（日本語・タイ語）</h2>
+  <p class="desc">ツアー情報を1行送るだけで、日本語とタイ語の投稿文を作り、決まった曜日に自動で投稿します。</p>
+  <div class="btns" id="tours"></div>
+  <label class="small" for="tourline">ツアー情報（1行）</label>
+  <input type="text" id="tourline">
+  <div style="margin:10px 0 14px"><button class="primary" id="runsns">投稿文を作る</button></div>
+  <div id="snsout"></div>
+</section>
+
+<section class="cta">
+  <h2 id="ctaTitle">このデモを、貴社の実際のメールと料金表で動かします</h2>
+  <p style="margin:6px 0">貴社で実際に届くメールの形式・料金表・手配先に合わせて作り込みます。予約管理のスプレッドシートやLINEとの連携も可能です。</p>
+  <div class="price">開発費 0円 ／ 1機能 月額 5,000バーツ（税別）</div>
+  <p style="margin:6px 0">まずは30分、今お困りの業務をお聞かせください。オンライン、またはバンコク市内でしたら伺います。</p>
+  <p style="margin:6px 0"><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</p>
+</section>
+<p class="note">※ デモのため、料金・コース名・内容はサンプルです。本番ではAIが自由な文面のメールを読み取り、貴社の料金表で計算します。入力内容はこのページの外に送信されません。</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return n.toLocaleString("en-US")}
+
+/* ---------- personalization (?c=会社名&s=サービス1,サービス2) ---------- */
+var q=new URLSearchParams(location.search);
+var company=(q.get("c")||"").slice(0,60).trim();
+var services=(q.get("s")||"").split(/[,、]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,5);
+if(company){
+  $("title").textContent=company+"様向けデモ";
+  document.title=company+"様向けデモ｜Nova Strategy";
+  $("lead").textContent=company+"様に届く予約・見積依頼のメールを貼り付けるだけで、手配表・見積・返信メールの下書きを作ります。SNSの投稿文づくりも自動化できます。";
+  $("ctaTitle").textContent="このデモを、"+company+"様の実際のメールと料金表で動かします";
+}
+if(services.length){
+  var c=$("chips");
+  var lab=document.createElement("span");lab.style.cssText="font-size:13px;color:var(--sub);margin-right:4px";
+  lab.textContent=company?"想定した業務：":"対象業務：";c.appendChild(lab);
+  services.forEach(function(s){var e=document.createElement("span");e.className="chip";e.textContent=s;c.appendChild(e)});
+}
+
+/* ---------- samples ---------- */
+var SAMPLES=[
+ {label:"出張＋ゴルフ",text:"件名：11月 バンコク出張・ゴルフの手配のお願い\n\nいつもお世話になっております。山田です。\n11/20〜11/23で大人2名、バンコクに参ります。\n\n・ホテル：スクンビット周辺、4つ星、ツイン1室 3泊\n・ゴルフ：11/21 2名（できればアルパイン）\n・送迎：空港⇔ホテル 往復\n\nお見積りをいただけますでしょうか。\nよろしくお願いいたします。"},
+ {label:"工場視察",text:"件名：12月 アユタヤ視察の手配\n\nお世話になっております。株式会社サンプル総務部の佐藤です。\n12/3〜12/5で弊社役員3名がアユタヤ工業団地の視察に伺います。\n\nホテルはシーロム周辺で3室（2泊）お願いします。\n12/4は工場視察のため、終日車両（ドライバー付き）をお願いします。\n空港送迎は到着日のみで結構です。\n\nご確認のほどよろしくお願いいたします。"},
+ {label:"英語の問い合わせ",text:"Subject: Pattaya golf trip quote\n\nHi,\nWe are a group of 4 adults visiting Pattaya from Jan 10 to Jan 13.\nWe need 2 hotel rooms near the beach (3 nights), one round of golf on Jan 11 for 4 players at Siam Country Club, and airport transfers both ways.\nCould you send us a quote?\n\nBest regards,\nMichael"}
+];
+var sb=$("samples");
+SAMPLES.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){pick(i)};sb.appendChild(b)});
+function pick(i){$("mail").value=SAMPLES[i].text;[].forEach.call(sb.children,function(b,j){b.className=j===i?"on":""});$("out").innerHTML='<div class="placeholder">「手配表と見積を作る」を押してください</div>'}
+pick(0);
+
+/* ---------- demo price list (THB) ---------- */
+var PRICE={hotel4:3200,hotel3:2000,hotel5:5200,golf:4500,transfer:1500,car:3500,feeRate:0.10};
+
+/* ---------- parser ---------- */
+var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function findDates(t){
+  var out=[],m,re=/(\d{1,2})\s*[\/月]\s*(\d{1,2})日?/g;
+  while((m=re.exec(t)))out.push({m:+m[1],d:+m[2],i:m.index});
+  var re2=/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\b/gi;
+  while((m=re2.exec(t)))out.push({m:MON[m[1].slice(0,3).toLowerCase()],d:+m[2],i:m.index});
+  // "11/20〜23" style
+  var re3=/(\d{1,2})\s*[\/月]\s*(\d{1,2})日?\s*[〜～~\-–]\s*(\d{1,2})日?(?!\s*[\/月\d])/g;
+  while((m=re3.exec(t)))out.push({m:+m[1],d:+m[3],i:m.index+1});
+  // "Jan 10 to 13"
+  var re4=/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{1,2})\s*(?:to|-|–)\s*(\d{1,2})\b/gi;
+  while((m=re4.exec(t)))out.push({m:MON[m[1].slice(0,3).toLowerCase()],d:+m[3],i:m.index+1});
+  out.sort(function(a,b){return a.i-b.i});
+  return out.filter(function(x){return x.m>=1&&x.m<=12&&x.d>=1&&x.d<=31});
+}
+function dstr(o,en){if(!o)return en?"TBD":"未定";return en?(["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][o.m]+" "+o.d):(o.m+"/"+o.d)}
+function addDays(o,n){if(!o)return null;var y=new Date().getFullYear();var d=new Date(y,o.m-1,o.d+n);return {m:d.getMonth()+1,d:d.getDate()}}
+function diffDays(a,b){if(!a||!b)return null;var y=new Date().getFullYear();var x=new Date(y,a.m-1,a.d),z=new Date(y,b.m-1,b.d);if(z<x)z.setFullYear(y+1);return Math.round((z-x)/864e5)}
+function num(re,t){var m=t.match(re);if(!m)return null;for(var i=1;i<m.length;i++)if(m[i])return +m[i];return null}
+function lineWith(lines,re){for(var i=0;i<lines.length;i++){if(/^\s*(件名|subject)\s*[:：]/i.test(lines[i]))continue;if(re.test(lines[i]))return lines[i]}return ""}
+
+function parse(t){
+  var en=!/[぀-ヿ一-鿿]/.test(t);
+  var lines=t.split(/\n/);
+  var dates=findDates(t);
+  var start=dates[0]||null,end=null;
+  for(var k=1;k<dates.length;k++){var dd=diffDays(start,dates[k]);if(dd!==null&&dd>0&&dd<30){end=dates[k];break}}
+  var pax=num(/(?:大人\s*)?(\d+)\s*名|(\d+)\s*(?:adults?|people|persons|pax|guests)/i,t)||1;
+  var res={en:en,start:start,end:end,pax:pax,items:[],checks:[],dest:""};
+  var destM=t.match(/(バンコク|パタヤ|プーケット|チェンマイ|アユタヤ|シラチャ|Bangkok|Pattaya|Phuket|Chiang Mai|Ayutthaya|Sriracha)/i);
+  res.dest=destM?destM[1]:(en?"Thailand":"タイ");
+  var nights=num(/(\d+)\s*泊|(\d+)\s*nights?/i,t)||diffDays(start,end);
+
+  // hotel
+  var hl=lineWith(lines,/ホテル|hotel|room|室/i);
+  if(hl){
+    var rooms=num(/(\d+)\s*室|(\d+)\s*(?:hotel\s*)?rooms?/i,hl)||num(/(\d+)\s*室|(\d+)\s*(?:hotel\s*)?rooms?/i,t)||Math.max(1,Math.ceil(pax/2));
+    var star=/5つ星|5\s*star|five/i.test(hl)?5:(/3つ星|3\s*star/i.test(hl)?3:4);
+    var areaM=hl.match(/(スクンビット|シーロム|サトーン|プラトゥーナム|ビーチ|beach|Sukhumvit|Silom|Sathorn)/i);
+    var AREA_JA={beach:"ビーチ",sukhumvit:"スクンビット",silom:"シーロム",sathorn:"サトーン"};
+    var area=areaM?(en?(areaM[1].charAt(0).toUpperCase()+areaM[1].slice(1).toLowerCase()+" area"):((AREA_JA[areaM[1].toLowerCase()]||areaM[1])+"周辺")):"";
+    var n=nights||2;
+    if(!nights)res.checks.push(en?"Number of nights is not stated":"宿泊数の記載がないため、2泊で仮置き");
+    res.items.push({date:start,type:en?"Hotel":"ホテル",detail:(area?area+"・":"")+star+(en?"-star":"つ星")+" "+rooms+(en?" room(s) × ":"室 × ")+n+(en?" nights":"泊"),qty:rooms*n,unit:star===5?PRICE.hotel5:(star===3?PRICE.hotel3:PRICE.hotel4),label:(en?"Hotel ":"ホテル ")+star+(en?"-star (per room/night)":"つ星（1室1泊）"),to:en?"Hotel (partner list)":"提携ホテル（候補3件）"});
+    if(!area)res.checks.push(en?"Preferred hotel area":"ホテルの希望エリア");
+  }
+  // golf
+  var gl=lineWith(lines,/ゴルフ|golf/i);
+  if(gl){
+    var gd=findDates(gl)[0]||addDays(start,1);
+    var players=num(/(\d+)\s*名|(\d+)\s*players?/i,gl)||pax;
+    var cM=gl.match(/(アルパイン|サイアムカントリー|ナボンカ|タイカントリー|Alpine|Siam Country Club|Nikanti|Thai Country Club)/i);
+    res.items.push({date:gd,type:en?"Golf":"ゴルフ",detail:(cM?cM[1]:(en?"Course TBD":"コース未定"))+" "+players+(en?" players":"名"),qty:players,unit:PRICE.golf,label:en?"Golf (green fee, caddie, cart / person)":"ゴルフ（グリーンフィー・キャディ・カート／1名）",to:cM?cM[1]:(en?"Golf course":"ゴルフ場")});
+    if(!/朝|午前|午後|\d{1,2}:\d{2}|morning|afternoon|tee/i.test(gl))res.checks.push(en?"Preferred tee-off time":"ゴルフのスタート時間の希望");
+    if(!cM)res.checks.push(en?"Preferred golf course":"希望のゴルフ場");
+  }
+  // transfer
+  var tl=lineWith(lines,/送迎|transfer|空港|airport/i);
+  if(tl){
+    var legs=/往復|both ways|round/i.test(tl)?2:1;
+    var arrOnly=/到着日のみ|arrival only/i.test(tl);
+    if(arrOnly||legs===1){
+      res.items.push({date:start,type:en?"Transfer":"送迎",detail:en?"Airport → Hotel":"空港 → ホテル",qty:1,unit:PRICE.transfer,label:en?"Airport transfer (van, one way)":"空港送迎（バン・片道）",to:en?"Transport partner":"送迎会社"});
+    }else{
+      res.items.push({date:start,type:en?"Transfer":"送迎",detail:en?"Airport → Hotel":"空港 → ホテル",qty:1,unit:PRICE.transfer,label:en?"Airport transfer (van, one way)":"空港送迎（バン・片道）",to:en?"Transport partner":"送迎会社"});
+      res.items.push({date:end,type:en?"Transfer":"送迎",detail:en?"Hotel → Airport":"ホテル → 空港",qty:1,unit:PRICE.transfer,label:en?"Airport transfer (van, one way)":"空港送迎（バン・片道）",to:en?"Transport partner":"送迎会社"});
+    }
+    res.checks.push(en?"Flight numbers and arrival/departure times":"便名と到着・出発時刻");
+  }
+  // car with driver
+  var cl=lineWith(lines,/車両|ドライバー|チャーター|car with driver|driver|charter/i);
+  if(cl&&cl!==tl){
+    var cd=findDates(cl)[0]||addDays(start,1);
+    res.items.push({date:cd,type:en?"Car":"車両",detail:en?"Car with driver (full day)":"ドライバー付き車両（終日）",qty:1,unit:PRICE.car,label:en?"Car with driver (full day)":"車両チャーター（終日・ドライバー付き）",to:en?"Transport partner":"送迎会社"});
+    res.checks.push(en?"Pick-up time and itinerary for the day":"当日の出発時間と訪問先の住所");
+  }
+  if(!start)res.checks.unshift(en?"Travel dates":"旅行日程");
+  res.checks.push(en?"Names of all travelers (as in passport)":"ご参加者のお名前（パスポート表記）");
+  res.items.sort(function(a,b){var x=a.date?a.date.m*100+a.date.d:9999,y=b.date?b.date.m*100+b.date.d:9999;return x-y});
+  return res;
+}
+
+function render(r){
+  var en=r.en,h="";
+  if(!r.items.length){$("out").innerHTML='<div class="placeholder">'+(en?"No bookable items found. Please include hotel, golf or transfer requests.":"手配項目が見つかりませんでした。ホテル・ゴルフ・送迎などの依頼を含めてお試しください。")+'</div>';return}
+  h+="<h3>"+(en?"Arrangement sheet":"手配表")+"（"+esc(r.dest)+" "+esc(dstr(r.start,en))+(r.end?"〜"+esc(dstr(r.end,en)):"")+"・"+r.pax+(en?" pax":"名")+"）</h3>";
+  h+="<table><tr><th>"+(en?"Date":"日付")+"</th><th>"+(en?"Type":"種別")+"</th><th>"+(en?"Details":"内容")+"</th><th>"+(en?"Supplier":"手配先")+"</th><th>"+(en?"Status":"状況")+"</th></tr>";
+  r.items.forEach(function(it){h+="<tr><td>"+esc(dstr(it.date,en))+"</td><td>"+esc(it.type)+"</td><td>"+esc(it.detail)+"</td><td>"+esc(it.to)+"</td><td><span class='status'>"+(en?"To book":"未手配")+"</span></td></tr>"});
+  h+="</table>";
+  var sub=0;
+  h+="<h3>"+(en?"Quotation (THB)":"お見積り（バーツ）")+"</h3><table><tr><th>"+(en?"Item":"項目")+"</th><th class='num'>"+(en?"Unit":"単価")+"</th><th class='num'>"+(en?"Qty":"数量")+"</th><th class='num'>"+(en?"Amount":"金額")+"</th></tr>";
+  r.items.forEach(function(it){var a=it.unit*it.qty;sub+=a;h+="<tr><td>"+esc(it.label)+"</td><td class='num'>"+fmt(it.unit)+"</td><td class='num'>"+it.qty+"</td><td class='num'>"+fmt(a)+"</td></tr>"});
+  var fee=Math.round(sub*PRICE.feeRate),tot=sub+fee;
+  h+="<tr><td>"+(en?"Service fee (10%)":"手配手数料（10%）")+"</td><td></td><td></td><td class='num'>"+fmt(fee)+"</td></tr>";
+  h+="<tr class='total'><td>"+(en?"Total":"合計")+"</td><td></td><td></td><td class='num'>"+fmt(tot)+"</td></tr></table>";
+  h+="<div class='check'><b>"+(en?"Missing information (asked automatically in the reply)":"不足している情報（返信で自動的に確認）")+"</b><ul>";
+  r.checks.forEach(function(c){h+="<li>"+esc(c)+"</li>"});
+  h+="</ul></div>";
+  var mail;
+  if(en){
+    var en_nm=(r.raw.match(/(?:regards|thanks|sincerely),?\s*\n\s*([A-Z][a-z]+)/i)||[])[1];
+    mail="Dear "+(en_nm||"customer")+",\n\nThank you for your inquiry. Please find our quotation below.\n\n";
+    r.items.forEach(function(it){mail+="- "+dstr(it.date,true)+" "+it.type+": "+it.detail+"\n"});
+    mail+="\nTotal: THB "+fmt(tot)+" (incl. service fee)\n\nTo proceed, could you please let us know:\n";
+    r.checks.forEach(function(c){mail+="- "+c+"\n"});
+    mail+="\nWe look forward to hearing from you.\n"+(company||"[Your company]");
+  }else{
+    var nm=(r.raw.match(/([^\s、。]{1,6})(?:です|と申します)/)||[])[1];
+    if(nm)nm=nm.split("の").pop();
+    mail=(nm?nm+"様":"お客様")+"\n\nお問い合わせありがとうございます。\n以下の内容でお見積りいたしました。\n\n";
+    r.items.forEach(function(it){mail+="・"+dstr(it.date)+" "+it.type+"："+it.detail+"\n"});
+    mail+="\n合計："+fmt(tot)+"バーツ（手配手数料込み）\n\n手配を進めるにあたり、以下をお知らせください。\n";
+    r.checks.forEach(function(c){mail+="・"+c+"\n"});
+    mail+="\n引き続きよろしくお願いいたします。\n"+(company||"〇〇トラベル");
+  }
+  h+="<h3>"+(en?"Reply draft":"返信メールの下書き")+"</h3><pre class='mail'>"+esc(mail)+"</pre>";
+  $("out").innerHTML=h;
+}
+
+$("run").onclick=function(){
+  var t=$("mail").value.trim();if(!t)return;
+  $("out").innerHTML="<p class='busy'>メールを読み取っています…</p>";
+  setTimeout(function(){var r=parse(t);r.raw=t;render(r)},700);
+};
+
+/* ---------- SNS ---------- */
+var TOURS=[
+ {label:"アユタヤ遺跡",line:"アユタヤ遺跡 日帰りツアー｜日本語ガイド・ホテル送迎付き｜大人1,800バーツ",
+  ja:"【日本語ガイドで巡る アユタヤ遺跡 日帰りツアー】\n世界遺産の寺院を、日本語ガイドがわかりやすくご案内します。\nバンコク市内のホテル送迎付きなので、初めての方も安心です。\n\n■ 料金：大人 1,800バーツ\n■ ご予約：DMまたはLINEで\n\n#タイ旅行 #アユタヤ #バンコク観光",
+  th:"ทัวร์อยุธยา 1 วัน พร้อมไกด์ภาษาญี่ปุ่น\nเที่ยวชมวัดมรดกโลก พร้อมรถรับส่งจากโรงแรมในกรุงเทพฯ\n\nราคาผู้ใหญ่ 1,800 บาท\nจองได้ทาง DM หรือ LINE\n\n#เที่ยวไทย #อยุธยา"},
+ {label:"水上マーケット",line:"ダムヌンサドゥアック水上マーケット＆メークロン線路市場｜半日｜1,500バーツ",
+  ja:"【水上マーケット＆線路市場 半日ツアー】\n小舟で巡るダムヌンサドゥアック水上マーケットと、列車が市場の真ん中を通るメークロン線路市場へ。\n午前中だけで回れるので、午後はゆっくり過ごせます。\n\n■ 料金：1,500バーツ\n■ ご予約：DMまたはLINEで\n\n#タイ旅行 #水上マーケット #メークロン",
+  th:"ทัวร์ตลาดน้ำดำเนินสะดวกและตลาดร่มหุบ ครึ่งวัน\nสัมผัสบรรยากาศตลาดน้ำและตลาดริมทางรถไฟ พร้อมรถรับส่งจากโรงแรม\n\nราคา 1,500 บาท\nจองได้ทาง DM หรือ LINE\n\n#ตลาดน้ำดำเนินสะดวก #ตลาดร่มหุบ"},
+ {label:"パタヤ ゴルフ",line:"パタヤ ゴルフ1ラウンド｜送迎・キャディ付き｜3,900バーツ〜",
+  ja:"【パタヤ ゴルフ1ラウンド】\nバンコクからの送迎・キャディ付きで、手ぶらで楽しめるゴルフプランです。\nコースのご希望もお気軽にご相談ください。\n\n■ 料金：3,900バーツ〜\n■ ご予約：DMまたはLINEで\n\n#タイゴルフ #パタヤ #ゴルフ旅行",
+  th:"แพ็กเกจกอล์ฟพัทยา 1 รอบ\nรวมรถรับส่งและแคดดี้ เหมาะสำหรับนักกอล์ฟชาวญี่ปุ่น\n\nราคาเริ่มต้น 3,900 บาท\nสอบถามและจองได้ทาง DM หรือ LINE\n\n#กอล์ฟพัทยา #ตีกอล์ฟไทย"}
+];
+var tb=$("tours"),cur=0;
+TOURS.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){tpick(i)};tb.appendChild(b)});
+function tpick(i){cur=i;$("tourline").value=TOURS[i].line;[].forEach.call(tb.children,function(b,j){b.className=j===i?"on":""});$("snsout").innerHTML=""}
+tpick(0);
+$("runsns").onclick=function(){
+  var line=$("tourline").value.trim();if(!line)return;
+  var t=TOURS[cur],ja,th;
+  if(line===t.line){ja=t.ja;th=t.th}
+  else{
+    var parts=line.split(/[｜|]/).map(function(x){return x.trim()}).filter(Boolean);
+    ja="【"+parts[0]+"】\n"+(parts.slice(1,-1).join("・")||"")+"\n\n"+(parts.length>1?"■ "+parts[parts.length-1]+"\n":"")+"■ ご予約：DMまたはLINEで\n\n#タイ旅行";
+    th="（本番では、AIがこの内容をタイ語の投稿文に翻訳します）";
+  }
+  var h="<div class='posts'><div class='post'><div class='tag'>日本語（Facebook・Instagram）</div><p>"+esc(ja)+"</p></div><div class='post'><div class='tag'>ภาษาไทย（タイ語）</div><p>"+esc(th)+"</p></div></div>";
+  h+="<p class='sched'>投稿予定：毎週 火曜・金曜 18:00 に自動投稿（投稿前に確認する設定にもできます）</p>";
+  $("snsout").innerHTML="<p class='busy'>作成しています…</p>";
+  setTimeout(function(){$("snsout").innerHTML=h},600);
+};
+})();
+</script>
+</body>
+</html>
