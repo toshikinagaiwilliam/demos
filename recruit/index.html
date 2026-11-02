@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>人材紹介会社向け 業務自動化デモ｜Nova Strategy</title>
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d2433;--sub:#5b6474;--line:#e3e1db;
+  --accent:#0f6e6e;--accent-weak:#e3f1f0;--warn:#a5520c;--warn-weak:#fbefe3;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#14171c;--card:#1c2027;--ink:#e8eaee;--sub:#a3abb8;--line:#2d333d;
+    --accent:#4fb8b2;--accent-weak:#18302f;--warn:#e9a462;--warn-weak:#33261a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",system-ui,sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+header{padding:28px 0 8px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.35;margin:6px 0 10px}
+.lead{color:var(--sub);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.chip{background:var(--accent-weak);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:13px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px}
+h2{font-size:19px;margin:0 0 4px}
+.step{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;padding:1px 8px;margin-right:8px;vertical-align:2px}
+.desc{color:var(--sub);margin:0 0 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.grid>*{min-width:0}
+.out{overflow-x:auto}
+label.small{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
+textarea{min-height:230px;resize:vertical}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+button{font:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;padding:10px 18px}
+button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.match{font-size:12px;border-radius:6px;padding:1px 7px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
+.miss{font-size:12px;color:var(--warn)}
+.check{background:var(--warn-weak);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13.5px}
+.check b{color:var(--warn)}
+.check ul{margin:4px 0 0;padding-left:20px}
+pre.mail{white-space:pre-wrap;font-family:inherit;font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0}
+.out h3{font-size:14px;margin:16px 0 6px}
+.out h3:first-child{margin-top:0}
+.placeholder{color:var(--sub);font-size:14px;border:1px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center}
+.busy{color:var(--accent);font-size:14px}
+.posts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.posts{grid-template-columns:1fr}}
+.post{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+.post .tag{font-size:12px;color:var(--accent);font-weight:700}
+.post p{white-space:pre-wrap;margin:6px 0 0;font-size:14px}
+.sched{margin-top:12px;font-size:13.5px;color:var(--sub)}
+.cta{background:var(--accent-weak);border:1px solid var(--accent);border-radius:14px;padding:20px;margin-top:24px}
+.cta h2{color:var(--accent)}
+.price{font-size:20px;font-weight:700;margin:6px 0}
+.note{font-size:12px;color:var(--sub);margin-top:24px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DEMO ｜ Nova Strategy</div>
+  <h1 id="title">人材紹介会社様向け<br>求人のご依頼から、求人票・推薦文・面接の調整まで</h1>
+  <p class="lead" id="lead">企業様からの求人依頼のメールを貼り付けるだけで、求人票（日本語・英語）と確認事項を作ります。候補者の経歴からは、推薦文と面接日程のご連絡の下書きを作ります。</p>
+  <div class="chips" id="chips"></div>
+</header>
+
+<section class="card">
+  <h2><span class="step">1</span>求人依頼のメール → 求人票（日本語・英語）・確認事項</h2>
+  <p class="desc">サンプルを選ぶか、実際のご依頼に近い文面に書き換えてお試しください。</p>
+  <div class="grid">
+    <div>
+      <div class="btns" id="samples"></div>
+      <label class="small" for="mail">企業様からの求人依頼（メール・LINE）</label>
+      <textarea id="mail"></textarea>
+      <div style="margin-top:10px"><button class="primary" id="run">求人票を作る</button></div>
+    </div>
+    <div class="out" id="out"><div class="placeholder">左のご依頼から、ここに求人票と確認事項が表示されます</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="step">2</span>候補者の経歴 → 推薦文・面接日程のご連絡</h2>
+  <p class="desc">上の求人に合わせて、候補者の経歴から企業様への推薦文と、候補者への面接日程のご連絡を作ります。</p>
+  <div class="btns" id="cands"></div>
+  <label class="small" for="cv">候補者の経歴（履歴書・面談メモの抜粋）</label>
+  <textarea id="cv" style="min-height:150px"></textarea>
+  <div style="margin:10px 0 14px"><button class="primary" id="runcv">推薦文と面接のご連絡を作る</button></div>
+  <div id="cvout"></div>
+</section>
+
+<section class="cta">
+  <h2 id="ctaTitle">このデモを、貴社の求人・候補者の情報で動かします</h2>
+  <p style="margin:6px 0">貴社の求人票の書式や候補者データベース（Excel・スプレッドシート）に合わせて作り込みます。タイ語の求人票・タイ語の履歴書の日本語要約、求人サイトへの掲載文づくりも自動化できます。</p>
+  <div class="price">開発費 0円 ／ 1機能 月額 5,000バーツ（税別）</div>
+  <p style="margin:6px 0">まずは30分、今お困りの業務をお聞かせください。オンライン、またはバンコク市内でしたら伺います。</p>
+  <p style="margin:6px 0"><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</p>
+</section>
+<p class="note">※ デモのため、企業・候補者・条件はすべて架空のサンプルです。本番ではAIが自由な文面のご依頼や履歴書を読み取ります。入力内容はこのページの外に送信されません。</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return n.toLocaleString("en-US")}
+
+/* ---------- personalization (?c=会社名&s=サービス1,サービス2) ---------- */
+var q=new URLSearchParams(location.search);
+var company=(q.get("c")||"").slice(0,60).trim();
+var services=(q.get("s")||"").split(/[,、]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,5);
+if(company){
+  $("title").textContent=company+"様向けデモ";
+  document.title=company+"様向けデモ｜Nova Strategy";
+  $("lead").textContent=company+"様に届く求人依頼のメールを貼り付けるだけで、求人票（日本語・英語）と確認事項を作ります。候補者の経歴からは、推薦文と面接日程のご連絡の下書きを作ります。";
+  $("ctaTitle").textContent="このデモを、"+company+"様の求人・候補者の情報で動かします";
+}
+if(services.length){
+  var c=$("chips");
+  var lab=document.createElement("span");lab.style.cssText="font-size:13px;color:var(--sub);margin-right:4px";
+  lab.textContent=company?"想定した業務：":"対象業務：";c.appendChild(lab);
+  services.forEach(function(s){var e=document.createElement("span");e.className="chip";e.textContent=s;c.appendChild(e)});
+}
+
+/* ---------- dictionaries ---------- */
+var POS=[
+ {re:/営業|sales/i,ja:"営業",en:"Sales Representative"},
+ {re:/経理|会計|accounting|accountant/i,ja:"経理",en:"Accountant"},
+ {re:/通訳|翻訳|interpreter|translator/i,ja:"通訳・翻訳",en:"Interpreter / Translator"},
+ {re:/秘書|アシスタント|assistant|secretary/i,ja:"秘書・アシスタント",en:"Secretary / Assistant"},
+ {re:/生産管理|production\s*control/i,ja:"生産管理",en:"Production Control"},
+ {re:/品質|QC|QA|quality/i,ja:"品質管理",en:"Quality Control"},
+ {re:/エンジニア|技術|engineer/i,ja:"エンジニア",en:"Engineer"},
+ {re:/購買|調達|purchas/i,ja:"購買",en:"Purchasing"}
+];
+var LOC=[
+ {re:/バンコク|bangkok/i,ja:"バンコク",en:"Bangkok"},
+ {re:/シラチャ|シーラチャー|sriracha/i,ja:"シラチャ（チョンブリー）",en:"Sriracha, Chonburi"},
+ {re:/アマタ|amata/i,ja:"アマタナコン工業団地（チョンブリー）",en:"Amata Nakorn, Chonburi"},
+ {re:/ラヨーン|イースタンシーボード|rayong/i,ja:"ラヨーン",en:"Rayong"},
+ {re:/アユタヤ|ayutthaya/i,ja:"アユタヤ",en:"Ayutthaya"},
+ {re:/バンナー|bangna/i,ja:"バンナー（バンコク）",en:"Bangna, Bangkok"}
+];
+
+/* ---------- samples ---------- */
+var SAMPLES=[
+ {label:"日本語の営業",text:"いつもお世話になっております。サンプル精工タイランドの山本です。\n\n新しく営業スタッフを1名募集したく、ご紹介をお願いできますでしょうか。\n・勤務地：アマタナコン工業団地\n・日本語：N2以上（日系のお客様を担当）\n・経験：営業経験3年以上、製造業だと尚可\n・給与：45,000〜60,000バーツ\n・入社：できれば12月中\n\n車の運転ができる方だと助かります。\nよろしくお願いいたします。"},
+ {label:"経理（日本語不要）",text:"お世話になります。サンプル商事の佐藤です。\n経理担当を1名探しています。\n勤務地はバンコク（アソーク）、日本語は不要ですが英語で会話ができる方。\n経理経験5年以上、月次決算ができる方。\n給与は4万バーツまでで考えています。"},
+ {label:"英語のご依頼",text:"Hi,\nWe are looking for a Japanese-speaking interpreter for our factory in Rayong.\nJLPT N1 or N2, at least 2 years of experience.\nSalary range: 40,000 - 55,000 THB.\nStart date: January.\nThanks,\nKen"}
+];
+var sb=$("samples");
+SAMPLES.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){pick(i)};sb.appendChild(b)});
+function pick(i){$("mail").value=SAMPLES[i].text;[].forEach.call(sb.children,function(b,j){b.className=j===i?"on":""});$("out").innerHTML='<div class="placeholder">「求人票を作る」を押してください</div>'}
+
+/* ---------- parser ---------- */
+var JOB=null;
+function money(s){s=s.replace(/,/g,"");var m=s.match(/(\d+(?:\.\d+)?)\s*万/);if(m)return Math.round(parseFloat(m[1])*10000);m=s.match(/\d{4,6}/);return m?+m[0]:null}
+function parse(t){
+  var en=!/[぀-ヿ一-鿿]/.test(t);
+  var r={en:en,pos:null,loc:null,jp:"",jpNone:false,exp:null,expField:"",salMin:null,salMax:null,start:"",heads:1,extra:[],checks:[]};
+  POS.some(function(p){if(p.re.test(t)){r.pos=p;return true}});
+  LOC.some(function(p){if(p.re.test(t)){r.loc=p;return true}});
+  var m=t.match(/N\s*([1-5])/i);if(m)r.jp="N"+m[1]+(/以上|or\s*(N|above)/i.test(t)?"以上":"");
+  if(/日本語(は)?不要|no\s*japanese/i.test(t))r.jpNone=true;
+  m=t.match(/(\d{1,2})\s*(?:年以上|年|\+?\s*years?)/i);if(m)r.exp=+m[1];
+  if(/製造/.test(t))r.expField="製造業";
+  m=t.match(/(\d[\d,\.]*\s*万?)\s*(?:〜|~|-|–|から)\s*(\d[\d,\.]*\s*万?)\s*(?:バーツ|THB|baht)/i);
+  if(m){r.salMin=money(m[1]);r.salMax=money(m[2])}
+  else{m=t.match(/(\d[\d,\.]*\s*万?)\s*(?:バーツ|THB|baht)\s*(?:まで|以内)?/i);if(m)r.salMax=money(m[1])}
+  m=t.match(/(\d{1,2})\s*月(?:中|から|頃|まで)?/);if(m)r.start=m[0];
+  else{m=t.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*/i);if(m)r.start=(["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(m[1].toLowerCase())+1)+"月"}
+  m=t.match(/(\d)\s*名/);if(m)r.heads=+m[1];
+  if(/運転|driv/i.test(t))r.extra.push(en?"Driving license":"自動車の運転（免許）");
+  if(/英語/.test(t)&&!en)r.extra.push("英語での会話");
+  if(/月次決算/.test(t))r.extra.push("月次決算の経験");
+  if(!r.pos)r.checks.push(en?"Job title and main duties":"職種と主な仕事内容");
+  if(!r.loc)r.checks.push(en?"Work location":"勤務地");
+  if(!r.salMax)r.checks.push(en?"Salary range":"給与の幅");
+  if(!r.start)r.checks.push(en?"Start date":"入社希望時期");
+  r.checks.push(en?"Working hours, days off and benefits (bonus, transport, insurance)":"勤務時間・休日・手当（賞与・通勤・保険）");
+  r.checks.push(en?"Interview process (number of rounds, online or on-site)":"選考の流れ（面接回数、オンラインか対面か）");
+  if(!r.jp&&!r.jpNone)r.checks.push(en?"Required Japanese level":"必要な日本語のレベル");
+  return r;
+}
+function sal(r,en){if(r.salMin&&r.salMax)return (en?"THB ":"")+fmt(r.salMin)+(en?" - ":"〜")+fmt(r.salMax)+(en?" / month":"バーツ／月");if(r.salMax)return (en?"Up to THB ":"")+fmt(r.salMax)+(en?" / month":"バーツ／月まで");return ""}
+
+function render(r,raw){
+  var en=r.en,h="",client=(raw.match(/(サンプル[一-龥ァ-ヶー]+(?:タイランド)?)/)||[])[1]||(en?"Client company":"ご依頼企業");
+  var title=r.pos?(en?r.pos.en:r.pos.ja):(en?"(to confirm)":"（確認中）");
+  h+="<h3>求人票（日本語）</h3><table>";
+  function row(k,v){h+="<tr><th style='width:28%'>"+k+"</th><td>"+(v?esc(v):"<span class='miss'>記載なし（確認します）</span>")+"</td></tr>"}
+  row("職種",r.pos?r.pos.ja+"（"+r.heads+"名）":"");
+  row("勤務地",r.loc?r.loc.ja:"");
+  row("日本語",r.jpNone?"不要":(r.jp?"JLPT "+r.jp:""));
+  row("経験",r.exp?(r.expField?r.expField+"での":"")+(r.pos?r.pos.ja:"")+"経験 "+r.exp+"年以上":"");
+  row("給与",sal(r,false));
+  row("入社時期",r.start);
+  if(r.extra.length)row("歓迎・必須",r.extra.join("・"));
+  h+="</table>";
+  var enJD="Position: "+(r.pos?r.pos.en:"TBC")+(r.heads>1?" ("+r.heads+" openings)":"")+"\nLocation: "+(r.loc?r.loc.en:"TBC")+"\nJapanese: "+(r.jpNone?"Not required":(r.jp?"JLPT "+r.jp.replace("以上"," or above"):"TBC"))+"\nExperience: "+(r.exp?r.exp+"+ years":"TBC")+"\nSalary: "+(sal(r,true)||"TBC")+"\nStart: "+(r.start?(/月/.test(r.start)?r.start.replace(/(\d+)\s*月.*/,function(_,n){return ["","January","February","March","April","May","June","July","August","September","October","November","December"][+n]}):r.start):"TBC");
+  h+="<h3>Job description (English)</h3><pre class='mail'>"+esc(enJD)+"</pre>";
+  h+="<div class='check'><b>"+(en?"To confirm with the client (asked automatically in the reply)":"企業様に確認したいこと（返信で自動的に質問）")+"</b><ul>";
+  r.checks.forEach(function(c){h+="<li>"+esc(c)+"</li>"});
+  h+="</ul></div>";
+  var sig=company||"〇〇人材サービス";
+  var reply=en?("Dear "+((raw.match(/(?:thanks|regards),?\s*\n\s*([A-Z][a-z]+)/i)||[])[1]||"client")+",\n\nThank you for your request. We have prepared the job description below and will start searching right away.\nCould you let us know:\n"+r.checks.map(function(c){return "- "+c}).join("\n")+"\n\nBest regards,\n"+sig)
+   :("ご依頼ありがとうございます。\n以下の内容で求人票を作成し、本日から候補者の選定を始めます。\n\nあわせて、以下をお知らせいただけますでしょうか。\n"+r.checks.map(function(c){return "・"+c}).join("\n")+"\n\n引き続きよろしくお願いいたします。\n"+sig);
+  h+="<h3>"+(en?"Reply to the client (draft)":"企業様への返信（下書き）")+"</h3><pre class='mail'>"+esc(reply)+"</pre>";
+  $("out").innerHTML=h;
+}
+$("run").onclick=function(){
+  var t=$("mail").value.trim();if(!t)return;
+  $("out").innerHTML="<p class='busy'>ご依頼を読み取っています…</p>";
+  setTimeout(function(){JOB=parse(t);render(JOB,t)},700);
+};
+
+/* ---------- candidates ---------- */
+var CANDS=[
+ {label:"候補者A（N2・営業4年）",name:"Somchai",text:"氏名：Somchai K.（32歳・タイ）\n日本語：JLPT N2\n経歴：日系自動車部品メーカーで営業4年（日系顧客20社を担当）、その前に商社で営業アシスタント2年\n現在の給与：48,000バーツ\n希望給与：55,000バーツ\n住まい：チョンブリー\n運転：可（自家用車あり）\n入社：1か月前通知で可"},
+ {label:"候補者B（N3・経理6年）",name:"Nattaya",text:"氏名：Nattaya S.（35歳・タイ）\n日本語：JLPT N3\n英語：ビジネスレベル\n経歴：日系商社で経理6年、月次決算・監査対応を担当\n現在の給与：36,000バーツ\n希望給与：40,000バーツ\n住まい：バンコク（アソーク）\n入社：即日可"},
+ {label:"候補者C（N1・通訳3年）",name:"Ploy",text:"氏名：Ploy T.（28歳・タイ）\n日本語：JLPT N1\n経歴：日系工場で通訳3年（会議・現場の通訳、マニュアル翻訳）\n現在の給与：42,000バーツ\n希望給与：50,000バーツ\n住まい：ラヨーン\n入社：1月から可"}
+];
+var cb=$("cands");
+CANDS.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){cpick(i)};cb.appendChild(b)});
+function cpick(i){$("cv").value=CANDS[i].text;[].forEach.call(cb.children,function(b,j){b.className=j===i?"on":""});$("cvout").innerHTML=""}
+pick(0);cpick(0);
+
+function nextDays(){var d=new Date(),out=[];for(var i=1;out.length<3&&i<14;i++){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i);var w=x.getDay();if(w>=1&&w<=5)out.push(x)}return out}
+function wd(x){return (x.getMonth()+1)+"/"+x.getDate()+"（"+"日月火水木金土"[x.getDay()]+"）"}
+
+$("runcv").onclick=function(){
+  var t=$("cv").value.trim();if(!t)return;
+  var job=JOB||parse($("mail").value);
+  var nm=(t.match(/氏名[:：]\s*([A-Za-z]+[^（\n]*)/)||[])[1]||"候補者";
+  var jp=(t.match(/N\s*([1-5])/i)||[])[1];
+  var exp=(t.match(/(営業|経理|通訳)[^\n]{0,8}?(\d{1,2})\s*年/)||t.match(/(?:で|の)?([一-龥]{2,4})\s*(\d{1,2})\s*年/)||[]);
+  var want=money(((t.match(/希望給与[:：]\s*([^\n]+)/)||[])[1])||"");
+  var home=(t.match(/住まい[:：]\s*([^\n]+)/)||[])[1]||"";
+  var pts=[],gaps=[];
+  if(job.jp&&jp){var need=+job.jp.replace(/\D/g,"");if(+jp<=need)pts.push("日本語 N"+jp+"（求人の条件 "+job.jp+" を満たす）");else gaps.push("日本語 N"+jp+"（求人は "+job.jp+"）")}else if(jp)pts.push("日本語 N"+jp);
+  if(exp[2]){var y=+exp[2];if(job.exp&&y>=job.exp)pts.push(exp[1]+"経験 "+y+"年（条件 "+job.exp+"年以上）");else if(job.exp)gaps.push(exp[1]+"経験 "+y+"年（条件 "+job.exp+"年以上）");else pts.push(exp[1]+"経験 "+y+"年")}
+  if(job.pos&&!job.pos.re.test(t))gaps.push("職種（"+job.pos.ja+"）の直接の経験は経歴に見当たらない");
+  if(want&&job.salMax){if(want<=job.salMax)pts.push("希望給与 "+fmt(want)+"バーツ（予算内）");else gaps.push("希望給与 "+fmt(want)+"バーツ（予算 "+fmt(job.salMax)+"バーツを超過）")}
+  if(job.extra.some(function(x){return /運転/.test(x)})){if(/運転[:：]\s*可/.test(t))pts.push("運転可（自家用車あり）");else gaps.push("運転の可否が未確認")}
+  if(home&&job.loc){pts.push("住まい："+home+"（勤務地 "+job.loc.ja+"）")}
+  var h="<div class='grid'><div><h3 style='font-size:14px;margin:0 0 6px'>求人との照合</h3><table>";
+  pts.forEach(function(p){h+="<tr><td><span class='match'>合う</span> "+esc(p)+"</td></tr>"});
+  gaps.forEach(function(p){h+="<tr><td><span class='miss'>確認</span> "+esc(p)+"</td></tr>"});
+  h+="</table>";
+  var rec="【ご推薦】"+(job.pos?job.pos.ja:"")+"のポジションに "+nm.trim()+" 様をご推薦します。\n\n"+pts.map(function(p){return "・"+p}).join("\n")+(gaps.length?"\n\n※ 面接でご確認いただきたい点\n"+gaps.map(function(p){return "・"+p}).join("\n"):"")+"\n\n面接をご希望でしたら、下記の日程からご都合をお知らせください。";
+  h+="<h3 style='font-size:14px;margin:16px 0 6px'>企業様への推薦文（下書き）</h3><pre class='mail'>"+esc(rec)+"</pre></div>";
+  var days=nextDays();
+  var inv=nm.trim()+" 様\n\nいつもありがとうございます。\nご紹介した"+(job.pos?job.pos.ja+"の":"")+"求人について、企業様が面接を希望されています。\n以下からご都合のよい日時をお知らせください。\n\n"+days.map(function(d){return "・"+wd(d)+" 10:00／14:00／16:00"}).join("\n")+"\n\n面接は"+(job.loc?job.loc.ja:"オンライン")+"で約45分の予定です。\nよろしくお願いいたします。\n"+(company||"〇〇人材サービス");
+  h+="<div><h3 style='font-size:14px;margin:0 0 6px'>候補者への面接日程のご連絡（下書き）</h3><pre class='mail'>"+esc(inv)+"</pre><p class='sched'>本番では、タイ語・英語でのご連絡、カレンダーへの登録、前日のリマインドも自動で行えます。</p></div></div>";
+  $("cvout").innerHTML="<p class='busy'>経歴を読み取っています…</p>";
+  setTimeout(function(){$("cvout").innerHTML=h},600);
+};
+})();
+</script>
+</body>
+</html>
