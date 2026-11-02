@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>不動産仲介会社向け 業務自動化デモ｜Nova Strategy</title>
+<style>
+:root{
+  --bg:#f6f5f2;--card:#ffffff;--ink:#1d2433;--sub:#5b6474;--line:#e3e1db;
+  --accent:#0f6e6e;--accent-weak:#e3f1f0;--warn:#a5520c;--warn-weak:#fbefe3;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#14171c;--card:#1c2027;--ink:#e8eaee;--sub:#a3abb8;--line:#2d333d;
+    --accent:#4fb8b2;--accent-weak:#18302f;--warn:#e9a462;--warn-weak:#33261a;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",system-ui,sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+header{padding:28px 0 8px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.35;margin:6px 0 10px}
+.lead{color:var(--sub);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
+.chip{background:var(--accent-weak);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:13px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px}
+h2{font-size:19px;margin:0 0 4px}
+.step{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;padding:1px 8px;margin-right:8px;vertical-align:2px}
+.desc{color:var(--sub);margin:0 0 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.grid>*{min-width:0}
+.out{overflow-x:auto}
+label.small{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
+textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
+textarea{min-height:230px;resize:vertical}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+button{font:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;padding:10px 18px}
+button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.match{font-size:12px;border-radius:6px;padding:1px 7px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
+.miss{font-size:12px;color:var(--warn)}
+.check{background:var(--warn-weak);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13.5px}
+.check b{color:var(--warn)}
+.check ul{margin:4px 0 0;padding-left:20px}
+pre.mail{white-space:pre-wrap;font-family:inherit;font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0}
+.out h3{font-size:14px;margin:16px 0 6px}
+.out h3:first-child{margin-top:0}
+.placeholder{color:var(--sub);font-size:14px;border:1px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center}
+.busy{color:var(--accent);font-size:14px}
+.posts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.posts{grid-template-columns:1fr}}
+.post{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
+.post .tag{font-size:12px;color:var(--accent);font-weight:700}
+.post p{white-space:pre-wrap;margin:6px 0 0;font-size:14px}
+.sched{margin-top:12px;font-size:13.5px;color:var(--sub)}
+.cta{background:var(--accent-weak);border:1px solid var(--accent);border-radius:14px;padding:20px;margin-top:24px}
+.cta h2{color:var(--accent)}
+.price{font-size:20px;font-weight:700;margin:6px 0}
+.note{font-size:12px;color:var(--sub);margin-top:24px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">DEMO ｜ Nova Strategy</div>
+  <h1 id="title">不動産仲介会社様向け<br>お問い合わせから、物件の提案・内見の調整まで</h1>
+  <p class="lead" id="lead">お客様からの希望条件のメール・LINEを貼り付けるだけで、条件の整理、物件の候補、提案メールと内見日程の下書きを作ります。新着物件のお知らせ文づくりも自動化できます。</p>
+  <div class="chips" id="chips"></div>
+</header>
+
+<section class="card">
+  <h2><span class="step">1</span>希望条件のメール → 条件整理・候補物件・提案メール</h2>
+  <p class="desc">サンプルを選ぶか、実際のお問い合わせに近い文面に書き換えてお試しください。</p>
+  <div class="grid">
+    <div>
+      <div class="btns" id="samples"></div>
+      <label class="small" for="mail">お客様からのメール・LINE</label>
+      <textarea id="mail"></textarea>
+      <div style="margin-top:10px"><button class="primary" id="run">候補物件と提案メールを作る</button></div>
+    </div>
+    <div class="out" id="out"><div class="placeholder">左のお問い合わせから、ここに条件の整理・候補物件・提案メールの下書きが表示されます</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="step">2</span>新着物件1行 → LINE配信・SNS投稿（日本語・英語）</h2>
+  <p class="desc">新着物件の情報を1行送るだけで、LINE配信用とSNS投稿用の文面を作り、決まった曜日に自動で配信します。</p>
+  <div class="btns" id="props"></div>
+  <label class="small" for="propline">新着物件（1行）</label>
+  <input type="text" id="propline">
+  <div style="margin:10px 0 14px"><button class="primary" id="runsns">お知らせ文を作る</button></div>
+  <div id="snsout"></div>
+</section>
+
+<section class="cta">
+  <h2 id="ctaTitle">このデモを、貴社の物件リストと実際のお問い合わせで動かします</h2>
+  <p style="margin:6px 0">貴社の物件リスト（Excel・スプレッドシート）や、実際に届くメール・LINEの形式に合わせて作り込みます。内見予定の管理や、契約更新・退去のご案内の自動化も可能です。</p>
+  <div class="price">開発費 0円 ／ 1機能 月額 5,000バーツ（税別）</div>
+  <p style="margin:6px 0">まずは30分、今お困りの業務をお聞かせください。オンライン、またはバンコク市内でしたら伺います。</p>
+  <p style="margin:6px 0"><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</p>
+</section>
+<p class="note">※ デモのため、物件・家賃・内容はすべてサンプルです。本番ではAIが自由な文面のお問い合わせを読み取り、貴社の物件リストから候補を選びます。入力内容はこのページの外に送信されません。</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return n.toLocaleString("en-US")}
+
+/* ---------- personalization (?c=会社名&s=サービス1,サービス2) ---------- */
+var q=new URLSearchParams(location.search);
+var company=(q.get("c")||"").slice(0,60).trim();
+var services=(q.get("s")||"").split(/[,、]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,5);
+if(company){
+  $("title").textContent=company+"様向けデモ";
+  document.title=company+"様向けデモ｜Nova Strategy";
+  $("lead").textContent=company+"様に届く希望条件のメール・LINEを貼り付けるだけで、条件の整理、物件の候補、提案メールと内見日程の下書きを作ります。新着物件のお知らせ文づくりも自動化できます。";
+  $("ctaTitle").textContent="このデモを、"+company+"様の物件リストと実際のお問い合わせで動かします";
+}
+if(services.length){
+  var c=$("chips");
+  var lab=document.createElement("span");lab.style.cssText="font-size:13px;color:var(--sub);margin-right:4px";
+  lab.textContent=company?"想定した業務：":"対象業務：";c.appendChild(lab);
+  services.forEach(function(s){var e=document.createElement("span");e.className="chip";e.textContent=s;c.appendChild(e)});
+}
+
+/* ---------- sample listings (all fictional) ---------- */
+var AREAS=[
+ {key:"プロンポン",en:"Phrom Phong",re:/プロンポン|phrom\s*phong|soi\s*39|スクンビット39/i},
+ {key:"トンロー",en:"Thonglor",re:/トンロー|thong\s*lo/i},
+ {key:"エカマイ",en:"Ekkamai",re:/エカマイ|ekkamai|ekamai/i},
+ {key:"アソーク",en:"Asok",re:/アソーク|asok|asoke/i},
+ {key:"シーロム",en:"Silom",re:/シーロム|silom|サトーン|sathorn/i},
+ {key:"シラチャ",en:"Sriracha",re:/シラチャ|シーラチャー|sriracha|si\s*racha/i}
+];
+var LIST=[
+ {id:"A",name:"サンプルレジデンス39",ne:"Sample Residence 39",area:"プロンポン",type:"コンドミニアム",bed:1,sqm:48,rent:38000,walk:4,f:["日系スーパー近く","ジム","プール"]},
+ {id:"L",name:"スクンビット24レジデンス",ne:"Sukhumvit 24 Residence",area:"プロンポン",type:"コンドミニアム",bed:1,sqm:40,rent:36000,walk:7,f:["日系スーパー近く","プール"]},
+ {id:"M",name:"プロンポン・ファミリーレジデンス",ne:"Phrom Phong Family Residence",area:"プロンポン",type:"サービスアパート",bed:3,sqm:170,rent:98000,walk:6,f:["スクールバス停","ペット可","ジム"]},
+ {id:"B",name:"パークサイド・プロンポン",ne:"Parkside Phrom Phong",area:"プロンポン",type:"サービスアパート",bed:1,sqm:55,rent:45000,walk:6,f:["清掃付き","朝食付き","ジム"]},
+ {id:"C",name:"トンロー・ガーデン",ne:"Thonglor Garden",area:"トンロー",type:"コンドミニアム",bed:1,sqm:42,rent:32000,walk:9,f:["プール","ペット可"]},
+ {id:"D",name:"ファミリーコート・トンロー",ne:"Family Court Thonglor",area:"トンロー",type:"サービスアパート",bed:3,sqm:160,rent:95000,walk:8,f:["スクールバス停","キッズルーム","ペット可","プール"]},
+ {id:"E",name:"グリーンテラス39",ne:"Green Terrace 39",area:"プロンポン",type:"サービスアパート",bed:3,sqm:180,rent:110000,walk:5,f:["スクールバス停","日系スーパー近く","プール"]},
+ {id:"F",name:"エカマイ・ヒルズ",ne:"Ekkamai Hills",area:"エカマイ",type:"コンドミニアム",bed:2,sqm:85,rent:55000,walk:7,f:["ペット可","ジム"]},
+ {id:"G",name:"アソーク・タワー",ne:"Asok Tower",area:"アソーク",type:"コンドミニアム",bed:2,sqm:78,rent:60000,walk:2,f:["駅直結","ジム","プール"]},
+ {id:"H",name:"シーロム・スイーツ",ne:"Silom Suites",area:"シーロム",type:"サービスアパート",bed:1,sqm:50,rent:40000,walk:5,f:["清掃付き","ジム"]},
+ {id:"I",name:"シラチャ・ベイビュー",ne:"Sriracha Bay View",area:"シラチャ",type:"サービスアパート",bed:2,sqm:90,rent:48000,walk:null,f:["日系スーパー近く","送迎バス","海が見える"]},
+ {id:"J",name:"シラチャ・レジデンス",ne:"Sriracha Residence",area:"シラチャ",type:"コンドミニアム",bed:2,sqm:75,rent:35000,walk:null,f:["プール","日本人多め"]},
+ {id:"K",name:"シラチャ・ファミリーハウス",ne:"Sriracha Family House",area:"シラチャ",type:"サービスアパート",bed:3,sqm:140,rent:65000,walk:null,f:["スクールバス停","プール","キッズルーム"]}
+];
+var FEATS=[
+ {key:"ペット可",re:/ペット|犬|猫|pet|dog|cat/i,en:"pet-friendly"},
+ {key:"スクールバス停",re:/スクールバス|日本人学校|school\s*bus|japanese\s*school/i,en:"school bus stop"},
+ {key:"プール",re:/プール|pool/i,en:"pool"},
+ {key:"ジム",re:/ジム|gym/i,en:"gym"},
+ {key:"清掃付き",re:/清掃|掃除|cleaning|housekeep/i,en:"cleaning service"},
+ {key:"日系スーパー近く",re:/スーパー|フジスーパー|super\s*market|supermarket/i,en:"near Japanese supermarket"}
+];
+
+/* ---------- samples ---------- */
+var SAMPLES=[
+ {label:"単身赴任",text:"はじめまして。12月からバンコクに単身赴任になる田中と申します。\n\n希望条件は以下です。\n・エリア：プロンポン周辺\n・間取り：1LDK\n・家賃：4万バーツ以内\n・入居：12/1から\n・ジムがあると嬉しいです\n\n12月の頭に下見で一度バンコクに行く予定です。\nよろしくお願いいたします。"},
+ {label:"家族帯同",text:"お世話になります。来年1月に家族で赴任予定の鈴木です。\n妻と子ども2人（小学生）、小型犬1匹です。\n\n・3LDK、トンローかプロンポン\n・日本人学校のスクールバスが止まるところ\n・ペット可必須\n・会社の家賃補助は10万バーツまでです\n\n入居は1/15頃を考えています。\nいくつか候補をいただけますでしょうか。"},
+ {label:"英語・シラチャ",text:"Hello,\nI'm moving to Sriracha for work at the end of January.\nI'm looking for a 2 bedroom apartment with a pool, budget around 50,000 baht per month.\nCould you send me some options?\n\nThanks,\nDavid"}
+];
+var sb=$("samples");
+SAMPLES.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){pick(i)};sb.appendChild(b)});
+function pick(i){$("mail").value=SAMPLES[i].text;[].forEach.call(sb.children,function(b,j){b.className=j===i?"on":""});$("out").innerHTML='<div class="placeholder">「候補物件と提案メールを作る」を押してください</div>'}
+pick(0);
+
+/* ---------- parser ---------- */
+var MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function parse(t){
+  var en=!/[぀-ヿ一-鿿]/.test(t);
+  var r={en:en,areas:[],bed:null,budget:null,move:"",feats:[],checks:[],family:""};
+  AREAS.forEach(function(a){if(a.re.test(t))r.areas.push(a.key)});
+  var m=t.match(/(\d)\s*(?:LDK|LK|DK|BR|ベッドルーム|bed\s*rooms?|bedrooms?|bed)/i);
+  if(m)r.bed=+m[1];else if(/スタジオ|studio/i.test(t))r.bed=1;
+  m=t.match(/(\d+(?:\.\d+)?)\s*万\s*(?:バーツ|THB|B)/i);
+  if(m)r.budget=Math.round(parseFloat(m[1])*10000);
+  else{m=t.match(/(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:バーツ|baht|thb|฿)/i);if(m)r.budget=+m[1].replace(/,/g,"")}
+  m=t.match(/(\d{1,2})\s*[\/月]\s*(\d{1,2})\s*日?/);
+  if(m)r.move=en?(m[1]+"/"+m[2]):(m[1]+"/"+m[2]+"頃");
+  else{m=t.match(/(\d{1,2})\s*月(?:から|頃|中|末|初旬|上旬)?/);if(m)r.move=m[1]+"月";
+    else{m=t.match(/\b(?:(?:early|mid|end of|late)\s+)?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*/i);if(m)r.move=m[0]}}
+  FEATS.forEach(function(f){if(f.re.test(t))r.feats.push(f.key)});
+  var kids=t.match(/子ども\s*(\d)|子供\s*(\d)|(\d)\s*kids?/i);
+  if(/家族|妻|夫|子ども|子供|family|wife|kids/i.test(t))r.family=en?"Family":"家族"+(kids?"（お子さま"+(kids[1]||kids[2]||kids[3])+"人）":"");
+  if(!r.areas.length)r.checks.push(en?"Preferred area (e.g. near the office or school)":"ご希望のエリア（お勤め先・学校の場所）");
+  if(!r.budget)r.checks.push(en?"Monthly budget":"ご予算（月額家賃）");
+  if(!r.bed)r.checks.push(en?"Number of bedrooms":"間取り");
+  if(!r.move)r.checks.push(en?"Move-in date":"入居希望日");
+  if(r.family&&!/学校|school/i.test(t))r.checks.push(en?"School your children will attend":"お子さまの通学先");
+  r.checks.push(en?"Dates you can come for viewings":"内見にお越しいただける日時");
+  if(!en)r.checks.push("会社の家賃補助・契約名義（個人か法人か）");
+  return r;
+}
+
+function score(p,r){
+  var s=0,hit=[],miss=[];
+  if(r.areas.length){if(r.areas.indexOf(p.area)>=0){s+=30;hit.push(r.en?AREAS.filter(function(x){return x.key===p.area})[0].en:p.area)}else return null}
+  if(r.bed){if(p.bed===r.bed){s+=25;hit.push(p.bed+"BR")}else if(Math.abs(p.bed-r.bed)===1){s+=8;miss.push(r.en?"Bedrooms differ":"間取り違い")}else return null}
+  if(r.budget){if(p.rent<=r.budget){s+=25;hit.push(r.en?"Within budget":"予算内")}else if(p.rent<=r.budget*1.1){s+=8;miss.push(r.en?"Slightly over budget":"予算を少し超過")}else return null}
+  r.feats.forEach(function(f){var fl=r.en?FEATS.filter(function(x){return x.key===f})[0].en:f;if(p.f.indexOf(f)>=0){s+=10;hit.push(fl)}else{if(f==="ペット可")return;miss.push((r.en?"No ":"")+fl+(r.en?"":"なし"))}});
+  if(r.feats.indexOf("ペット可")>=0&&p.f.indexOf("ペット可")<0)return null;
+  if(p.walk!==null&&p.walk<=5)s+=5;
+  return {p:p,s:s,hit:hit,miss:miss};
+}
+
+function nextWeekend(){var d=new Date(),out=[];for(var i=1;out.length<3&&i<14;i++){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i);var w=x.getDay();if(w===6||w===0||(out.length===0&&w===5))out.push(x)}return out}
+function wd(x,en){return en?(["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][x.getDay()]+", "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]+" "+x.getDate()):((x.getMonth()+1)+"/"+x.getDate()+"（"+"日月火水木金土"[x.getDay()]+"）")}
+
+function render(r,raw){
+  var en=r.en,h="";
+  h+="<h3>"+(en?"Requirements":"希望条件の整理")+"</h3><table>";
+  function row(k,v){h+="<tr><th style='width:30%'>"+k+"</th><td>"+(v?esc(v):"<span class='miss'>"+(en?"Not stated":"記載なし")+"</span>")+"</td></tr>"}
+  row(en?"Area":"エリア",r.areas.map(function(a){return en?(AREAS.filter(function(x){return x.key===a})[0].en):a}).join(en?", ":"・"));
+  row(en?"Bedrooms":"間取り",r.bed?(en?r.bed+" bedroom(s)":r.bed+"ベッドルーム"):"");
+  row(en?"Budget":"予算",r.budget?(en?"THB "+fmt(r.budget)+"/month":fmt(r.budget)+"バーツ／月"):"");
+  row(en?"Move-in":"入居希望",r.move);
+  row(en?"Must-haves":"こだわり条件",r.feats.map(function(f){return en?FEATS.filter(function(x){return x.key===f})[0].en:f}).join(en?", ":"・"));
+  if(r.family)row(en?"Household":"ご家族",r.family);
+  h+="</table>";
+
+  var cands=LIST.map(function(p){return score(p,r)}).filter(Boolean).sort(function(a,b){return b.s-a.s}).slice(0,3);
+  h+="<h3>"+(en?"Matching listings":"候補物件")+"（"+(en?"from your listing sheet":"物件リストから自動で選定")+"）</h3>";
+  if(!cands.length){h+="<div class='placeholder'>"+(en?"No listing matches all conditions. The reply suggests relaxing the budget or area.":"条件に合う物件がありませんでした。返信では、予算かエリアの調整をご提案します。")+"</div>"}
+  else{
+    h+="<table><tr><th>"+(en?"Listing":"物件")+"</th><th>"+(en?"Area":"エリア")+"</th><th class='num'>"+(en?"Size":"広さ")+"</th><th class='num'>"+(en?"Rent (THB)":"家賃（バーツ）")+"</th><th>"+(en?"Fit":"合う点")+"</th></tr>";
+    cands.forEach(function(c){var p=c.p;var AE=function(a){return en?AREAS.filter(function(x){return x.key===a})[0].en:a};h+="<tr><td>"+esc(en?p.ne:p.name)+"<br><span style='font-size:12px;color:var(--sub)'>"+esc(en?(p.type==="コンドミニアム"?"Condominium":"Serviced apartment"):p.type)+(en?" · ":"・")+p.bed+"BR"+(p.walk!==null?(en?" · BTS "+p.walk+" min":"・BTS徒歩"+p.walk+"分"):"")+"</span></td><td>"+esc(AE(p.area))+"</td><td class='num'>"+p.sqm+"㎡</td><td class='num'>"+fmt(p.rent)+"</td><td>"+c.hit.map(function(x){return "<span class='match'>"+esc(x)+"</span>"}).join(" ")+(c.miss.length?"<br><span class='miss'>"+esc(c.miss.join(en?", ":"・"))+"</span>":"")+"</td></tr>"});
+    h+="</table>";
+  }
+  var days=nextWeekend();
+  h+="<div class='check'><b>"+(en?"To confirm (asked automatically in the reply)":"確認したいこと（返信で自動的に質問）")+"</b><ul>";
+  r.checks.forEach(function(c){h+="<li>"+esc(c)+"</li>"});
+  h+="</ul></div>";
+
+  var mail,sig=company||(en?"[Your company]":"〇〇不動産");
+  if(en){
+    var nm=(raw.match(/(?:thanks|regards|best),?\s*\n\s*([A-Z][a-z]+)/i)||[])[1];
+    mail="Dear "+(nm||"customer")+",\n\nThank you for contacting us. Based on your requirements, here are some options:\n\n";
+    cands.forEach(function(c,i){mail+=(i+1)+". "+c.p.ne+" ("+AREAS.filter(function(x){return x.key===c.p.area})[0].en+") "+c.p.bed+"BR / "+c.p.sqm+" sqm / THB "+fmt(c.p.rent)+"\n"});
+    if(!cands.length)mail+="We could not find an exact match yet. Would you consider a slightly higher budget or a nearby area?\n";
+    mail+="\nWe can arrange viewings on:\n";
+    days.forEach(function(d){mail+="- "+wd(d,true)+" 10:00-12:00 / 14:00-17:00\n"});
+    mail+="\nCould you also let us know:\n";
+    r.checks.forEach(function(c){mail+="- "+c+"\n"});
+    mail+="\nBest regards,\n"+sig;
+  }else{
+    var nm2=(raw.match(/([一-龥ァ-ヶー]{1,5})(?:と申します|です[。\n])/)||[])[1];
+    mail=(nm2?nm2+"様":"お客様")+"\n\nお問い合わせありがとうございます。\nご希望の条件で、以下の物件をご提案いたします。\n\n";
+    cands.forEach(function(c,i){mail+=(i+1)+". "+c.p.name+"（"+c.p.area+"）"+c.p.bed+"ベッドルーム・"+c.p.sqm+"㎡・家賃"+fmt(c.p.rent)+"バーツ\n　"+c.p.f.join("・")+"\n"});
+    if(!cands.length)mail+="現在、すべての条件に合う物件は空きがございません。ご予算かエリアを少し広げてご検討いただけますでしょうか。\n";
+    mail+="\n内見は以下の日程でご案内できます。\n";
+    days.forEach(function(d){mail+="・"+wd(d)+" 10:00〜12:00／14:00〜17:00\n"});
+    mail+="\nあわせて、以下をお知らせいただけますでしょうか。\n";
+    r.checks.forEach(function(c){mail+="・"+c+"\n"});
+    mail+="\n引き続きよろしくお願いいたします。\n"+sig;
+  }
+  h+="<h3>"+(en?"Reply draft":"提案メールの下書き")+"</h3><pre class='mail'>"+esc(mail)+"</pre>";
+  $("out").innerHTML=h;
+}
+
+$("run").onclick=function(){
+  var t=$("mail").value.trim();if(!t)return;
+  $("out").innerHTML="<p class='busy'>お問い合わせを読み取っています…</p>";
+  setTimeout(function(){render(parse(t),t)},700);
+};
+
+/* ---------- 新着物件のお知らせ ---------- */
+var PROPS=[
+ {label:"プロンポン 1BR",line:"プロンポン 1BR 48㎡｜BTS徒歩4分・ジム・プール｜38,000バーツ｜12月入居可",
+  ja:"【新着】プロンポン 1ベッドルーム 48㎡\nBTSプロンポン駅から徒歩4分。日系スーパーも近く、単身の方に人気のエリアです。\nジム・プール付き。12月からご入居いただけます。\n\n■ 家賃：38,000バーツ／月\n■ 内見のご予約：このLINEに「内見希望」とお送りください",
+  en:"New listing: Phrom Phong, 1 bedroom, 48 sqm\n4 min walk to BTS Phrom Phong. Gym and pool. Available from December.\n\nRent: THB 38,000 / month\nMessage us to book a viewing.\n\n#Bangkok #PhromPhong #BangkokCondo"},
+ {label:"トンロー 3BR",line:"トンロー 3BR 160㎡｜スクールバス停・ペット可｜95,000バーツ｜1月入居可",
+  ja:"【新着・ご家族向け】トンロー 3ベッドルーム 160㎡\n日本人学校のスクールバスが目の前に止まります。ペット可・キッズルーム付き。\n1月からご入居いただけます。\n\n■ 家賃：95,000バーツ／月\n■ 内見のご予約：このLINEに「内見希望」とお送りください",
+  en:"New family listing: Thonglor, 3 bedrooms, 160 sqm\nJapanese school bus stop right outside. Pet-friendly, kids' room. Available from January.\n\nRent: THB 95,000 / month\nMessage us to book a viewing.\n\n#Bangkok #Thonglor #FamilyApartment"},
+ {label:"シラチャ 2BR",line:"シラチャ 2BR 90㎡｜送迎バス・日系スーパー近く｜48,000バーツ｜即入居可",
+  ja:"【新着】シラチャ 2ベッドルーム 90㎡\n日系スーパーまですぐ。工業団地への送迎バスもあり、通勤が楽になります。\n海が見えるお部屋です。すぐにご入居いただけます。\n\n■ 家賃：48,000バーツ／月\n■ 内見のご予約：このLINEに「内見希望」とお送りください",
+  en:"New listing: Sriracha, 2 bedrooms, 90 sqm\nShuttle bus to the industrial estates, close to Japanese supermarkets, sea view. Available now.\n\nRent: THB 48,000 / month\nMessage us to book a viewing.\n\n#Sriracha #Chonburi #ApartmentForRent"}
+];
+var pb=$("props"),cur=0;
+PROPS.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){ppick(i)};pb.appendChild(b)});
+function ppick(i){cur=i;$("propline").value=PROPS[i].line;[].forEach.call(pb.children,function(b,j){b.className=j===i?"on":""});$("snsout").innerHTML=""}
+ppick(0);
+$("runsns").onclick=function(){
+  var line=$("propline").value.trim();if(!line)return;
+  var t=PROPS[cur],ja,en;
+  if(line===t.line){ja=t.ja;en=t.en}
+  else{
+    var parts=line.split(/[｜|]/).map(function(x){return x.trim()}).filter(Boolean);
+    ja="【新着】"+parts[0]+"\n"+(parts.slice(1).join("\n■ ")?"■ "+parts.slice(1).join("\n■ "):"")+"\n■ 内見のご予約：このLINEに「内見希望」とお送りください";
+    en="（本番では、AIがこの内容を英語の投稿文にします）";
+  }
+  var h="<div class='posts'><div class='post'><div class='tag'>日本語（LINE配信・Facebook）</div><p>"+esc(ja)+"</p></div><div class='post'><div class='tag'>English（Instagram・Facebook）</div><p>"+esc(en)+"</p></div></div>";
+  h+="<p class='sched'>配信予定：毎週 水曜・土曜 18:00 に自動配信（配信前に確認する設定にもできます）</p>";
+  $("snsout").innerHTML="<p class='busy'>作成しています…</p>";
+  setTimeout(function(){$("snsout").innerHTML=h},600);
+};
+})();
+</script>
+</body>
+</html>
