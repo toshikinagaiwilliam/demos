@@ -4,268 +4,765 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>人材紹介会社向け 業務自動化デモ｜Nova Strategy</title>
+<title>候補者推薦ワークスペース｜Nova Strategy</title>
+<meta name="description" content="企業からの求人依頼メールから、求人票・候補者の照合と意向確認・推薦書・面接調整、求人のSNS配信までをひとつの画面で。人材紹介会社向けの業務デモ。">
 <style>
-:root{
-  --bg:#f6f5f2;--card:#ffffff;--ink:#1d2433;--sub:#5b6474;--line:#e3e1db;
-  --accent:#0f6e6e;--accent-weak:#e3f1f0;--warn:#a5520c;--warn-weak:#fbefe3;
-}
-@media (prefers-color-scheme: dark){
-  :root{--bg:#14171c;--card:#1c2027;--ink:#e8eaee;--sub:#a3abb8;--line:#2d333d;
-    --accent:#4fb8b2;--accent-weak:#18302f;--warn:#e9a462;--warn-weak:#33261a;}
-}
+:root{--bg:#f6f8fa;--paper:#fff;--ink:#223731;--muted:#788680;--line:#e4eae7;--green:#16654e;--green-2:#104c3a;--green-light:#eaf5ee;--amber:#926417;--amber-light:#fff5df;--red:#b04438;--red-light:#fbeae6;--blue:#476c9f;--blue-light:#e9f0fb;--nav:176px;
+--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",system-ui,sans-serif;line-height:1.7;font-size:15px}
-.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
-header{padding:28px 0 8px}
-.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700}
-h1{font-size:clamp(22px,4vw,30px);line-height:1.35;margin:6px 0 10px}
-.lead{color:var(--sub);margin:0 0 14px}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}
-.chip{background:var(--accent-weak);color:var(--accent);border-radius:999px;padding:2px 10px;font-size:13px}
-section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:20px}
-h2{font-size:19px;margin:0 0 4px}
-.step{display:inline-block;background:var(--accent);color:#fff;border-radius:6px;font-size:12px;padding:1px 8px;margin-right:8px;vertical-align:2px}
-.desc{color:var(--sub);margin:0 0 14px;font-size:14px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media (max-width:760px){.grid{grid-template-columns:1fr}}
-.grid>*{min-width:0}
-.out{overflow-x:auto}
-label.small{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
-textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--bg);color:var(--ink)}
-textarea{min-height:230px;resize:vertical}
-.btns{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
-button{font:inherit;font-size:14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;cursor:pointer}
-button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;padding:10px 18px}
-button.on{border-color:var(--accent);color:var(--accent);font-weight:700}
-table{width:100%;border-collapse:collapse;font-size:13.5px}
-th,td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
-th{color:var(--sub);font-weight:600;font-size:12px}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.match{font-size:12px;border-radius:6px;padding:1px 7px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
-.miss{font-size:12px;color:var(--warn)}
-.check{background:var(--warn-weak);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13.5px}
-.check b{color:var(--warn)}
-.check ul{margin:4px 0 0;padding-left:20px}
-pre.mail{white-space:pre-wrap;font-family:inherit;font-size:13.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;margin:0}
-.out h3{font-size:14px;margin:16px 0 6px}
-.out h3:first-child{margin-top:0}
-.placeholder{color:var(--sub);font-size:14px;border:1px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center}
-.busy{color:var(--accent);font-size:14px}
-.posts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:760px){.posts{grid-template-columns:1fr}}
-.post{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg)}
-.post .tag{font-size:12px;color:var(--accent);font-weight:700}
-.post p{white-space:pre-wrap;margin:6px 0 0;font-size:14px}
-.sched{margin-top:12px;font-size:13.5px;color:var(--sub)}
-.cta{background:var(--accent-weak);border:1px solid var(--accent);border-radius:14px;padding:20px;margin-top:24px}
-.cta h2{color:var(--accent)}
-.price{font-size:20px;font-weight:700;margin:6px 0}
-.note{font-size:12px;color:var(--sub);margin-top:24px}
-a{color:var(--accent)}
+html,body{height:100%}
+body{margin:0;font:13px/1.65 var(--font);color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;white-space:nowrap;transition:background .15s}
+button:hover:not(:disabled){background:#f0f6f2}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #75baa2;outline-offset:2px}
+.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--green-2)}
+.small{font-size:11px;padding:5px 9px}
+.subtle{border:0;background:transparent}
+.muted{color:var(--muted)}.tiny{font-size:11px}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.btn-i{display:inline-flex;align-items:center;gap:7px}
+/* top */
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-symbol{width:31px;height:31px;background:var(--green);border-radius:9px;color:#fff;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.brand b{font-size:15px;letter-spacing:.02em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.brand small{display:block;font-size:9px;line-height:1.2;letter-spacing:.16em;color:#6b7c73}
+.crumb{font-size:12px;color:#7b8b83;flex:1}
+.demo-pill{background:#f8f2df;color:#856e30;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.help{border:0;background:none;display:flex;gap:6px;align-items:center;font-size:12px}
+/* layout */
+.layout{height:calc(100vh - 60px);display:grid;grid-template-columns:var(--nav) minmax(0,1fr)}
+.nav{border-right:1px solid var(--line);padding:22px 12px;background:#f3f6f3;display:flex;flex-direction:column;gap:6px}
+.nav-label{font-size:10px;letter-spacing:.12em;color:#859389;padding:0 12px 10px}
+.nav button{display:flex;align-items:center;gap:10px;text-align:left;border:0;padding:11px 12px;background:none;border-radius:8px;font-weight:500;font-size:12.5px;width:100%}
+.nav button.active{background:#dcebe1;color:#145c44}
+.nav button:hover{background:#e5eee7}
+.nav .count:empty{display:none}.nav .count{margin-left:auto;background:#fff9;border-radius:6px;padding:0 6px;font-size:10px}
+.nav .count.hot{background:var(--green);color:#fff}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.nav .note{font-size:9.5px;color:#829083;padding:12px 12px 0;line-height:1.6}
+.workspace{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{min-height:72px;flex-shrink:0;display:flex;align-items:center;padding:10px 26px;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);gap:16px}
+.ws-head h1{font-size:19px;line-height:1.5;margin:0;font-weight:600}
+.ws-head p{font-size:11px;color:#7b8981;margin:2px 0 0}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr)}
+.list-pane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.list-tools{padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:16px;padding-top:4px}
+.tabs button{border:0;background:none;padding:6px 0;border-bottom:2px solid transparent;border-radius:0;color:#829087;font-size:11.5px}
+.tabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+.row{width:100%;display:block;border:0;border-bottom:1px solid #edf0ee;border-radius:0;text-align:left;padding:15px 17px;white-space:normal;background:#fff}
+.row.active{background:#eef6f0;box-shadow:3px 0 0 var(--green) inset}
+.row:hover{background:#f5f8f5}
+.row-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.row-top b{font-size:11.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-top time{font-size:10px;color:#8a968f}
+.dot{width:7px;height:7px;border-radius:50%;background:#267658;flex-shrink:0}
+.row .subj{font-size:12.5px;font-weight:500;line-height:1.6;margin:2px 0}
+.row .snip{font-size:11px;color:#8c968f;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row-foot{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap;line-height:1.7}
+.badge.green{background:#e5f2e9;color:#377355}.badge.amber{background:var(--amber-light);color:var(--amber)}.badge.blue{background:var(--blue-light);color:var(--blue)}.badge.gray{background:#f0f2f1;color:#7e8982}.badge.red{background:var(--red-light);color:#a65a4b}
+.list-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.detail{min-width:0;overflow:auto;background:#fff}
+.detail-inner{padding:24px 30px 40px;max-width:980px}
+.mail-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mail-h h2{font-size:19px;margin:0 0 14px;font-weight:600;line-height:1.5}
+.sender{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#efe9da;color:#7a6331;display:grid;place-items:center;font-size:13px;font-weight:600;flex-shrink:0}
+.sender b{font-size:12.5px;display:block}.sender span{font-size:11px;color:var(--muted)}
+.sender time{margin-left:auto;font-size:11px;color:var(--muted)}
+.mail-body{white-space:pre-wrap;font-size:13px;line-height:1.95;border-bottom:1px solid var(--line);padding-bottom:20px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.reply{border:1px solid var(--line);border-radius:12px;margin-top:18px;overflow:hidden}
+.reply-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;background:#fafbfa;flex-wrap:wrap}
+.reply-h input{border:0;background:transparent;flex:1;min-width:160px;padding:2px}
+.reply textarea{width:100%;border:0;min-height:220px;padding:14px;resize:vertical;line-height:1.8;font-size:12.5px;background:#fff}
+.reply-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfa;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green);border-radius:6px;padding:3px 9px;font-size:11px}
+.empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .em-i{width:58px;height:58px;border:1px solid var(--line);border-radius:14px;display:grid;place-items:center;margin:0 auto 14px;color:var(--green);background:#fff}
+.empty h3{color:var(--ink);font-size:16px;font-weight:500;margin:0 0 6px}
+/* proposal */
+.p-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.p-head h2{margin:0;font-size:18px;font-weight:600}
+.p-head .meta{font-size:11px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px}
+.step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#8a978f;border:0;background:none;padding:6px 0;text-align:left;border-radius:0;border-top:3px solid #e5ebe7}
+.step i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid #cfd8d3;display:grid;place-items:center;font-size:10px;flex-shrink:0}
+.step.done{border-color:#9cc9b2;color:#3d6d57}.step.done i{background:#9cc9b2;color:#fff;border-color:#9cc9b2}
+.step.cur{border-color:var(--green);color:var(--green);font-weight:600}.step.cur i{background:var(--green);color:#fff;border-color:var(--green)}
+.ptabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:10px}
+.ptabs button{border:0;background:none;border-radius:0;padding:9px 0;border-bottom:2px solid transparent;color:#7d8a83;font-size:12px}
+.ptabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;margin-top:14px}
+.card h3{font-size:13.5px;margin:0 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv th{width:28%}
+.miss{color:var(--amber)}
+.checklist{background:var(--amber-light);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px}
+.checklist b{color:var(--amber)}
+.checklist ul{margin:4px 0 0;padding-left:20px}
+.cands{display:grid;gap:12px;margin-top:12px}
+.cand{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.cand.off{opacity:.55}
+.photo{border-radius:9px;min-height:96px;position:relative;overflow:hidden;display:grid;place-items:end start;padding:8px;color:#fff;font-size:10px;font-weight:600;text-shadow:0 1px 2px #0005}
+.photo svg{position:absolute;right:8px;top:8px;width:44px;height:44px;opacity:.85}
+.cand-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cand-h b{font-size:13.5px}
+.cand .spec{font-size:11.5px;color:#5f6d66;margin:2px 0 6px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:999px;padding:1px 8px;background:var(--green-light);color:var(--green)}
+.chip.no{background:#f3f3f1;color:#9a8f7a;text-decoration:line-through}
+.owner{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bubble{border-radius:10px;padding:8px 11px;font-size:12px;max-width:520px;line-height:1.7}
+.bubble.out{background:#e9f6ee}
+.bubble.in{background:#f2f3f5}
+.bubble .tr{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.vac{font-size:11px;font-weight:600}
+.doc{border:1px solid var(--line);border-radius:6px;padding:28px 30px;background:#fff;box-shadow:0 6px 20px #2237310d;max-width:760px}
+.doc h4{margin:0;font-size:18px}
+.doc .to{font-size:13px;margin:14px 0 4px}
+.doc .lead{font-size:12px;color:#5d6b64;margin:0 0 14px}
+.doc-prop{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding:14px 0}
+.doc-prop .photo{min-height:104px}
+.route{display:grid;gap:0;margin-top:6px}
+.route div{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;font-size:12px;align-items:start}
+.route .ln{width:2px;background:#cfe3d7;justify-self:center;height:100%}
+.route .pt{width:10px;height:10px;border-radius:50%;background:var(--green);margin:5px auto 0}
+.foot-bar{position:sticky;bottom:0;background:#fffffff2;border-top:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.foot-bar .sum{margin-right:auto;font-size:11.5px;color:var(--muted)}
+/* sns */
+.sns-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.post-prev{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:420px}
+.post-prev .ph{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:12px}
+.post-prev .ph .avatar{width:28px;height:28px;font-size:11px;background:var(--green);color:#fff}
+.post-prev .photo{border-radius:0;min-height:200px}
+.post-prev .tx{white-space:pre-wrap;padding:12px;font-size:12.5px;line-height:1.75}
+.line-prev{background:#8cabd9;border-radius:12px;padding:14px;max-width:420px}
+.line-prev .lb{background:#fff;border-radius:14px;padding:12px;white-space:pre-wrap;font-size:12.5px;line-height:1.75}
+.line-prev .photo{border-radius:12px;margin-bottom:8px;min-height:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;font-size:11.5px}
+.seg button.on{background:var(--green);color:#fff}
+.cal{display:grid;gap:6px}
+.cal-day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.cal-day b{font-size:11.5px}
+.cal-day .it{font-size:11px;margin-top:4px;display:flex;gap:6px;align-items:center}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:6px 0}
+.toggle input{margin-top:3px;accent-color:var(--green)}
+/* misc */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#21352f;color:#fff;border-radius:10px;padding:10px 16px;font-size:12.5px;box-shadow:0 8px 24px #0003;z-index:50;max-width:92vw}
+.modal-bg{position:fixed;inset:0;background:#1d2b2680;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px 24px}
+.modal h3{margin:0 0 8px;font-size:17px}
+.modal ol{padding-left:20px;margin:8px 0}
+.modal li{margin:6px 0}
+.cta-box{background:var(--green-light);border:1px solid #bfdccb;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:12.5px}
+.cta-box b{color:var(--green)}
+.paste textarea{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px}
+.mobile-tabs{display:none}
+@media (max-width:900px){
+  .topbar{padding:0 12px;gap:10px;height:56px}
+  .crumb,.help span{display:none}
+  .brand{flex:1}
+  .demo-pill{font-size:10px;padding:3px 6px}
+  .demo-pill .long{display:none}
+  .ws-head{flex-wrap:wrap}
+  .brand b{max-width:52vw;font-size:14px}
+  .layout{display:block;height:auto}
+  .nav{display:none}
+  .mobile-tabs{display:flex;gap:4px;background:#f3f6f3;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5;overflow-x:auto}
+  .mobile-tabs button{border:0;background:none;padding:8px 10px;font-size:12px;border-radius:8px}
+  .mobile-tabs button.active{background:#dcebe1;color:#145c44;font-weight:600}
+  .workspace{overflow:visible}
+  .ws-head{padding:10px 14px;min-height:0}
+  .ws-head h1{font-size:16px}
+  .body{display:block}
+  .list-pane{border-right:0;border-bottom:1px solid var(--line);max-height:300px}
+  .detail{overflow:visible}
+  .detail-inner{padding:16px 14px 30px}
+  .foot-bar{padding:10px 14px}
+  .steps{grid-template-columns:1fr}
+  .cand{grid-template-columns:1fr}
+  .cand .photo{min-height:120px}
+  .doc{padding:18px 16px}
+  .doc-prop{grid-template-columns:1fr}
+  .sns-grid{grid-template-columns:1fr}
+}
+@media print{
+  body *{visibility:hidden}
+  #printDoc,#printDoc *{visibility:visible}
+  #printDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  .modal-bg{position:static;background:none}
+}
+
+</style>
+<style>
+:root{--green:#2f5d8a;--green-2:#244a6e;--green-light:#ebf2f9}
+.nav button.active,.mobile-tabs button.active{background:#dde8f3;color:#244a6e}
+.nav{background:#f3f5f8}.nav button:hover{background:#e6edf4}
+.row.active{background:#eef3f9}
+.badge.green{background:#e3eef8;color:#2f5d8a}
+.bubble.out{background:#e7f0f9}
+button:hover:not(:disabled){background:#f0f4f9}
+.route .ln{background:#cfdcea}
+.cand{grid-template-columns:96px minmax(0,1fr)}
+.photo svg{width:40px;height:40px}
+.cand .photo{align-self:start;min-height:110px}
+.step.done{border-color:#a9c3dd;color:#3d5f80}.step.done i{background:#a9c3dd;border-color:#a9c3dd}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="eyebrow">DEMO ｜ Nova Strategy</div>
-  <h1 id="title">人材紹介会社様向け<br>求人のご依頼から、求人票・推薦文・面接の調整まで</h1>
-  <p class="lead" id="lead">企業様からの求人依頼のメールを貼り付けるだけで、求人票（日本語・英語）と確認事項を作ります。候補者の経歴からは、推薦文と面接日程のご連絡の下書きを作ります。</p>
-  <div class="chips" id="chips"></div>
-</header>
-
-<section class="card">
-  <h2><span class="step">1</span>求人依頼のメール → 求人票（日本語・英語）・確認事項</h2>
-  <p class="desc">サンプルを選ぶか、実際のご依頼に近い文面に書き換えてお試しください。</p>
-  <div class="grid">
-    <div>
-      <div class="btns" id="samples"></div>
-      <label class="small" for="mail">企業様からの求人依頼（メール・LINE）</label>
-      <textarea id="mail"></textarea>
-      <div style="margin-top:10px"><button class="primary" id="run">求人票を作る</button></div>
-    </div>
-    <div class="out" id="out"><div class="placeholder">左のご依頼から、ここに求人票と確認事項が表示されます</div></div>
-  </div>
-</section>
-
-<section class="card">
-  <h2><span class="step">2</span>候補者の経歴 → 推薦文・面接日程のご連絡</h2>
-  <p class="desc">上の求人に合わせて、候補者の経歴から企業様への推薦文と、候補者への面接日程のご連絡を作ります。</p>
-  <div class="btns" id="cands"></div>
-  <label class="small" for="cv">候補者の経歴（履歴書・面談メモの抜粋）</label>
-  <textarea id="cv" style="min-height:150px"></textarea>
-  <div style="margin:10px 0 14px"><button class="primary" id="runcv">推薦文と面接のご連絡を作る</button></div>
-  <div id="cvout"></div>
-</section>
-
-<section class="cta">
-  <h2 id="ctaTitle">このデモを、貴社の求人・候補者の情報で動かします</h2>
-  <p style="margin:6px 0">貴社の求人票の書式や候補者データベース（Excel・スプレッドシート）に合わせて作り込みます。タイ語の求人票・タイ語の履歴書の日本語要約、求人サイトへの掲載文づくりも自動化できます。</p>
-  <div class="price">開発費 0円 ／ 1機能 月額 5,000バーツ（税別）</div>
-  <p style="margin:6px 0">まずは30分、今お困りの業務をお聞かせください。オンライン、またはバンコク市内でしたら伺います。</p>
-  <p style="margin:6px 0"><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</p>
-</section>
-<p class="note">※ デモのため、企業・候補者・条件はすべて架空のサンプルです。本番ではAIが自由な文面のご依頼や履歴書を読み取ります。入力内容はこのページの外に送信されません。</p>
-</div>
-
+<div id="app"></div>
 <script>
 (function(){
 "use strict";
-var $=function(id){return document.getElementById(id)};
-function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
-function fmt(n){return n.toLocaleString("en-US")}
+/* ============================================================ helpers */
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return Number(n).toLocaleString("en-US")}
+var IC={
+ mail:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ user:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>',
+ share:'<svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+ list:'<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+ reset:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ help:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>',
+ spark:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+ send:'<svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>',
+ clip:'<svg class="icon" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>',
+ doc:'<svg class="icon" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+ plus:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cal:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+ chat:'<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+ person:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>'
+};
 
-/* ---------- personalization (?c=会社名&s=サービス1,サービス2) ---------- */
+/* ============================================================ personalization */
 var q=new URLSearchParams(location.search);
-var company=(q.get("c")||"").slice(0,60).trim();
-var services=(q.get("s")||"").split(/[,、]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,5);
-if(company){
-  $("title").textContent=company+"様向けデモ";
-  document.title=company+"様向けデモ｜Nova Strategy";
-  $("lead").textContent=company+"様に届く求人依頼のメールを貼り付けるだけで、求人票（日本語・英語）と確認事項を作ります。候補者の経歴からは、推薦文と面接日程のご連絡の下書きを作ります。";
-  $("ctaTitle").textContent="このデモを、"+company+"様の求人・候補者の情報で動かします";
-}
-if(services.length){
-  var c=$("chips");
-  var lab=document.createElement("span");lab.style.cssText="font-size:13px;color:var(--sub);margin-right:4px";
-  lab.textContent=company?"想定した業務：":"対象業務：";c.appendChild(lab);
-  services.forEach(function(s){var e=document.createElement("span");e.className="chip";e.textContent=s;c.appendChild(e)});
-}
+var COMPANY=(q.get("c")||"").slice(0,60).trim();
+var SERVICES=(q.get("s")||"").split(/[,、]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,4);
+var BRAND=COMPANY||"サンプル人材サービス";
+var STAFF="山本",STAFF_EN="Yamamoto";
 
-/* ---------- dictionaries ---------- */
-var POS=[
- {re:/営業|sales/i,ja:"営業",en:"Sales Representative"},
- {re:/経理|会計|accounting|accountant/i,ja:"経理",en:"Accountant"},
- {re:/通訳|翻訳|interpreter|translator/i,ja:"通訳・翻訳",en:"Interpreter / Translator"},
- {re:/秘書|アシスタント|assistant|secretary/i,ja:"秘書・アシスタント",en:"Secretary / Assistant"},
- {re:/生産管理|production\s*control/i,ja:"生産管理",en:"Production Control"},
- {re:/品質|QC|QA|quality/i,ja:"品質管理",en:"Quality Control"},
- {re:/エンジニア|技術|engineer/i,ja:"エンジニア",en:"Engineer"},
- {re:/購買|調達|purchas/i,ja:"購買",en:"Purchasing"}
-];
-var LOC=[
- {re:/バンコク|bangkok/i,ja:"バンコク",en:"Bangkok"},
- {re:/シラチャ|シーラチャー|sriracha/i,ja:"シラチャ（チョンブリー）",en:"Sriracha, Chonburi"},
- {re:/アマタ|amata/i,ja:"アマタナコン工業団地（チョンブリー）",en:"Amata Nakorn, Chonburi"},
- {re:/ラヨーン|イースタンシーボード|rayong/i,ja:"ラヨーン",en:"Rayong"},
- {re:/アユタヤ|ayutthaya/i,ja:"アユタヤ",en:"Ayutthaya"},
- {re:/バンナー|bangna/i,ja:"バンナー（バンコク）",en:"Bangna, Bangkok"}
-];
+/* ============================================================ dates */
+var NOW=new Date();
+function addD(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+function md(d){return (d.getMonth()+1)+"/"+d.getDate()}
+function wdJ(d){return "日月火水木金土"[d.getDay()]}
+function mdw(d){return md(d)+"（"+wdJ(d)+"）"}
+function mdwEn(d){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getDate()}
+function nextDow(dow,from){var d=addD(from||NOW,1);while(d.getDay()!==dow)d=addD(d,1);return d}
+var D1=nextDow(2),D2=nextDow(3);          // 面接候補日（次の火・水）
+var Y=addD(NOW,-1);
+function stamp(d,h){return md(d)+" "+h}
+var NEXTM=new Date(NOW.getFullYear(),NOW.getMonth()+1,1);
+var START=(NEXTM.getMonth()+1)+"/1";
 
-/* ---------- samples ---------- */
-var SAMPLES=[
- {label:"日本語の営業",text:"いつもお世話になっております。サンプル精工タイランドの山本です。\n\n新しく営業スタッフを1名募集したく、ご紹介をお願いできますでしょうか。\n・勤務地：アマタナコン工業団地\n・日本語：N2以上（日系のお客様を担当）\n・経験：営業経験3年以上、製造業だと尚可\n・給与：45,000〜60,000バーツ\n・入社：できれば12月中\n\n車の運転ができる方だと助かります。\nよろしくお願いいたします。"},
- {label:"経理（日本語不要）",text:"お世話になります。サンプル商事の佐藤です。\n経理担当を1名探しています。\n勤務地はバンコク（アソーク）、日本語は不要ですが英語で会話ができる方。\n経理経験5年以上、月次決算ができる方。\n給与は4万バーツまでで考えています。"},
- {label:"英語のご依頼",text:"Hi,\nWe are looking for a Japanese-speaking interpreter for our factory in Rayong.\nJLPT N1 or N2, at least 2 years of experience.\nSalary range: 40,000 - 55,000 THB.\nStart date: January.\nThanks,\nKen"}
-];
-var sb=$("samples");
-SAMPLES.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){pick(i)};sb.appendChild(b)});
-function pick(i){$("mail").value=SAMPLES[i].text;[].forEach.call(sb.children,function(b,j){b.className=j===i?"on":""});$("out").innerHTML='<div class="placeholder">「求人票を作る」を押してください</div>'}
-
-/* ---------- parser ---------- */
-var JOB=null;
-function money(s){s=s.replace(/,/g,"");var m=s.match(/(\d+(?:\.\d+)?)\s*万/);if(m)return Math.round(parseFloat(m[1])*10000);m=s.match(/\d{4,6}/);return m?+m[0]:null}
-function parse(t){
-  var en=!/[぀-ヿ一-鿿]/.test(t);
-  var r={en:en,pos:null,loc:null,jp:"",jpNone:false,exp:null,expField:"",salMin:null,salMax:null,start:"",heads:1,extra:[],checks:[]};
-  POS.some(function(p){if(p.re.test(t)){r.pos=p;return true}});
-  LOC.some(function(p){if(p.re.test(t)){r.loc=p;return true}});
-  var m=t.match(/N\s*([1-5])/i);if(m)r.jp="N"+m[1]+(/以上|or\s*(N|above)/i.test(t)?"以上":"");
-  if(/日本語(は)?不要|no\s*japanese/i.test(t))r.jpNone=true;
-  m=t.match(/(\d{1,2})\s*(?:年以上|年|\+?\s*years?)/i);if(m)r.exp=+m[1];
-  if(/製造/.test(t))r.expField="製造業";
-  m=t.match(/(\d[\d,\.]*\s*万?)\s*(?:〜|~|-|–|から)\s*(\d[\d,\.]*\s*万?)\s*(?:バーツ|THB|baht)/i);
-  if(m){r.salMin=money(m[1]);r.salMax=money(m[2])}
-  else{m=t.match(/(\d[\d,\.]*\s*万?)\s*(?:バーツ|THB|baht)\s*(?:まで|以内)?/i);if(m)r.salMax=money(m[1])}
-  m=t.match(/(\d{1,2})\s*月(?:中|から|頃|まで)?/);if(m)r.start=m[0];
-  else{m=t.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*/i);if(m)r.start=(["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"].indexOf(m[1].toLowerCase())+1)+"月"}
-  m=t.match(/(\d)\s*名/);if(m)r.heads=+m[1];
-  if(/運転|driv/i.test(t))r.extra.push(en?"Driving license":"自動車の運転（免許）");
-  if(/英語/.test(t)&&!en)r.extra.push("英語での会話");
-  if(/月次決算/.test(t))r.extra.push("月次決算の経験");
-  if(!r.pos)r.checks.push(en?"Job title and main duties":"職種と主な仕事内容");
-  if(!r.loc)r.checks.push(en?"Work location":"勤務地");
-  if(!r.salMax)r.checks.push(en?"Salary range":"給与の幅");
-  if(!r.start)r.checks.push(en?"Start date":"入社希望時期");
-  r.checks.push(en?"Working hours, days off and benefits (bonus, transport, insurance)":"勤務時間・休日・手当（賞与・通勤・保険）");
-  r.checks.push(en?"Interview process (number of rounds, online or on-site)":"選考の流れ（面接回数、オンラインか対面か）");
-  if(!r.jp&&!r.jpNone)r.checks.push(en?"Required Japanese level":"必要な日本語のレベル");
-  return r;
-}
-function sal(r,en){if(r.salMin&&r.salMax)return (en?"THB ":"")+fmt(r.salMin)+(en?" - ":"〜")+fmt(r.salMax)+(en?" / month":"バーツ／月");if(r.salMax)return (en?"Up to THB ":"")+fmt(r.salMax)+(en?" / month":"バーツ／月まで");return ""}
-
-function render(r,raw){
-  var en=r.en,h="",client=(raw.match(/(サンプル[一-龥ァ-ヶー]+(?:タイランド)?)/)||[])[1]||(en?"Client company":"ご依頼企業");
-  var title=r.pos?(en?r.pos.en:r.pos.ja):(en?"(to confirm)":"（確認中）");
-  h+="<h3>求人票（日本語）</h3><table>";
-  function row(k,v){h+="<tr><th style='width:28%'>"+k+"</th><td>"+(v?esc(v):"<span class='miss'>記載なし（確認します）</span>")+"</td></tr>"}
-  row("職種",r.pos?r.pos.ja+"（"+r.heads+"名）":"");
-  row("勤務地",r.loc?r.loc.ja:"");
-  row("日本語",r.jpNone?"不要":(r.jp?"JLPT "+r.jp:""));
-  row("経験",r.exp?(r.expField?r.expField+"での":"")+(r.pos?r.pos.ja:"")+"経験 "+r.exp+"年以上":"");
-  row("給与",sal(r,false));
-  row("入社時期",r.start);
-  if(r.extra.length)row("歓迎・必須",r.extra.join("・"));
-  h+="</table>";
-  var enJD="Position: "+(r.pos?r.pos.en:"TBC")+(r.heads>1?" ("+r.heads+" openings)":"")+"\nLocation: "+(r.loc?r.loc.en:"TBC")+"\nJapanese: "+(r.jpNone?"Not required":(r.jp?"JLPT "+r.jp.replace("以上"," or above"):"TBC"))+"\nExperience: "+(r.exp?r.exp+"+ years":"TBC")+"\nSalary: "+(sal(r,true)||"TBC")+"\nStart: "+(r.start?(/月/.test(r.start)?r.start.replace(/(\d+)\s*月.*/,function(_,n){return ["","January","February","March","April","May","June","July","August","September","October","November","December"][+n]}):r.start):"TBC");
-  h+="<h3>Job description (English)</h3><pre class='mail'>"+esc(enJD)+"</pre>";
-  h+="<div class='check'><b>"+(en?"To confirm with the client (asked automatically in the reply)":"企業様に確認したいこと（返信で自動的に質問）")+"</b><ul>";
-  r.checks.forEach(function(c){h+="<li>"+esc(c)+"</li>"});
-  h+="</ul></div>";
-  var sig=company||"〇〇人材サービス";
-  var reply=en?("Dear "+((raw.match(/(?:thanks|regards),?\s*\n\s*([A-Z][a-z]+)/i)||[])[1]||"client")+",\n\nThank you for your request. We have prepared the job description below and will start searching right away.\nCould you let us know:\n"+r.checks.map(function(c){return "- "+c}).join("\n")+"\n\nBest regards,\n"+sig)
-   :("ご依頼ありがとうございます。\n以下の内容で求人票を作成し、本日から候補者の選定を始めます。\n\nあわせて、以下をお知らせいただけますでしょうか。\n"+r.checks.map(function(c){return "・"+c}).join("\n")+"\n\n引き続きよろしくお願いいたします。\n"+sig);
-  h+="<h3>"+(en?"Reply to the client (draft)":"企業様への返信（下書き）")+"</h3><pre class='mail'>"+esc(reply)+"</pre>";
-  $("out").innerHTML=h;
-}
-$("run").onclick=function(){
-  var t=$("mail").value.trim();if(!t)return;
-  $("out").innerHTML="<p class='busy'>ご依頼を読み取っています…</p>";
-  setTimeout(function(){JOB=parse(t);render(JOB,t)},700);
-};
-
-/* ---------- candidates ---------- */
+/* ============================================================ master data (all fictional) */
+var AREAS={"バンコク":{en:"Bangkok",th:"กรุงเทพฯ"},"チョンブリ":{en:"Chonburi (Amata City / Sriracha)",th:"ชลบุรี"},"アユタヤ":{en:"Ayutthaya",th:"อยุธยา"},"ラヨーン":{en:"Rayong",th:"ระยอง"}};
+var FIELD_EN={"通訳":"Interpreter","生産管理":"Production control","営業":"Sales","経理":"Accounting","総務・人事":"HR & admin"};
+var JL={"N1":5,"N2":4,"N3":3,"N4":2,"N5":1,"":0};
+var ENL={"ビジネス":2,"日常会話":1,"":0};
+var ENL_EN={"ビジネス":"Business","日常会話":"Conversational","":"-"};
 var CANDS=[
- {label:"候補者A（N2・営業4年）",name:"Somchai",text:"氏名：Somchai K.（32歳・タイ）\n日本語：JLPT N2\n経歴：日系自動車部品メーカーで営業4年（日系顧客20社を担当）、その前に商社で営業アシスタント2年\n現在の給与：48,000バーツ\n希望給与：55,000バーツ\n住まい：チョンブリー\n運転：可（自家用車あり）\n入社：1か月前通知で可"},
- {label:"候補者B（N3・経理6年）",name:"Nattaya",text:"氏名：Nattaya S.（35歳・タイ）\n日本語：JLPT N3\n英語：ビジネスレベル\n経歴：日系商社で経理6年、月次決算・監査対応を担当\n現在の給与：36,000バーツ\n希望給与：40,000バーツ\n住まい：バンコク（アソーク）\n入社：即日可"},
- {label:"候補者C（N1・通訳3年）",name:"Ploy",text:"氏名：Ploy T.（28歳・タイ）\n日本語：JLPT N1\n経歴：日系工場で通訳3年（会議・現場の通訳、マニュアル翻訳）\n現在の給与：42,000バーツ\n希望給与：50,000バーツ\n住まい：ラヨーン\n入社：1月から可"}
+ {id:"K01",name:"Pimchanok S.",ja:"ピムチャノック・S",g:"f",nat:"th",age:29,jlpt:"N2",en:"日常会話",field:["通訳","生産管理"],yrs:4,want:38000,areas:["チョンブリ","ラヨーン"],start:"1か月後",resp:"yes",pt:"自動車部品メーカーで会議通訳と生産計画の補助を4年。日本人上司の報告資料をタイ語・日本語で作成。",hue:330},
+ {id:"K02",name:"Thanakorn P.",ja:"タナコーン・P",g:"m",nat:"th",age:33,jlpt:"N1",en:"ビジネス",field:["通訳"],yrs:6,want:40000,areas:["チョンブリ","バンコク"],start:"即日",resp:"no",pt:"日系電機メーカーで工場長付き通訳を6年。",hue:210},
+ {id:"K03",name:"Siriporn K.",ja:"シリポーン・K",g:"f",nat:"th",age:27,jlpt:"N2",en:"日常会話",field:["通訳","総務・人事"],yrs:3,want:35000,areas:["チョンブリ"],start:"1か月後",resp:"yes",pt:"樹脂成形メーカーで通訳と勤怠・社内行事の運営を3年。アマタナコン在住。",hue:12},
+ {id:"K04",name:"Nattapong W.",ja:"ナッタポン・W",g:"m",nat:"th",age:31,jlpt:"N3",en:"",field:["生産管理"],yrs:5,want:36000,areas:["チョンブリ","ラヨーン"],start:"1か月後",resp:"yes",pt:"金型メーカーで生産計画・在庫管理を5年。",hue:160},
+ {id:"K15",name:"Ratchanee L.",ja:"ラッチャニー・L",g:"f",nat:"th",age:26,jlpt:"N2",en:"日常会話",field:["通訳"],yrs:2,want:33000,areas:["ラヨーン","チョンブリ"],start:"2週間後",resp:"yes",pt:"日本留学1年。食品工場で品質会議の通訳を2年。",hue:280},
+ {id:"K05",rom:"S.S.",name:"佐々木 翔",ja:"佐々木 翔",g:"m",nat:"jp",age:31,jlpt:"",en:"ビジネス",field:["営業"],yrs:5,want:75000,areas:["バンコク"],start:"1か月後",resp:"yes",pt:"専門商社で法人営業5年（化学品）。TOEIC 850。タイ在住2年、タイ語は日常会話。",hue:200},
+ {id:"K06",rom:"A.N.",name:"中村 彩",ja:"中村 彩",g:"f",nat:"jp",age:28,jlpt:"",en:"ビジネス",field:["営業"],yrs:3,want:65000,areas:["バンコク"],start:"即日",resp:"yes",pt:"物流会社で日系顧客の新規開拓3年。英語での見積・交渉の経験あり。",hue:340},
+ {id:"K07",rom:"D.T.",name:"高橋 大輔",ja:"高橋 大輔",g:"m",nat:"jp",age:35,jlpt:"",en:"日常会話",field:["営業"],yrs:8,want:90000,areas:["バンコク"],start:"2か月後",resp:"yes",pt:"機械商社で営業8年。",hue:30},
+ {id:"K08",rom:"Y.K.",name:"小林 優",ja:"小林 優",g:"m",nat:"jp",age:27,jlpt:"",en:"ビジネス",field:["営業"],yrs:2,want:60000,areas:["バンコク"],start:"即日",resp:"no",pt:"IT企業で法人営業2年。",hue:100},
+ {id:"K16",rom:"K.Y.",name:"山口 健太",ja:"山口 健太",g:"m",nat:"jp",age:30,jlpt:"",en:"ビジネス",field:["営業"],yrs:4,want:70000,areas:["バンコク"],start:"1か月後",resp:"yes",pt:"電子部品商社で東南アジア向け営業4年。出張でタイの顧客を担当。",hue:240},
+ {id:"K09",name:"Kanokwan T.",ja:"カノックワン・T",g:"f",nat:"th",age:30,jlpt:"",en:"ビジネス",field:["経理"],yrs:4,want:30000,areas:["バンコク"],start:"1か月後",resp:"yes",pt:"外資系商社で月次決算・VAT申告を4年。Express・SAPを使用。",hue:50},
+ {id:"K10",name:"Apichart M.",ja:"アピチャート・M",g:"m",nat:"th",age:26,jlpt:"",en:"ビジネス",field:["経理"],yrs:2,want:27000,areas:["バンコク"],start:"2週間後",resp:"yes",pt:"会計事務所で記帳・源泉税の申告を2年。",hue:180},
+ {id:"K11",name:"Waraporn J.",ja:"ワラポーン・J",g:"f",nat:"th",age:34,jlpt:"",en:"日常会話",field:["経理"],yrs:6,want:38000,areas:["バンコク"],start:"1か月後",resp:"yes",pt:"製造業で経理6年。",hue:300},
+ {id:"K17",name:"Jirawat S.",ja:"ジラワット・S",g:"m",nat:"th",age:28,jlpt:"",en:"ビジネス",field:["経理"],yrs:3,want:29000,areas:["バンコク"],start:"1か月後",resp:"yes",pt:"日系物流会社で買掛・売掛管理を3年。英語の月次報告を担当。",hue:120},
+ {id:"K12",name:"Supansa R.",ja:"スパンサー・R",g:"f",nat:"th",age:28,jlpt:"N3",en:"日常会話",field:["総務・人事"],yrs:3,want:27000,areas:["アユタヤ","バンコク"],start:"1か月後",resp:"yes",pt:"日系工場で給与計算・社会保険の手続きを3年。",hue:20},
+ {id:"K13",name:"Chalermchai B.",ja:"チャルームチャイ・B",g:"m",nat:"th",age:32,jlpt:"N2",en:"日常会話",field:["総務・人事"],yrs:5,want:30000,areas:["アユタヤ"],start:"1か月後",resp:"yes",pt:"日系工場で総務5年。ワークパーミット・BOI関連の書類を担当。",hue:260},
+ {id:"K14",name:"Ploy N.",ja:"プロイ・N",g:"f",nat:"th",age:25,jlpt:"N3",en:"",field:["総務・人事"],yrs:2,want:25000,areas:["アユタヤ"],start:"即日",resp:"no",pt:"人材派遣会社で事務2年。",hue:90}
 ];
-var cb=$("cands");
-CANDS.forEach(function(s,i){var b=document.createElement("button");b.textContent=s.label;b.onclick=function(){cpick(i)};cb.appendChild(b)});
-function cpick(i){$("cv").value=CANDS[i].text;[].forEach.call(cb.children,function(b,j){b.className=j===i?"on":""});$("cvout").innerHTML=""}
-pick(0);cpick(0);
+function K(id){for(var i=0;i<CANDS.length;i++)if(CANDS[i].id===id)return CANDS[i];return null}
+function face(k,label){return '<div class="photo" style="background:linear-gradient(135deg,hsl('+k.hue+',36%,56%),hsl('+((k.hue+40)%360)+',40%,36%))">'+IC.person+'<span>'+esc(label||"")+'</span></div>'}
+function initials(k){if(k.rom)return k.rom;var p=k.name.split(" ");return p[0].charAt(0)+"."+(p[1]||"").charAt(0)+"."}
+function natJ(k){return k.nat==="jp"?"日本":"タイ"}
 
-function nextDays(){var d=new Date(),out=[];for(var i=1;out.length<3&&i<14;i++){var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+i);var w=x.getDay();if(w>=1&&w<=5)out.push(x)}return out}
-function wd(x){return (x.getMonth()+1)+"/"+x.getDate()+"（"+"日月火水木金土"[x.getDay()]+"）"}
+/* ============================================================ sample job requests (4 cases) */
+var CASES=[
+ {id:"C1",from:"株式会社サンプル精工（タイランド） 管理部",addr:"kanri@sample-seiko.example.com",init:"精",date:stamp(Y,"17:20"),
+  subject:"【求人のご依頼】日本語通訳 兼 生産管理アシスタント 1名",tag:"製造・通訳",
+  body:"いつもお世話になっております。サンプル精工（タイランド）管理部の森です。\n\n通訳スタッフが来月末で退職することになり、後任の採用をお願いしたく、ご連絡しました。\n\n・職種：日本語通訳 兼 生産管理アシスタント（タイ人）\n・勤務地：アマタシティ・チョンブリ\n・日本語：N2以上（会議通訳ができる方）\n・経験：製造業での通訳経験2年以上\n・給与：4万バーツまで\n・入社："+START+"希望\n\n工場長の会議通訳と、生産計画の資料づくりを手伝ってもらう予定です。\n送迎バスあり、土曜は隔週出勤です。\nなるべく早めに候補者をご紹介いただけますと助かります。",
+  cond:{client:"株式会社サンプル精工（タイランド）",pos:"日本語通訳 兼 生産管理アシスタント",posEn:"Japanese Interpreter / Production Control Assistant",posTh:"ล่ามภาษาญี่ปุ่น / ผู้ช่วยฝ่ายวางแผนการผลิต",nat:"th",area:"チョンブリ",field:["通訳","生産管理"],jlpt:"N2",en:"",yrs:2,budget:40000,start:START,n:1,lang:"ja",
+   duties:["工場長の会議通訳（日本語⇔タイ語）","生産計画・実績資料の作成補助","日本からの出張者のアテンド"],perks:"送迎バスあり／土曜隔週出勤"},
+  checks:["賞与・昇給の実績（候補者に聞かれます）","面接の形式（オンライン／工場での対面）","通訳のテスト（筆記・口頭）の有無"],
+  addressee:"株式会社サンプル精工（タイランド）\n管理部 森様"},
+ {id:"C2",from:"サンプル商事タイランド 代表 大野",addr:"ohno@sample-shoji.example.com",init:"大",date:stamp(NOW,"08:05"),
+  subject:"日本人営業（現地採用）を1名探しています",tag:"商社・日本人",
+  body:"お世話になります。サンプル商事タイランドの大野です。\n\n事業拡大のため、日本人の営業を1名採用したいと考えています。\n\n・日系のお客様（製造業）へのルート営業と新規開拓\n・英語でタイ人スタッフ・仕入先とやり取りできること（ビジネスレベル）\n・営業経験2年以上、商社経験があれば尚可\n・給与は8万バーツまで、ビザ・ワークパーミットは当社で手配します\n・勤務地はバンコク（アソーク）\n\n年内に面接を始めたいので、条件に合う方がいればご紹介ください。",
+  cond:{client:"サンプル商事タイランド",pos:"日本人営業（現地採用）",posEn:"Japanese Sales Representative",posTh:"พนักงานขายชาวญี่ปุ่น",nat:"jp",area:"バンコク",field:["営業"],jlpt:"",en:"ビジネス",yrs:2,budget:80000,start:"相談",n:1,lang:"ja",
+   duties:["日系製造業へのルート営業","新規開拓・見積・価格交渉","タイ人スタッフ・仕入先との調整（英語）"],perks:"ビザ・ワークパーミット会社手配"},
+  checks:["住宅手当・帰国費用の有無","社用車・運転手の有無","入社時期の希望（候補者が日本在住の場合）"],
+  addressee:"サンプル商事タイランド\n代表 大野様"},
+ {id:"C3",from:"Khun Arisa (HR Manager)",addr:"arisa.hr@sample-trading.example.com",init:"A",date:stamp(NOW,"09:30"),
+  subject:"Request: Accounting Staff (Thai, English required)",tag:"英語・経理",
+  body:"Dear "+"Recruitment Team,\n\nWe are looking for an Accounting Staff for our Bangkok office (Sathorn).\n\n- Thai nationality\n- Business-level English (monthly reports to our Singapore HQ)\n- At least 2 years of accounting experience\n- Salary up to 30,000 THB\n- Start date: as soon as possible\n\nCould you send us a few candidates?\n\nBest regards,\nArisa\nHR Manager",
+  cond:{client:"Sample Trading (Thailand) Co., Ltd.",pos:"経理スタッフ",posEn:"Accounting Staff",posTh:"พนักงานบัญชี",nat:"th",area:"バンコク",field:["経理"],jlpt:"",en:"ビジネス",yrs:2,budget:30000,start:"ASAP",n:1,lang:"en",
+   duties:["Monthly closing and VAT filing","AP/AR management","Monthly reports in English to HQ"],perks:""},
+  checks:["Accounting software you use (Express, SAP, etc.)","Interview format (online / at your office)","Probation period and benefits"],
+  addressee:"Khun Arisa"},
+ {id:"C4",from:"株式会社サンプル化成 アユタヤ工場",addr:"soumu@sample-kasei.example.com",init:"化",date:stamp(NOW,"10:50"),
+  subject:"総務・人事スタッフの増員（前回に続きお願いします）",tag:"既存客・増員",
+  body:"いつもお世話になっております。サンプル化成アユタヤ工場の石井です。\n\n昨年ご紹介いただいた総務スタッフがとても頑張ってくれているので、また同じ条件で1名お願いしたいです。\n\n・総務・人事（給与計算、勤怠、ワークパーミットの書類など）\n・日本語はN3以上\n・経験2年以上\n・給与は2.8万バーツくらいまで\n・勤務地：アユタヤ（ロジャナ工業団地）\n\n前回と同じく、推薦書をいただければ社内で回覧します。",
+  cond:{client:"株式会社サンプル化成 アユタヤ工場",pos:"総務・人事スタッフ",posEn:"HR & Admin Staff",posTh:"เจ้าหน้าที่ธุรการและบุคคล",nat:"th",area:"アユタヤ",field:["総務・人事"],jlpt:"N3",en:"",yrs:2,budget:28000,start:"相談",n:1,lang:"ja",
+   duties:["給与計算・勤怠管理","ワークパーミット・ビザの書類準備","社内行事・備品の管理"],perks:"送迎バスあり"},
+  checks:["前回採用者と同じ給与テーブルでよいか","面接官（日本人・タイ人）","入社希望日"],
+  addressee:"株式会社サンプル化成 アユタヤ工場\n石井様"}
+];
+function C(id){for(var i=0;i<CASES.length;i++)if(CASES[i].id===id)return CASES[i];return state.custom[id]||null}
 
-$("runcv").onclick=function(){
-  var t=$("cv").value.trim();if(!t)return;
-  var job=JOB||parse($("mail").value);
-  var nm=(t.match(/氏名[:：]\s*([A-Za-z]+[^（\n]*)/)||[])[1]||"候補者";
-  var jp=(t.match(/N\s*([1-5])/i)||[])[1];
-  var exp=(t.match(/(営業|経理|通訳)[^\n]{0,8}?(\d{1,2})\s*年/)||t.match(/(?:で|の)?([一-龥]{2,4})\s*(\d{1,2})\s*年/)||[]);
-  var want=money(((t.match(/希望給与[:：]\s*([^\n]+)/)||[])[1])||"");
-  var home=(t.match(/住まい[:：]\s*([^\n]+)/)||[])[1]||"";
-  var pts=[],gaps=[];
-  if(job.jp&&jp){var need=+job.jp.replace(/\D/g,"");if(+jp<=need)pts.push("日本語 N"+jp+"（求人の条件 "+job.jp+" を満たす）");else gaps.push("日本語 N"+jp+"（求人は "+job.jp+"）")}else if(jp)pts.push("日本語 N"+jp);
-  if(exp[2]){var y=+exp[2];if(job.exp&&y>=job.exp)pts.push(exp[1]+"経験 "+y+"年（条件 "+job.exp+"年以上）");else if(job.exp)gaps.push(exp[1]+"経験 "+y+"年（条件 "+job.exp+"年以上）");else pts.push(exp[1]+"経験 "+y+"年")}
-  if(job.pos&&!job.pos.re.test(t))gaps.push("職種（"+job.pos.ja+"）の直接の経験は経歴に見当たらない");
-  if(want&&job.salMax){if(want<=job.salMax)pts.push("希望給与 "+fmt(want)+"バーツ（予算内）");else gaps.push("希望給与 "+fmt(want)+"バーツ（予算 "+fmt(job.salMax)+"バーツを超過）")}
-  if(job.extra.some(function(x){return /運転/.test(x)})){if(/運転[:：]\s*可/.test(t))pts.push("運転可（自家用車あり）");else gaps.push("運転の可否が未確認")}
-  if(home&&job.loc){pts.push("住まい："+home+"（勤務地 "+job.loc.ja+"）")}
-  var h="<div class='grid'><div><h3 style='font-size:14px;margin:0 0 6px'>求人との照合</h3><table>";
-  pts.forEach(function(p){h+="<tr><td><span class='match'>合う</span> "+esc(p)+"</td></tr>"});
-  gaps.forEach(function(p){h+="<tr><td><span class='miss'>確認</span> "+esc(p)+"</td></tr>"});
-  h+="</table>";
-  var rec="【ご推薦】"+(job.pos?job.pos.ja:"")+"のポジションに "+nm.trim()+" 様をご推薦します。\n\n"+pts.map(function(p){return "・"+p}).join("\n")+(gaps.length?"\n\n※ 面接でご確認いただきたい点\n"+gaps.map(function(p){return "・"+p}).join("\n"):"")+"\n\n面接をご希望でしたら、下記の日程からご都合をお知らせください。";
-  h+="<h3 style='font-size:14px;margin:16px 0 6px'>企業様への推薦文（下書き）</h3><pre class='mail'>"+esc(rec)+"</pre></div>";
-  var days=nextDays();
-  var inv=nm.trim()+" 様\n\nいつもありがとうございます。\nご紹介した"+(job.pos?job.pos.ja+"の":"")+"求人について、企業様が面接を希望されています。\n以下からご都合のよい日時をお知らせください。\n\n"+days.map(function(d){return "・"+wd(d)+" 10:00／14:00／16:00"}).join("\n")+"\n\n面接は"+(job.loc?job.loc.ja:"オンライン")+"で約45分の予定です。\nよろしくお願いいたします。\n"+(company||"〇〇人材サービス");
-  h+="<div><h3 style='font-size:14px;margin:0 0 6px'>候補者への面接日程のご連絡（下書き）</h3><pre class='mail'>"+esc(inv)+"</pre><p class='sched'>本番では、タイ語・英語でのご連絡、カレンダーへの登録、前日のリマインドも自動で行えます。</p></div></div>";
-  $("cvout").innerHTML="<p class='busy'>経歴を読み取っています…</p>";
-  setTimeout(function(){$("cvout").innerHTML=h},600);
-};
+/* ============================================================ matching */
+function score(k,c){
+ var s=0,hit=[],miss=[];
+ if(c.nat&&k.nat!==c.nat)return null;
+ if(c.area){if(k.areas.indexOf(c.area)<0)return null;s+=20;hit.push(c.area+"で勤務可")}
+ if(c.field.length){var f=k.field.filter(function(x){return c.field.indexOf(x)>=0});if(!f.length)return null;s+=15+f.length*8;f.forEach(function(x){hit.push(x+"経験")})}
+ if(c.jlpt){if(JL[k.jlpt]<JL[c.jlpt])return null;s+=10;hit.push("日本語"+k.jlpt);if(JL[k.jlpt]>JL[c.jlpt])s+=4}
+ if(c.en){if(ENL[k.en]<ENL[c.en])return null;s+=10;hit.push("英語"+k.en)}
+ if(c.budget){if(k.want<=c.budget){s+=20}else if(k.want<=c.budget*1.08){s+=4;miss.push("希望給与が予算を少し超過")}else return null}
+ if(c.yrs){if(k.yrs>=c.yrs){s+=10+Math.min(6,k.yrs-c.yrs)}else miss.push("経験"+k.yrs+"年（希望"+c.yrs+"年）")}
+ return {k:k,s:s,hit:hit,miss:miss};
+}
+function candidates(c){return CANDS.map(function(k){return score(k,c)}).filter(Boolean).sort(function(a,b){return b.s-a.s||a.k.want-b.k.want})}
+
+/* ============================================================ free-text parser (for pasted requests) */
+var AREA_RE=[["バンコク",/バンコク|bangkok|สาทร|アソーク|シーロム|サトーン|sathorn|asok/i],["チョンブリ",/チョンブリ|アマタ|シラチャ|chonburi|amata|sriracha/i],["アユタヤ",/アユタヤ|ロジャナ|ayutthaya|rojana/i],["ラヨーン",/ラヨーン|rayong/i]];
+var FIELD_RE=[["通訳",/通訳|interpret/i],["生産管理",/生産管理|生産計画|production/i],["営業",/営業|sales/i],["経理",/経理|会計|accounting|accountant/i],["総務・人事",/総務|人事|\bHR\b|admin/i]];
+function parse(t){
+ var en=!/[぀-ヿ一-鿿]/.test(t),c={client:en?"Client":"お客様",pos:"",posEn:"",posTh:"",nat:"",area:"",field:[],jlpt:"",en:"",yrs:0,budget:null,start:"",n:1,lang:en?"en":"ja",duties:[],perks:""},checks=[];
+ AREA_RE.some(function(a){if(a[1].test(t)){c.area=a[0];return true}});
+ FIELD_RE.forEach(function(f){if(f[1].test(t))c.field.push(f[0])});
+ if(/日本人|japanese/i.test(t)&&!/タイ人|thai/i.test(t))c.nat="jp";else if(/タイ人|thai/i.test(t))c.nat="th";
+ var m=t.match(/N\s*([1-5])/i);if(m)c.jlpt="N"+m[1];
+ if(/英語.{0,6}ビジネス|business[- ]level english|英語.{0,4}(必須|できる)/i.test(t))c.en="ビジネス";else if(/英語|english/i.test(t))c.en="日常会話";
+ m=t.match(/(\d+)\s*年以上|(\d+)\+?\s*years?/i);if(m)c.yrs=+(m[1]||m[2]);
+ m=t.match(/(\d+(?:\.\d+)?)\s*万\s*(?:バーツ|THB|B)?/i);
+ if(m)c.budget=Math.round(parseFloat(m[1])*10000);else{m=t.match(/(\d{1,3}(?:,\d{3})+|\d{4,6})\s*(?:バーツ|baht|thb|฿)/i);if(m)c.budget=+m[1].replace(/,/g,"")}
+ var co=(t.match(/([^\s、。\n]{2,24}(?:株式会社|Co\.,?\s*Ltd\.?|タイランド))/)||[])[1];if(co)c.client=co;
+ c.pos=c.field.length?c.field.join("・")+"スタッフ":(en?"Staff":"スタッフ");c.posEn=c.field.map(function(f){return FIELD_EN[f]}).join(" / ")||"Staff";c.posTh="พนักงาน";
+ c.duties=c.field.map(function(f){return en?FIELD_EN[f]+" duties":f+"の業務"});
+ if(!c.nat)checks.push(en?"Nationality (Thai / Japanese)":"国籍（タイ人／日本人）");
+ if(!c.area)checks.push(en?"Work location":"勤務地");
+ if(!c.budget)checks.push(en?"Salary range":"給与の上限");
+ if(!c.field.length)checks.push(en?"Job duties":"仕事内容");
+ checks.push(en?"Interview format (online / on-site)":"面接の形式（オンライン／対面）");
+ return {cond:c,checks:checks,addressee:c.client};
+}
+
+/* ============================================================ state */
+var KEY="nova-rc-ws-v1:"+BRAND;
+function fresh(){
+ var mails=CASES.map(function(c){return {id:"M"+c.id,folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:c.date,subject:c.subject,body:c.body,tags:[{t:"求人依頼",k:"green"},{t:c.tag,k:c.cond.lang==="en"?"blue":"gray"}],caseId:c.id,unread:true}});
+ mails.reverse();
+ var posts=[
+  {id:"S1",job:"J0",status:"posted",ch:"facebook",when:stamp(addD(NOW,-2),"12:00"),auto:false},
+  {id:"S2",job:"C1",status:"draft",ch:"line",when:"",auto:true,why:"求人票から"},
+  {id:"S3",job:"C4",status:"draft",ch:"facebook",when:"",auto:true,why:"求人票から"}
+ ];
+ return {view:"mail",folder:"inbox",selMail:mails[0].id,selCase:"C1",ptab:"cond",cases:{},custom:{},mails:mails,posts:posts,selPost:"S2",lang:"th",auto:{draft:true,weekly:true,approve:true},seq:1,seen:false};
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+if(!state||!state.mails)state=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cs(id){if(!state.cases[id])state.cases[id]={step:0,extracted:false,checks:{},picked:[],attached:false,sent:false,interview:null};return state.cases[id]}
+
+/* jobs for SNS (from cases + one past job) */
+var J0={id:"J0",cond:{client:"サンプル物流",pos:"営業アシスタント",posEn:"Sales Assistant",posTh:"ผู้ช่วยฝ่ายขาย",nat:"th",area:"バンコク",field:["営業"],jlpt:"N3",en:"",yrs:1,budget:25000,start:"相談",duties:["見積書・請求書の作成","日本人営業のスケジュール管理"],perks:""}};
+function JOB(id){return id==="J0"?J0:C(id)}
+
+/* ============================================================ toast / modal */
+var toastT;
+function toast(msg){var el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";document.body.appendChild(el)}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},3200)}
+function modal(html){var bg=document.createElement("div");bg.className="modal-bg";bg.innerHTML='<div class="modal" role="dialog">'+html+'</div>';bg.addEventListener("click",function(e){if(e.target===bg||e.target.closest("[data-close]"))bg.remove()});document.body.appendChild(bg);return bg}
+
+/* ============================================================ render: shell */
+function allCases(){return CASES.concat(Object.keys(state.custom).map(function(k){return state.custom[k]}))}
+function counts(){
+ var inbox=state.mails.filter(function(m){return m.folder==="inbox"&&m.unread}).length;
+ var open=allCases().filter(function(c){return !cs(c.id).sent}).length;
+ var drafts=state.posts.filter(function(p){return p.status==="draft"}).length;
+ return {inbox:inbox,open:open,drafts:drafts};
+}
+var VIEWS={mail:{t:"メール",d:"企業からの求人依頼の受信から、推薦書を添えた返信まで。",i:IC.mail},proposal:{t:"候補者推薦",d:"求人票づくり、候補者リストとの照合・意向確認、推薦書と面接日程まで。",i:IC.user},sns:{t:"求人のSNS・LINE配信",d:"求人票から募集投稿を日本語・タイ語・英語で作り、決まった時間に自動で配信。",i:IC.share}};
+function render(){
+ var n=counts(),v=VIEWS[state.view];
+ var nav='<button data-view="mail" class="'+(state.view==="mail"?"active":"")+'">'+IC.mail+'メール<span class="count '+(n.inbox?"hot":"")+'">'+(n.inbox||"")+'</span></button>'+
+  '<button data-view="proposal" class="'+(state.view==="proposal"?"active":"")+'">'+IC.user+'候補者推薦<span class="count">'+(n.open||"")+'</span></button>'+
+  '<button data-view="sns" class="'+(state.view==="sns"?"active":"")+'">'+IC.share+'求人のSNS配信<span class="count">'+(n.drafts||"")+'</span></button>';
+ var html='<header class="topbar"><div class="brand"><div class="brand-symbol">'+esc(BRAND.charAt(0))+'</div><div><b>'+esc(BRAND)+'</b><small>RECRUITMENT WORKSPACE</small></div></div>'+
+  '<div class="crumb">ワークスペース　/　'+v.t+'</div><span class="demo-pill">DEMO<span class="long"> · 実際には送信しません</span></span>'+
+  '<button class="help" data-act="help">'+IC.help+'<span>使い方</span></button></header>'+
+  '<div class="layout"><nav class="nav"><div class="nav-label">WORKSPACE</div>'+nav+
+  '<div class="nav-bottom"><button data-act="cands">'+IC.list+'候補者リスト</button><button data-act="reset">'+IC.reset+'デモをリセット</button>'+
+  '<div class="note">● このブラウザに自動保存<br>企業・候補者はすべて架空のサンプルです</div></div></nav>'+
+  '<main class="workspace"><div class="mobile-tabs">'+nav+'<button data-act="help">使い方</button></div>'+
+  '<div class="ws-head"><div><h1>'+v.t+'</h1><p>'+v.d+'</p></div><div class="head-actions">'+headActions()+'</div></div>'+
+  (state.view==="mail"?viewMail():state.view==="proposal"?viewProposal():viewSns())+'</main></div>';
+ $("#app").innerHTML=html;
+ save();
+}
+function headActions(){
+ if(state.view==="mail")return '<button class="btn-i" data-act="paste">'+IC.plus+'求人依頼を貼り付けて試す</button>';
+ if(state.view==="proposal")return '<button class="btn-i" data-act="gomail">'+IC.mail+'関連メール</button>';
+ return '<button class="btn-i" data-act="newpost">'+IC.plus+'求人から投稿を作る</button>';
+}
+
+/* ============================================================ view: mail */
+function viewMail(){
+ var f=state.folder,list=state.mails.filter(function(m){return m.folder===f});
+ var rows=list.map(function(m){
+  return '<button class="row '+(m.id===state.selMail?"active":"")+'" data-mail="'+m.id+'"><div class="row-top">'+(m.unread?'<span class="dot"></span>':'')+'<b>'+esc(f==="inbox"?m.from:"宛先："+(m.toName||m.addr))+'</b><time>'+esc(m.date)+'</time></div><div class="subj">'+esc(m.subject)+'</div><div class="snip">'+esc(m.body.slice(0,90))+'</div><div class="row-foot">'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join("")+(m.attach?'<span class="badge green">'+IC.clip.replace('class="icon"','class="icon" style="width:11px;height:11px"')+'添付あり</span>':'')+'</div></button>';
+ }).join("")||'<div class="empty"><div><p class="tiny">'+(f==="sent"?"送信済みのメールはまだありません":f==="draft"?"下書きはありません":"受信メールはありません")+'</p></div></div>';
+ var tabs=[["inbox","受信箱"],["sent","送信済み"],["draft","下書き"]].map(function(t){var c=state.mails.filter(function(m){return m.folder===t[0]}).length;return '<button data-folder="'+t[0]+'" class="'+(f===t[0]?"active":"")+'">'+t[1]+(c?" "+c:"")+'</button>'}).join("");
+ var sel=state.mails.filter(function(m){return m.id===state.selMail&&m.folder===f})[0]||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools"><div class="tabs">'+tabs+'</div></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルメール / 外部のメールとは接続していません</div></section>'+
+  '<section class="detail">'+(sel?mailDetail(sel):'<div class="empty"><div><div class="em-i">'+IC.mail+'</div><h3>メールを選んでください</h3></div></div>')+'</section></div>';
+}
+function mailDetail(m){
+ if(m.unread){m.unread=false;setTimeout(save,0)}
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(m.subject)+'</h2><div>'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join(" ")+'</div></div>'+
+  '<div class="sender"><div class="avatar">'+esc(m.init||"?")+'</div><div><b>'+esc(m.folder==="inbox"?m.from:BRAND+" "+STAFF)+'</b><span>'+esc(m.folder==="inbox"?m.addr:"宛先："+m.addr)+'</span></div><time>'+esc(m.date)+'</time></div>'+
+  '<div class="mail-body">'+esc(m.body)+'</div>';
+ if(m.attach)h+='<div class="actions"><span class="attach">'+IC.doc+esc(m.attach)+'</span><button class="small" data-act="viewdoc" data-case="'+m.caseId+'">開く</button></div>';
+ if(m.folder==="inbox"&&m.caseId){
+  var st=cs(m.caseId);
+  if(m.kind==="interview"){
+   var v=st.interview;
+   h+='<div class="actions"><button class="primary btn-i" data-act="confirmint" data-case="'+m.caseId+'" '+(v&&v.confirmed?"disabled":"")+'>'+IC.cal+(v&&v.confirmed?"面接予定に登録済み":"面接を確定して返信を作る")+'</button><span class="tiny muted">返信から面接したい候補者と日時を読み取り、確認メールと候補者への案内を作ります</span></div>';
+  }else{
+   h+='<div class="actions"><button class="primary btn-i" data-act="toproposal" data-case="'+m.caseId+'">'+IC.user+(st.extracted?"候補者推薦の続きを開く":"このメールから候補者推薦を作る")+'</button><span class="tiny muted">'+(st.sent?"推薦書を送信済みです":"求人票づくり → 候補者と照合 → 意向確認 → 推薦書")+'</span></div>';
+  }
+  h+=replyBox(m);
+ }
+ if(m.folder==="draft")h+=replyBox(m,true);
+ h+='</div>';
+ return h;
+}
+function replyBox(m,isDraft){
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ var d=state.compose&&state.compose.mail===m.id?state.compose:null;
+ if(!d){
+  var body="",att=null,subj="Re: "+m.subject;
+  if(isDraft){body=m.body;att=m.attach;subj=m.subject}
+  else if(st&&st.attached&&!st.sent&&m.kind!=="interview"){body=proposalMail(c,st);att=docName(c)}
+  d={mail:m.id,to:m.addr,subject:subj,body:body,attach:att};
+ }
+ var canInsert=st&&st.step>=3&&!st.sent&&m.kind!=="interview";
+ return '<div class="reply" id="replyBox" data-attach="'+esc(d.attach||"")+'"><div class="reply-h">↩ 宛先 <input id="rTo" value="'+esc(d.to)+'" aria-label="宛先"><button class="small btn-i" data-act="insertdoc" data-mail="'+m.id+'" '+(canInsert?"":"disabled")+' title="候補者推薦で作った推薦書を添付し、本文を作ります">'+IC.clip+(st&&st.attached?"推薦書を添付済み":"作成中の推薦書を挿入")+'</button></div>'+
+  '<div class="reply-h" style="background:#fff">件名 <input id="rSubj" value="'+esc(d.subject)+'" aria-label="件名"></div>'+
+  '<textarea id="rBody" placeholder="'+(st&&!st.attached&&m.kind!=="interview"?"「候補者推薦」で推薦書を作ると、ここに返信の本文が入ります":"本文")+'">'+esc(d.body)+'</textarea>'+
+  '<div class="reply-f">'+(d.attach?'<span class="attach">'+IC.doc+esc(d.attach)+'</span>':'<span class="tiny muted">添付なし</span>')+'<span style="flex:1"></span><button data-act="savedraft" data-mail="'+m.id+'">下書き保存</button><button class="primary btn-i" data-act="send" data-mail="'+m.id+'">'+IC.send+'送信（デモ）</button></div></div>';
+}
+function docName(c){return c.cond.lang==="en"?"Candidate_Recommendation_"+c.cond.posEn.replace(/[^A-Za-z]+/g,"_")+".pdf":"候補者のご推薦_"+c.cond.pos.replace(/[\s（）()]/g,"")+".pdf"}
+
+/* ============================================================ view: proposal */
+function viewProposal(){
+ var list=allCases();
+ var rows=list.map(function(c,i){var st=cs(c.id);var lab=st.sent?(st.interview&&st.interview.confirmed?["面接確定","green"]:["推薦済み","green"]):st.step>=1?["対応中","amber"]:["未着手","gray"];
+  var k=c.cond;
+  return '<button class="row '+(c.id===state.selCase?"active":"")+'" data-case="'+c.id+'"><div class="row-top"><b>'+esc(k.client)+'</b><span class="badge '+lab[1]+'">'+lab[0]+'</span></div><div class="subj">'+esc(k.pos)+'</div><div class="snip">'+esc((k.area||"勤務地未定")+" / "+(k.nat==="jp"?"日本人":k.nat==="th"?"タイ人":"国籍未定")+(k.jlpt?" / 日本語"+k.jlpt+"以上":"")+(k.en?" / 英語"+k.en:"")+" / "+(k.budget?fmt(k.budget)+"B以内":"給与未定"))+'</div><div class="row-foot"><span class="badge gray">'+(c.custom?"貼り付けた求人依頼":"事例"+(i+1)+" · "+esc(c.tag))+'</span></div></button>'}).join("");
+ var c=C(state.selCase)||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">求人依頼を選択</b> <span class="badge gray">'+list.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">読み取りは4事例を使ったデモ再現です（貼り付けた求人依頼は簡易読み取り）</div></section>'+
+  '<section class="detail">'+caseDetail(c)+'</section></div>';
+}
+function caseDetail(c){
+ var st=cs(c.id);
+ var stepLab=["求人票をつくる","候補者の照合・意向確認","推薦書と面接日程"];
+ var steps=stepLab.map(function(s,i){var cl=st.step>i+1||(i===2&&st.attached)?"done":(st.step===i+1||(st.step===0&&i===0))?"cur":"";return '<button class="step '+cl+'" data-ptab="'+["cond","cand","doc"][i]+'"><i>'+(i+1)+'</i>'+s+'</button>'}).join("");
+ var tabs=[["cond","求人票"],["cand","候補者・意向確認"],["doc","推薦書・面接日程"],["mail","元のメール"]].map(function(t){return '<button data-ptab="'+t[0]+'" class="'+(state.ptab===t[0]?"active":"")+'">'+t[1]+'</button>'}).join("");
+ var h='<div class="detail-inner"><div class="p-head"><div><h2>'+esc(c.cond.pos)+'</h2><div class="meta">JOB-'+c.id+' · '+esc(c.cond.client)+' · 担当 '+STAFF+'</div></div><span class="badge '+(st.sent?"green":"amber")+'">'+(st.sent?"推薦書を送信済み":"対応中")+'</span></div>'+
+  '<div class="steps">'+steps+'</div><div class="ptabs">'+tabs+'</div>';
+ if(state.ptab==="mail")h+='<div class="card"><div class="mail-body" style="border:0;padding:0">'+esc(C(c.id).body)+'</div></div>';
+ else if(!st.extracted)h+='<div class="empty"><div><div class="em-i">'+IC.spark+'</div><h3>メールから求人票をつくります</h3><p class="tiny">職種・勤務地・国籍・語学・経験・給与・入社日を取り出して求人票にし、<br>足りない情報は「確認したいこと」にまとめます。英語版・タイ語版も同時に作ります。</p><button class="primary btn-i" data-act="extract" data-case="'+c.id+'">'+IC.spark+'求人票をつくる</button></div></div>';
+ else if(state.ptab==="cond")h+=condTab(c,st);
+ else if(state.ptab==="cand")h+=candTab(c,st);
+ else h+=docTab(c,st);
+ h+='</div>';
+ var ok=okIds(st);
+ h+='<div class="foot-bar"><span class="sum">'+(st.extracted?"候補 "+st.picked.length+"名 ／ 応募意思あり "+ok.length+"名"+(ok.length?" ／ 希望給与 "+fmt(Math.min.apply(null,ok.map(function(id){return K(id).want})))+"〜"+fmt(Math.max.apply(null,ok.map(function(id){return K(id).want})))+" B":""):"求人票をつくってください")+'</span>'+
+  '<button class="btn-i" data-act="viewdoc" data-case="'+c.id+'" '+(ok.length?"":"disabled")+'>'+IC.doc+'推薦書プレビュー</button>'+
+  '<button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(ok.length&&!st.sent?"":"disabled")+'>'+IC.send+(st.sent?"送信済み":"返信へ添付")+'</button></div>';
+ return h;
+}
+function okIds(st){return st.picked.filter(function(id){return st.checks[id]==="yes"})}
+function condTab(c,st){
+ var k=c.cond;
+ var rows=[["企業",k.client],["職種",k.pos],["勤務地",k.area],["国籍",k.nat==="jp"?"日本人":k.nat==="th"?"タイ人":""],["日本語",k.jlpt?k.jlpt+"以上":(k.nat==="jp"?"（ネイティブ）":"不問")],["英語",k.en||"不問"],["経験",k.yrs?k.yrs+"年以上":""],["給与（月額）",k.budget?fmt(k.budget)+" バーツまで":""],["入社",k.start],["仕事内容",(k.duties||[]).join("／")],["待遇・その他",k.perks]];
+ var h='<div class="card"><h3>求人票（日本語）</h3><table class="kv">'+rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+(r[1]?esc(r[1]):'<span class="miss">記載なし</span>')+'</td></tr>'}).join("")+'</table>'+
+  '<div class="checklist"><b>確認したいこと（推薦メールで質問します）</b><ul>'+c.checks.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div></div>'+
+  '<div class="card"><h3>英語版・タイ語版（求人サイト・SNS用に自動作成）</h3><table class="kv"><tr><th>English</th><td><b>'+esc(k.posEn)+'</b> — '+esc(AREAS[k.area]?AREAS[k.area].en:"Thailand")+(k.budget?" · up to THB "+fmt(k.budget):"")+(k.jlpt?" · Japanese "+k.jlpt+"+":"")+(k.en?" · English: "+ENL_EN[k.en]:"")+'</td></tr><tr><th>ภาษาไทย</th><td><b>'+esc(k.posTh)+'</b> — '+esc(AREAS[k.area]?AREAS[k.area].th:"ประเทศไทย")+(k.budget?" · เงินเดือนสูงสุด "+fmt(k.budget)+" บาท":"")+(k.jlpt?" · ภาษาญี่ปุ่น "+k.jlpt+" ขึ้นไป":"")+'</td></tr></table>'+
+  (state.auto.draft?'<p class="tiny muted" style="margin:8px 0 0">● この求人の募集投稿を「求人のSNS配信」に下書きしました</p>':'')+'</div>'+
+  '<div class="actions"><button class="primary btn-i" data-ptab="cand">'+IC.user+'候補者リストと照合する</button><span class="tiny muted">候補者リスト（'+CANDS.length+'名）から条件に合う人を選びます</span></div>';
+ return h;
+}
+function contactMsg(k,c){
+ var p=k.g==="f"?"ค่ะ":"ครับ",me="ครับ";
+ if(k.nat==="jp")return {txt:k.ja.split(" ")[0]+"様\nお世話になっております。"+BRAND+"の"+STAFF+"です。\n"+c.cond.area+"の「"+c.cond.pos+"」（月給"+fmt(c.cond.budget||0)+"バーツまで）のご紹介です。ご経験に合うと思い、ご連絡しました。推薦を進めてもよろしいでしょうか。",tr:""};
+ return {txt:"สวัสดี"+me+" คุณ"+k.name.split(" ")[0]+" มีตำแหน่ง "+c.cond.posTh+" ที่บริษัทญี่ปุ่นใน"+(AREAS[c.cond.area]?AREAS[c.cond.area].th:"")+" เงินเดือนสูงสุด "+fmt(c.cond.budget||0)+" บาท สนใจให้เราแนะนำไหม"+me,
+  tr:"（訳）"+k.ja+"さん、"+c.cond.area+"の日系企業で「"+c.cond.pos+"」の求人があります。月給"+fmt(c.cond.budget||0)+"バーツまでです。推薦を進めてもよいですか。"};
+}
+function contactReply(k){
+ var p=k.g==="f"?"ค่ะ":"ครับ";
+ if(k.nat==="jp")return k.resp==="no"?{txt:"ご連絡ありがとうございます。申し訳ありません、先週ほかの会社の内定を承諾しました。",tr:""}:{txt:"ありがとうございます。ぜひ進めてください。平日の午後ならオンライン面接が可能です。",tr:""};
+ return k.resp==="no"?{txt:"ขอบคุณ"+p+" แต่ตอนนี้ตัดสินใจรับข้อเสนอของที่อื่นไปแล้ว"+p,tr:"（訳）ありがとうございます。ただ、先日ほかの会社の内定を承諾しました。"}:{txt:"สนใจ"+p+" ช่วยแนะนำด้วยนะ"+p+" สัมภาษณ์ได้วันธรรมดาช่วงบ่าย"+p,tr:"（訳）興味があります。ぜひ推薦してください。平日の午後なら面接できます。"};
+}
+function candTab(c,st){
+ var list=candidates(c.cond);
+ if(!list.length)return '<div class="card"><h3>条件に合う候補者がいません</h3><p class="tiny muted">推薦メールでは、給与か経験年数の条件を少し広げるご提案をします。あわせて求人の募集投稿で新しい候補者を集めます。</p></div>';
+ var ok=okIds(st).length;
+ var h='<div class="card" style="padding:12px 16px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:13px">候補者リストから '+list.length+' 名が条件に合いました</b><span class="tiny muted">上位の方にLINEで応募の意思を確認します（タイ人の方はタイ語で）</span><span style="flex:1"></span><button class="small btn-i" data-act="askall" data-case="'+c.id+'">'+IC.chat+'選んだ候補者にまとめて確認</button></div></div><div class="cands">';
+ list.forEach(function(r){
+  var k=r.k,on=st.picked.indexOf(k.id)>=0,ck=st.checks[k.id]||"none";
+  var stat=ck==="yes"?'<span class="vac" style="color:var(--green)">● 応募意思あり</span>':ck==="no"?'<span class="vac" style="color:var(--red)">● 辞退（他社に決定）</span>':ck==="asking"?'<span class="vac" style="color:var(--amber)">● 確認中…</span>':'<span class="vac muted">○ 未確認</span>';
+  h+='<div class="cand '+(ck==="no"?"off":"")+'">'+face(k,natJ(k)+" · "+k.age+"歳")+'<div><div class="cand-h"><b>'+esc(k.ja)+'</b><span class="tiny muted">'+esc(k.field.join("・"))+' · 経験'+k.yrs+'年</span><span style="flex:1"></span>'+stat+'</div>'+
+   '<div class="spec">'+(k.jlpt?"日本語"+k.jlpt+" · ":"")+(k.en?"英語"+k.en+" · ":"")+'勤務可：'+esc(k.areas.join("・"))+' · 入社：'+esc(k.start)+' · <b style="color:var(--ink)">希望 '+fmt(k.want)+' B/月</b> · 一致度 '+Math.min(99,r.s)+'</div>'+
+   '<div class="chips">'+r.hit.map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join("")+r.miss.map(function(x){return '<span class="chip no">'+esc(x)+'</span>'}).join("")+'</div>'+
+   '<div class="owner"><label class="tiny" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-pick="'+k.id+'" data-case="'+c.id+'" '+(on?"checked":"")+' '+(ck==="no"?"disabled":"")+'>推薦に入れる</label>'+
+   (ck==="none"?'<button class="small btn-i" data-act="ask" data-cand="'+k.id+'" data-case="'+c.id+'">'+IC.chat+'応募意思を確認（LINE'+(k.nat==="th"?"・タイ語":"")+'）</button>':'')+'</div>';
+  if(ck!=="none"){var o=contactMsg(k,c);h+='<div class="owner" style="flex-direction:column"><div class="bubble out" style="white-space:pre-wrap">'+esc(o.txt)+(o.tr?'<span class="tr">'+esc(o.tr)+'</span>':'')+'</div>';
+   if(ck!=="asking"){var rp=contactReply(k);h+='<div class="bubble in">'+esc(rp.txt)+(rp.tr?'<span class="tr">'+esc(rp.tr)+'</span>':'')+'</div>'}
+   h+='</div>'}
+  h+='</div></div>';
+ });
+ h+='</div><div class="actions"><button class="primary btn-i" data-ptab="doc" '+(ok?"":"disabled")+'>'+IC.doc+'推薦書と面接日程を作る</button><span class="tiny muted">'+(ok?"応募意思を確認できた "+ok+" 名で作ります":"推薦に入れた候補者の応募意思を確認してください")+'</span></div>';
+ return h;
+}
+var TIMES=["10:00","13:30","15:00","16:30"];
+function slotsFor(ids){return ids.map(function(id,i){return {k:K(id),d:i<2?D1:D2,t:TIMES[i%2]}})}
+function docHtml(c,st,forPrint){
+ var en=c.cond.lang==="en",ids=okIds(st),sl=slotsFor(ids),k=c.cond;
+ var h='<div class="doc" '+(forPrint?'id="printDoc"':'')+'><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h4>'+(en?"Candidate Recommendation":"候補者のご推薦")+'</h4><div class="tiny muted">'+esc(BRAND)+' · '+md(NOW)+' · '+(en?"Prepared by "+STAFF_EN:"担当 "+STAFF)+'</div></div><div class="tiny muted" style="text-align:right">JOB-'+c.id+'</div></div>'+
+  '<div class="to">'+esc(c.addressee.replace(/\n/g," "))+'</div><p class="lead">'+(en?"For the position of "+k.posEn+" ("+(AREAS[k.area]?AREAS[k.area].en:"")+(k.budget?", up to THB "+fmt(k.budget):"")+"), we confirmed interest with the following candidates.":"「"+k.pos+"」（"+(k.area||"")+(k.budget?"／月給"+fmt(k.budget)+"バーツまで":"")+"）に、応募の意思を確認できた方をご推薦します。")+'</p>';
+ ids.forEach(function(id,i){var p=K(id);h+='<div class="doc-prop">'+face(p,(i+1)+". "+initials(p))+'<div><b style="font-size:14px">'+(i+1)+". "+esc(initials(p))+'（'+p.age+(en?", ":"歳・")+(en?(p.nat==="jp"?"Japanese":"Thai"):natJ(p))+'）</b><div class="spec tiny" style="margin:4px 0 6px;color:#5f6d66">'+(en?p.field.map(function(f){return FIELD_EN[f]}).join(" / ")+" · "+p.yrs+" yrs"+(p.jlpt?" · Japanese "+p.jlpt:"")+(p.en?" · English: "+ENL_EN[p.en]:""):esc(p.field.join("・"))+" · 経験"+p.yrs+"年"+(p.jlpt?" · 日本語"+p.jlpt:"")+(p.en?" · 英語"+p.en:""))+'</div><div style="font-size:12.5px;line-height:1.75">'+esc(en?"Summary: "+p.pt:"推薦理由："+p.pt)+'</div><div style="font-size:13px;font-weight:600;margin-top:6px">'+(en?"Expected salary: THB "+fmt(p.want)+" / Available: "+p.start:"希望給与 "+fmt(p.want)+" バーツ ／ 入社可能："+p.start)+'</div></div></div>'});
+ h+='<div style="border-top:1px solid var(--line);padding-top:12px"><b style="font-size:13px">'+(en?"Proposed interview schedule":"面接日程のご提案")+'</b><div class="route">';
+ sl.forEach(function(x){h+='<div><b>'+(en?mdwEn(x.d):mdw(x.d))+'</b><span class="pt"></span><span>'+x.t+'　'+esc(initials(x.k))+(en?" · online or at your office":" · オンライン／貴社にて")+'</span></div>'});
+ h+='</div><p class="tiny muted" style="margin:8px 0 0">'+(en?"Full résumés are available on request. We will coordinate the schedule with each candidate.":"履歴書の原本はご希望に応じてお送りします。候補者との日程調整は当社で行います。")+'</p></div></div>';
+ return h;
+}
+function docTab(c,st){
+ var ids=okIds(st);
+ if(!ids.length)return '<div class="empty"><div><div class="em-i">'+IC.doc+'</div><h3>応募意思を確認できた候補者がまだいません</h3><p class="tiny">「候補者・意向確認」で候補者を選び、意思を確認してください。</p><button data-ptab="cand">候補者へ</button></div></div>';
+ if(st.step<3){st.step=3;setTimeout(save,0)}
+ return '<div class="card" style="background:#fbfcfb">'+docHtml(c,st)+'</div><div class="actions"><button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.sent?"disabled":"")+'>'+IC.send+'推薦書を返信メールに添付</button><span class="tiny muted">メール画面に移り、推薦書付きの返信が入ります</span></div>';
+}
+function proposalMail(c,st){
+ var en=c.cond.lang==="en",ids=okIds(st),sl=slotsFor(ids),k=c.cond;
+ if(en){
+  var s="Dear "+c.addressee+",\n\nThank you for your request. For the "+k.posEn+" position, we contacted candidates and confirmed interest from the following "+ids.length+":\n\n";
+  ids.forEach(function(id,i){var p=K(id);s+=(i+1)+". "+initials(p)+" ("+p.age+") "+p.field.map(function(f){return FIELD_EN[f]}).join("/")+" "+p.yrs+" yrs / English: "+ENL_EN[p.en]+" / THB "+fmt(p.want)+"\n"});
+  s+="\nDetails are in the attached recommendation. Proposed interview slots:\n";
+  sl.forEach(function(x){s+="- "+mdwEn(x.d)+" "+x.t+" "+initials(x.k)+"\n"});
+  s+="\nCould you also let us know:\n";c.checks.forEach(function(x){s+="- "+x+"\n"});
+  return s+"\nBest regards,\n"+STAFF_EN+"\n"+BRAND;
+ }
+ var s2=c.addressee+"\n\nいつもお世話になっております。"+BRAND+"の"+STAFF+"です。\n「"+k.pos+"」の件、候補者に連絡し、応募の意思を確認できた"+ids.length+"名をご推薦いたします。\n\n";
+ ids.forEach(function(id,i){var p=K(id);s2+=(i+1)+". "+initials(p)+"（"+p.age+"歳・"+natJ(p)+"）"+p.field.join("・")+" "+p.yrs+"年"+(p.jlpt?"・日本語"+p.jlpt:"")+(p.en?"・英語"+p.en:"")+"・希望"+fmt(p.want)+"バーツ\n"});
+ s2+="\n詳しくは添付の推薦書をご覧ください。\n面接は以下の日程でいかがでしょうか。\n";
+ sl.forEach(function(x){s2+="・"+mdw(x.d)+" "+x.t+" "+initials(x.k)+"\n"});
+ s2+="\nあわせて、以下をお知らせいただけますでしょうか。\n";c.checks.forEach(function(x){s2+="・"+x+"\n"});
+ return s2+"\n引き続きよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF;
+}
+
+/* ============================================================ view: sns */
+function postText(j,ch,lang,v){
+ v=v||0;var k=j.cond,ar=AREAS[k.area]||{en:"Thailand",th:"ประเทศไทย"};
+ if(lang==="en"){
+  var hook=["We're hiring","Job opening","New position"][v%3];
+  return hook+": "+k.posEn+" ("+ar.en+")\n"+(k.nat==="th"?"Thai nationality":k.nat==="jp"?"Japanese nationality":"")+(k.jlpt?" · Japanese "+k.jlpt+"+":"")+(k.en?" · English: "+ENL_EN[k.en]:"")+(k.yrs?" · "+k.yrs+"+ yrs experience":"")+"\n"+(k.duties||[]).slice(0,2).map(function(x){return "- "+x}).join("\n")+"\n\nSalary: up to THB "+fmt(k.budget||0)+" / month\nApply: send your résumé by message."+(ch==="line"?"":"\n\n#JobsInThailand #"+ar.en.split(" ")[0]+"Jobs #JapaneseCompany");
+ }
+ if(lang==="th"){
+  var hk=["รับสมัครด่วน","ตำแหน่งงานใหม่","บริษัทญี่ปุ่นรับสมัคร"][v%3];
+  return "【"+hk+"】"+k.posTh+"\n📍 "+ar.th+"\n"+(k.jlpt?"• ภาษาญี่ปุ่น "+k.jlpt+" ขึ้นไป\n":"")+(k.en?"• ภาษาอังกฤษ"+(k.en==="ビジネス"?"ระดับธุรกิจ":"สื่อสารได้")+"\n":"")+(k.yrs?"• ประสบการณ์ "+k.yrs+" ปีขึ้นไป\n":"")+"💰 เงินเดือนสูงสุด "+fmt(k.budget||0)+" บาท\n\nสนใจส่งเรซูเม่ทาง"+(ch==="line"?"แชทนี้":"ข้อความ")+"ได้เลย"+(ch==="line"?"":"\n\n#หางานญี่ปุ่น #งาน"+ar.th.replace(/\s|ฯ/g,"")+" #บริษัทญี่ปุ่น");
+ }
+ var lead=["日系企業の求人です。","新しい求人が入りました。","急募の求人です。"][v%3];
+ return (ch==="line"?"【求人のお知らせ】\n":"【求人】")+k.area+"｜"+k.pos+"\n"+lead+"\n"+(k.duties||[]).slice(0,2).map(function(x){return "・"+x}).join("\n")+"\n\n■ 給与：〜"+fmt(k.budget||0)+"バーツ／月\n■ 条件："+(k.nat==="jp"?"日本人":"タイ人")+(k.jlpt?"・日本語"+k.jlpt+"以上":"")+(k.en?"・英語"+k.en:"")+(k.yrs?"・経験"+k.yrs+"年以上":"")+"\n■ 応募："+(ch==="line"?"このトークに「応募」と送ってください":"DM・LINEでお気軽に")+(ch==="line"?"":"\n\n#タイ求人 #タイ就職 #"+k.area+" #現地採用");
+}
+function slots(){var out=[];for(var i=0;i<14&&out.length<4;i++){var d=addD(NOW,i+1);if(d.getDay()===1||d.getDay()===4)out.push(d)}return out}
+function viewSns(){
+ var posts=state.posts;
+ var rows=posts.map(function(s){var j=JOB(s.job);var b=s.status==="posted"?["配信済み","gray"]:s.status==="scheduled"?["予約済み","green"]:["下書き","amber"];
+  return '<button class="row '+(s.id===state.selPost?"active":"")+'" data-post="'+s.id+'"><div class="row-top"><b>'+esc(j.cond.pos)+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div class="snip">'+esc(j.cond.area+" · "+(j.cond.nat==="jp"?"日本人":"タイ人")+" · 〜"+fmt(j.cond.budget||0)+"B")+'</div><div class="row-foot"><span class="badge blue">'+({line:"LINE配信",facebook:"Facebook",linkedin:"LinkedIn"})[s.ch]+'</span>'+(s.auto?'<span class="badge gray">自動作成：'+esc(s.why||"")+'</span>':'')+(s.when?'<span class="badge gray">'+esc(s.when)+'</span>':'')+'</div></button>'}).join("");
+ var s=posts.filter(function(x){return x.id===state.selPost})[0]||posts[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">配信する求人</b> <span class="badge gray">'+posts.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">求人票をつくると、募集投稿の下書きが自動でできます</div></section>'+
+  '<section class="detail">'+(s?postDetail(s):"")+'</section></div>';
+}
+function postDetail(s){
+ var j=JOB(s.job),lang=state.lang,txt=s.text||postText(j,s.ch,lang,s.v),k=j.cond;
+ var ch=[["line","LINE配信"],["facebook","Facebook"],["linkedin","LinkedIn"]].map(function(x){return '<button data-ch="'+x[0]+'" class="'+(s.ch===x[0]?"on":"")+'" '+(s.status!=="draft"?"disabled":"")+'>'+x[1]+'</button>'}).join("");
+ var lg=[["th","ไทย"],["ja","日本語"],["en","English"]].map(function(x){return '<button data-lang="'+x[0]+'" class="'+(lang===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+ var hue={"バンコク":200,"チョンブリ":160,"アユタヤ":30,"ラヨーン":260}[k.area]||200;
+ var ph='<div class="photo" style="background:linear-gradient(135deg,hsl('+hue+',38%,52%),hsl('+((hue+40)%360)+',42%,34%))">'+IC.person+'<span>'+esc((lang==="th"?k.posTh:lang==="en"?k.posEn:k.pos)+" · ~"+fmt(k.budget||0)+"B")+'</span></div>';
+ var prev=s.ch==="line"?'<div class="line-prev">'+ph+'<div class="lb">'+esc(txt)+'</div></div>':'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><b>'+esc(BRAND)+'</b></div>'+ph+'<div class="tx">'+esc(txt)+'</div></div>';
+ var sl=slots().map(function(d){return '<option value="'+stamp(d,"12:00")+'">'+mdw(d)+' 12:00</option>'}).join("");
+ return '<div class="detail-inner"><div class="sns-grid"><div><div class="p-head"><div><h2>'+esc(k.pos)+'</h2><div class="meta">'+esc(k.client+" · "+k.area+" · 〜"+fmt(k.budget||0)+" B/月")+'</div></div></div>'+
+  '<div class="actions"><div class="seg">'+ch+'</div><div class="seg">'+lg+'</div><button class="small btn-i" data-act="regen" '+(s.status!=="draft"?"disabled":"")+'>'+IC.spark+'文面を作り直す</button></div>'+prev+
+  '<div class="actions">'+(s.status==="draft"?'<select id="slot" aria-label="配信日時">'+sl+'</select><button class="primary btn-i" data-act="schedule">'+IC.cal+'この日時に予約</button><button data-act="postnow">今すぐ配信（デモ）</button>':s.status==="scheduled"?'<span class="badge green">'+esc(s.when)+' に配信予定</span><button class="small" data-act="unschedule">予約を取り消す</button>':'<span class="badge gray">'+esc(s.when)+' に配信済み</span>')+'</div></div>'+
+  '<div><div class="card" style="margin-top:0"><h3>'+IC.cal+' 配信カレンダー</h3>'+calendar()+'</div>'+
+  '<div class="card"><h3>自動運用のルール</h3>'+
+  '<label class="toggle"><input type="checkbox" data-auto="draft" '+(state.auto.draft?"checked":"")+'><span>求人票をつくったら、募集投稿の下書きを自動で作る（タイ語・日本語・英語）</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="weekly" '+(state.auto.weekly?"checked":"")+'><span>毎週 月・木 12:00 に、予約した投稿を自動で配信する</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="approve" '+(state.auto.approve?"checked":"")+'><span>配信の前に担当者の確認を入れる</span></label>'+
+  '<p class="tiny muted" style="margin:6px 0 0">本番では、求人依頼のメールや求人票の更新をもとに、この画面の操作なしで動きます。応募があれば候補者リストに自動で入ります。</p></div></div></div></div>';
+}
+function calendar(){
+ var out="";
+ for(var i=-2;i<7;i++){var d=addD(NOW,i);var key=md(d);
+  var its=state.posts.filter(function(s){return s.when&&s.when.split(" ")[0]===key});
+  out+='<div class="cal-day"><b>'+mdw(d)+(i===0?"　今日":"")+'</b>'+(its.length?its.map(function(s){return '<div class="it"><span class="badge '+(s.status==="posted"?"gray":"green")+'">'+s.when.split(" ")[1]+'</span>'+esc(JOB(s.job).cond.pos)+'</div>'}).join(""):'<div class="it muted">—</div>')+'</div>'}
+ return '<div class="cal">'+out+'</div>';
+}
+
+/* ============================================================ actions */
+function go(view){state.view=view;render();window.scrollTo(0,0)}
+function openCase(id){state.selCase=id;var s=cs(id);state.ptab=s.extracted?(s.step>=3?"doc":s.step>=2?"cand":"cond"):"cond";go("proposal")}
+function captureCompose(mailId){var to=$("#rTo"),sj=$("#rSubj"),b=$("#rBody");if(!to)return null;return {mail:mailId,to:to.value,subject:sj.value,body:b.value,attach:$("#replyBox").dataset.attach||null}}
+function addPostFor(jobId,why){
+ if(!state.auto.draft)return;
+ if(state.posts.some(function(s){return s.job===jobId}))return;
+ var id="S"+(++state.seq)+"x";state.posts.unshift({id:id,job:jobId,status:"draft",ch:"line",when:"",auto:true,why:why});
+}
+function ask(caseId,kid){
+ var st=cs(caseId);if(st.checks[kid]&&st.checks[kid]!=="none")return;
+ st.checks[kid]="asking";if(st.picked.indexOf(kid)<0)st.picked.push(kid);if(st.step<2)st.step=2;
+ render();
+ setTimeout(function(){
+  var k=K(kid);st.checks[kid]=k.resp;
+  if(k.resp==="no"){st.picked=st.picked.filter(function(x){return x!==kid});
+   var nxt=candidates(C(caseId).cond).map(function(r){return r.k.id}).filter(function(id){return (!st.checks[id]||st.checks[id]==="none")&&st.picked.indexOf(id)<0})[0];
+   toast(k.ja+" さんは他社に決まっていました。"+(nxt?"次の候補「"+K(nxt).ja+"」さんを推薦に追加しました":"他の候補者を確認してください"));
+   if(nxt){st.picked.push(nxt)}
+  }
+  render();
+ },1400);
+}
+function attachDoc(caseId){
+ var st=cs(caseId),c=C(caseId);st.attached=true;st.step=3;
+ var mid=state.mails.filter(function(m){return m.caseId===caseId&&m.folder==="inbox"&&m.kind!=="interview"})[0];
+ state.compose={mail:mid.id,to:mid.addr,subject:"Re: "+mid.subject,body:proposalMail(c,st),attach:docName(c)};
+ state.folder="inbox";state.selMail=mid.id;go("mail");
+ setTimeout(function(){var r=$("#replyBox");if(r)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("推薦書を添付し、返信の本文を作りました。内容を確認して送信してください");
+}
+function sendMail(mailId){
+ var m=state.mails.filter(function(x){return x.id===mailId})[0],d=captureCompose(mailId);if(!d)return;
+ if(!d.to||!d.body.trim()){toast("宛先と本文を入れてください");return}
+ var sent={id:"M"+(++state.seq)+"s",folder:"sent",from:BRAND,addr:d.to,toName:m.folder==="inbox"?m.from:m.toName,init:BRAND.charAt(0),date:stamp(NOW,new Date().toTimeString().slice(0,5)),subject:d.subject,body:d.body,attach:d.attach,caseId:m.caseId,tags:[{t:"送信済み",k:"gray"}]};
+ state.mails.unshift(sent);state.compose=null;
+ if(m.folder==="draft")state.mails=state.mails.filter(function(x){return x.id!==m.id});
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ if(st&&d.attach&&m.kind!=="interview"){st.sent=true;
+  var ids=okIds(st);
+  setTimeout(function(){
+   var en=c.cond.lang==="en",a=K(ids[0]),b=K(ids[1]||ids[0]);
+   var body=en?"Thank you for the recommendation.\nWe would like to interview "+initials(a)+(b!==a?" and "+initials(b):"")+" on "+mdwEn(D1)+" in the afternoon, at our office if possible.\n\nBest regards,\nArisa":"ご推薦ありがとうございます。\n"+initials(a)+"さん"+(b!==a?"と"+initials(b)+"さん":"")+"の面接をお願いします。\n"+mdw(D1)+"の午後、当社で対面でお願いできますか。\nよろしくお願いいたします。";
+   state.mails.unshift({id:"M"+(++state.seq)+"r",folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:stamp(NOW,new Date().toTimeString().slice(0,5)),subject:"Re: "+d.subject.replace(/^Re:\s*/,""),body:body,caseId:c.id,kind:"interview",want:[a.id,b.id],tags:[{t:"面接希望",k:"green"}],unread:true});
+   render();toast(c.from+" から返信が届きました（面接希望）");
+  },3500);
+ }
+ if(st&&m.kind==="interview"&&st.interview){st.interview.confirmed=true}
+ state.folder="sent";state.selMail=sent.id;render();toast("送信しました（デモのため、実際には送信していません）");
+}
+function confirmInterview(caseId,mailId){
+ var st=cs(caseId),c=C(caseId),m=state.mails.filter(function(x){return x.id===mailId})[0];
+ var ids=(m.want||[]).filter(function(v,i,a){return a.indexOf(v)===i});
+ st.interview={ids:ids,date:md(D1),confirmed:false};
+ var times=["13:30","15:00"],en=c.cond.lang==="en";
+ var t=en?"Dear "+c.addressee+",\n\nThank you. The interviews are confirmed for "+mdwEn(D1)+" at your office:\n":c.addressee.split("\n").pop()+"\n\nご連絡ありがとうございます。以下の日程で面接を確定しました。\n\n";
+ ids.forEach(function(id,i){var k=K(id);t+=(en?"- ":"・")+times[i]+" "+initials(k)+"\n"});
+ t+=en?"\nBoth candidates will bring their résumés and certificates. I will attend the first interview.\n\n"+STAFF_EN+"\n"+BRAND:"\n候補者には当社から場所と持ち物をご案内し、前日にもリマインドいたします。\n当日は最初の面接に"+STAFF+"も同席いたします。\n\n"+BRAND+"　"+STAFF;
+ state.compose={mail:mailId,to:m.addr,subject:"Re: "+m.subject.replace(/^Re:\s*/,""),body:t,attach:null};
+ render();setTimeout(function(){var r2=$("#replyBox");if(r2)r2.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("面接日程を確定し、確認メールと候補者へのLINE案内（タイ語）を作りました");
+}
+function help(){
+ modal('<h3>このワークスペースの使い方</h3><p class="tiny muted">'+esc(BRAND)+'様の業務に近い形で動かせるデモです。企業・候補者はすべて架空のサンプルで、メールも実際には送信しません。</p>'+
+ '<ol><li><b>メール</b>：企業からの求人依頼を開き、「このメールから候補者推薦を作る」を押します。</li><li><b>候補者推薦</b>：①求人票をつくる（英語版・タイ語版も）→ ②候補者リストと照合し、LINEで応募の意思を確認（タイ人の方にはタイ語で）→ ③推薦書と面接日程を作る → 「返信へ添付」。</li><li><b>メール</b>：推薦書付きの返信を送ると、企業から面接希望の返信が届きます。「面接を確定して返信を作る」で確認メールまで作ります。</li><li><b>求人のSNS配信</b>：求人票をつくると、募集投稿の下書きがタイ語・日本語・英語で自動でできます。日時を選んで予約すると、カレンダーに入ります。</li></ol>'+
+ (SERVICES.length?'<p class="tiny">想定した業務：'+SERVICES.map(esc).join("・")+'</p>':'')+
+ '<div class="cta-box"><b>このデモを、'+esc(BRAND)+'様の実際の候補者リストとメールで動かします。</b><br>Excel・スプレッドシートの候補者リスト、Gmail・Outlook、LINE公式アカウントと連携できます。<br>開発費 0円 ／ 1機能 月額 5,000バーツ（税別）。まずは30分、お困りの業務をお聞かせください。<br><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</div>'+
+ '<div class="actions" style="justify-content:flex-end"><button class="primary" data-close>はじめる</button></div>');
+}
+function candsModal(){
+ modal('<h3>候補者リスト（サンプル '+CANDS.length+'名）</h3><p class="tiny muted">本番では、貴社のExcel・スプレッドシート・データベースの候補者リストをそのまま使います。</p><div style="overflow-x:auto"><table><tr><th>候補者</th><th>国籍</th><th>職種</th><th class="num">経験</th><th>日本語</th><th>英語</th><th class="num">希望給与（B）</th><th>勤務可</th></tr>'+CANDS.map(function(k){return '<tr><td>'+esc(k.ja)+'</td><td>'+natJ(k)+'</td><td class="tiny">'+esc(k.field.join("・"))+'</td><td class="num">'+k.yrs+'年</td><td>'+(k.jlpt||"—")+'</td><td>'+(k.en||"—")+'</td><td class="num">'+fmt(k.want)+'</td><td class="tiny">'+esc(k.areas.join("・"))+'</td></tr>'}).join("")+'</table></div><div class="actions" style="justify-content:flex-end"><button data-close>閉じる</button></div>');
+}
+function pasteModal(){
+ var bg=modal('<h3>求人依頼を貼り付けて試す</h3><p class="tiny muted">実際に届くメール・LINEに近い文面を貼り付けると、受信箱に追加して候補者推薦まで試せます（簡易読み取り）。</p><div class="paste"><textarea id="pasteText" placeholder="例）チョンブリの工場で、日本語N2以上のタイ人通訳を1名探しています。経験2年以上、給与は3.5万バーツまで。"></textarea></div><div class="actions" style="justify-content:flex-end"><button data-close>キャンセル</button><button class="primary" id="pasteGo">受信箱に追加</button></div>');
+ $("#pasteGo",bg).onclick=function(){var t=$("#pasteText",bg).value.trim();if(!t)return;
+  var r=parse(t),id="X"+(++state.seq);
+  state.custom[id]={id:id,custom:true,from:r.cond.client,addr:"client@example.com",init:r.cond.client.charAt(0),date:stamp(NOW,new Date().toTimeString().slice(0,5)),subject:t.split("\n")[0].slice(0,40),tag:"貼り付け",body:t,cond:r.cond,checks:r.checks,addressee:r.addressee};
+  state.mails.unshift({id:"M"+id,folder:"inbox",from:r.cond.client,addr:"client@example.com",init:r.cond.client.charAt(0),date:state.custom[id].date,subject:state.custom[id].subject,body:t,tags:[{t:"求人依頼",k:"green"},{t:"貼り付け",k:"gray"}],caseId:id,unread:true});
+  state.folder="inbox";state.selMail="M"+id;bg.remove();render();toast("受信箱に追加しました");
+ };
+}
+
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button,[data-pick]");if(!t)return;
+ var ds=t.dataset;
+ if(t.hasAttribute("data-close"))return;
+ if(ds.view){go(ds.view);return}
+ if(ds.folder){state.folder=ds.folder;var f=state.mails.filter(function(m){return m.folder===ds.folder})[0];state.selMail=f?f.id:null;render();return}
+ if(ds.mail&&!ds.act){state.selMail=ds.mail;state.mails.forEach(function(m){if(m.id===ds.mail)m.unread=false});render();return}
+ if(ds.case&&!ds.act&&!t.hasAttribute("data-pick")){state.selCase=ds.case;var st0=cs(ds.case);state.ptab=st0.extracted?(st0.step>=3?"doc":st0.step>=2?"cand":"cond"):"cond";render();return}
+ if(ds.ptab){if(ds.ptab!=="mail"&&!cs(state.selCase).extracted&&ds.ptab!=="cond"){toast("先に求人票をつくってください");return}state.ptab=ds.ptab;if(ds.ptab==="doc"){var sd=cs(state.selCase);if(okIds(sd).length&&sd.step<3)sd.step=3}if(ds.ptab==="cand"){var s1=cs(state.selCase);if(s1.step<2)s1.step=2;if(!s1.picked.length){var c1=C(state.selCase);s1.picked=candidates(c1.cond).slice(0,3).map(function(r){return r.k.id})}}render();return}
+ if(ds.post){state.selPost=ds.post;render();return}
+ if(ds.ch){var sp=state.posts.filter(function(x){return x.id===state.selPost})[0];sp.ch=ds.ch;sp.text=null;render();return}
+ if(ds.lang){state.lang=ds.lang;state.posts.forEach(function(x){if(x.status==="draft")x.text=null});render();return}
+ switch(ds.act){
+  case "help":help();break;
+  case "cands":candsModal();break;
+  case "reset":if(confirm("デモを最初の状態に戻しますか？")){state=fresh();render();toast("最初の状態に戻しました")}break;
+  case "paste":pasteModal();break;
+  case "gomail":var mm=state.mails.filter(function(m){return m.caseId===state.selCase&&m.folder==="inbox"})[0];if(mm){state.folder="inbox";state.selMail=mm.id}go("mail");break;
+  case "toproposal":openCase(ds.case);break;
+  case "extract":var st=cs(ds.case);t.disabled=true;t.innerHTML=IC.spark+"求人票をつくっています…";setTimeout(function(){st.extracted=true;st.step=1;state.ptab="cond";addPostFor(ds.case,"求人票から");render()},900);break;
+  case "ask":ask(ds.case,ds.cand);break;
+  case "askall":var st2=cs(ds.case);if(!st2.picked.length){toast("推薦に入れる候補者を選んでください");break}st2.picked.slice().forEach(function(id,i){setTimeout(function(){ask(ds.case,id)},i*300)});break;
+  case "viewdoc":var c2=C(ds.case),st3=cs(ds.case);if(!okIds(st3).length){toast("応募意思を確認できた候補者がいません");break}modal(docHtml(c2,st3,true)+'<div class="actions" style="justify-content:flex-end"><button data-act="print">印刷・PDFで保存</button><button class="primary" data-close>閉じる</button></div>');break;
+  case "print":window.print();break;
+  case "attach":attachDoc(ds.case);break;
+  case "insertdoc":var mi=state.mails.filter(function(x){return x.id===ds.mail})[0];attachDoc(mi.caseId);break;
+  case "savedraft":var d=captureCompose(ds.mail);if(!d)break;var src=state.mails.filter(function(x){return x.id===ds.mail})[0];
+   if(src.folder==="draft"){src.body=d.body;src.subject=d.subject;src.addr=d.to}else{state.mails.unshift({id:"M"+(++state.seq)+"d",folder:"draft",from:BRAND,addr:d.to,toName:src.from,init:BRAND.charAt(0),date:stamp(NOW,new Date().toTimeString().slice(0,5)),subject:d.subject,body:d.body,attach:d.attach,caseId:src.caseId,tags:[{t:"下書き",k:"amber"}]})}
+   state.compose=null;render();toast("下書きに保存しました");break;
+  case "send":sendMail(ds.mail);break;
+  case "confirmint":confirmInterview(ds.case,state.selMail);break;
+  case "regen":var sp2=state.posts.filter(function(x){return x.id===state.selPost})[0];sp2.v=(sp2.v||0)+1;sp2.text=null;render();break;
+  case "schedule":var sp3=state.posts.filter(function(x){return x.id===state.selPost})[0];sp3.when=$("#slot").value;sp3.status="scheduled";sp3.text=postText(JOB(sp3.job),sp3.ch,state.lang,sp3.v);render();toast("予約しました："+sp3.when+"（"+({line:"LINE配信",facebook:"Facebook",linkedin:"LinkedIn"})[sp3.ch]+"）");break;
+  case "unschedule":var sp4=state.posts.filter(function(x){return x.id===state.selPost})[0];sp4.status="draft";sp4.when="";render();break;
+  case "postnow":var sp5=state.posts.filter(function(x){return x.id===state.selPost})[0];sp5.status="posted";sp5.when=stamp(NOW,new Date().toTimeString().slice(0,5));sp5.text=postText(JOB(sp5.job),sp5.ch,state.lang,sp5.v);render();toast("配信しました（デモのため、実際には配信していません）");break;
+  case "newpost":var free=allCases().filter(function(c){return !state.posts.some(function(s){return s.job===c.id})})[0];if(!free){toast("配信していない求人はありません");break}var nid="S"+(++state.seq)+"n";state.posts.unshift({id:nid,job:free.id,status:"draft",ch:"facebook",when:"",auto:false});state.selPost=nid;render();break;
+ }
+});
+document.addEventListener("change",function(e){
+ var t=e.target;
+ if(t.dataset.pick){var st=cs(t.dataset.case),id=t.dataset.pick;if(t.checked){if(st.picked.indexOf(id)<0)st.picked.push(id)}else st.picked=st.picked.filter(function(x){return x!==id});render();return}
+ if(t.dataset.auto){state.auto[t.dataset.auto]=t.checked;save();return}
+});
+document.addEventListener("input",function(e){
+ var t=e.target;if(t.id==="rBody"||t.id==="rTo"||t.id==="rSubj"){state.compose={mail:state.selMail,to:$("#rTo").value,subject:$("#rSubj").value,body:$("#rBody").value,attach:$("#replyBox").dataset.attach||null};save()}
+});
+
+render();
+if(!state.seen){state.seen=true;save();help()}
 })();
 </script>
 </body>
