@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>手続き・記帳ワークスペース｜Nova Strategy</title>
+<meta name="description" content="お客様からの依頼メールから、必要書類のチェックと不足の連絡、申請スケジュール・見積・期限表、申告期限のお知らせ配信までをひとつの画面で。会計事務所・会社設立・ビザ手続き代行向けの業務デモ。">
+<style>
+:root{--bg:#f6f8fa;--paper:#fff;--ink:#223731;--muted:#788680;--line:#e4eae7;--green:#16654e;--green-2:#104c3a;--green-light:#eaf5ee;--amber:#926417;--amber-light:#fff5df;--red:#b04438;--red-light:#fbeae6;--blue:#476c9f;--blue-light:#e9f0fb;--nav:176px;
+--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:13px/1.65 var(--font);color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;white-space:nowrap;transition:background .15s}
+button:hover:not(:disabled){background:#f0f6f2}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #75baa2;outline-offset:2px}
+.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--green-2)}
+.small{font-size:11px;padding:5px 9px}
+.subtle{border:0;background:transparent}
+.muted{color:var(--muted)}.tiny{font-size:11px}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.btn-i{display:inline-flex;align-items:center;gap:7px}
+/* top */
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-symbol{width:31px;height:31px;background:var(--green);border-radius:9px;color:#fff;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.brand b{font-size:15px;letter-spacing:.02em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.brand small{display:block;font-size:9px;line-height:1.2;letter-spacing:.16em;color:#6b7c73}
+.crumb{font-size:12px;color:#7b8b83;flex:1}
+.demo-pill{background:#f8f2df;color:#856e30;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.help{border:0;background:none;display:flex;gap:6px;align-items:center;font-size:12px}
+/* layout */
+.layout{height:calc(100vh - 60px);display:grid;grid-template-columns:var(--nav) minmax(0,1fr)}
+.nav{border-right:1px solid var(--line);padding:22px 12px;background:#f3f6f3;display:flex;flex-direction:column;gap:6px}
+.nav-label{font-size:10px;letter-spacing:.12em;color:#859389;padding:0 12px 10px}
+.nav button{display:flex;align-items:center;gap:10px;text-align:left;border:0;padding:11px 12px;background:none;border-radius:8px;font-weight:500;font-size:12.5px;width:100%}
+.nav button.active{background:#dcebe1;color:#145c44}
+.nav button:hover{background:#e5eee7}
+.nav .count:empty{display:none}.nav .count{margin-left:auto;background:#fff9;border-radius:6px;padding:0 6px;font-size:10px}
+.nav .count.hot{background:var(--green);color:#fff}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.nav .note{font-size:9.5px;color:#829083;padding:12px 12px 0;line-height:1.6}
+.workspace{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{min-height:72px;flex-shrink:0;display:flex;align-items:center;padding:10px 26px;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);gap:16px}
+.ws-head h1{font-size:19px;line-height:1.5;margin:0;font-weight:600}
+.ws-head p{font-size:11px;color:#7b8981;margin:2px 0 0}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr)}
+.list-pane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.list-tools{padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:16px;padding-top:4px}
+.tabs button{border:0;background:none;padding:6px 0;border-bottom:2px solid transparent;border-radius:0;color:#829087;font-size:11.5px}
+.tabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+.row{width:100%;display:block;border:0;border-bottom:1px solid #edf0ee;border-radius:0;text-align:left;padding:15px 17px;white-space:normal;background:#fff}
+.row.active{background:#eef6f0;box-shadow:3px 0 0 var(--green) inset}
+.row:hover{background:#f5f8f5}
+.row-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.row-top b{font-size:11.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-top time{font-size:10px;color:#8a968f}
+.dot{width:7px;height:7px;border-radius:50%;background:#267658;flex-shrink:0}
+.row .subj{font-size:12.5px;font-weight:500;line-height:1.6;margin:2px 0}
+.row .snip{font-size:11px;color:#8c968f;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row-foot{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap;line-height:1.7}
+.badge.green{background:#e5f2e9;color:#377355}.badge.amber{background:var(--amber-light);color:var(--amber)}.badge.blue{background:var(--blue-light);color:var(--blue)}.badge.gray{background:#f0f2f1;color:#7e8982}.badge.red{background:var(--red-light);color:#a65a4b}
+.list-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.detail{min-width:0;overflow:auto;background:#fff}
+.detail-inner{padding:24px 30px 40px;max-width:980px}
+.mail-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mail-h h2{font-size:19px;margin:0 0 14px;font-weight:600;line-height:1.5}
+.sender{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#efe9da;color:#7a6331;display:grid;place-items:center;font-size:13px;font-weight:600;flex-shrink:0}
+.sender b{font-size:12.5px;display:block}.sender span{font-size:11px;color:var(--muted)}
+.sender time{margin-left:auto;font-size:11px;color:var(--muted)}
+.mail-body{white-space:pre-wrap;font-size:13px;line-height:1.95;border-bottom:1px solid var(--line);padding-bottom:20px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.reply{border:1px solid var(--line);border-radius:12px;margin-top:18px;overflow:hidden}
+.reply-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;background:#fafbfa;flex-wrap:wrap}
+.reply-h input{border:0;background:transparent;flex:1;min-width:160px;padding:2px}
+.reply textarea{width:100%;border:0;min-height:220px;padding:14px;resize:vertical;line-height:1.8;font-size:12.5px;background:#fff}
+.reply-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfa;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green);border-radius:6px;padding:3px 9px;font-size:11px}
+.empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .em-i{width:58px;height:58px;border:1px solid var(--line);border-radius:14px;display:grid;place-items:center;margin:0 auto 14px;color:var(--green);background:#fff}
+.empty h3{color:var(--ink);font-size:16px;font-weight:500;margin:0 0 6px}
+/* proposal */
+.p-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.p-head h2{margin:0;font-size:18px;font-weight:600}
+.p-head .meta{font-size:11px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px}
+.step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#8a978f;border:0;background:none;padding:6px 0;text-align:left;border-radius:0;border-top:3px solid #e5ebe7}
+.step i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid #cfd8d3;display:grid;place-items:center;font-size:10px;flex-shrink:0}
+.step.done{border-color:#9cc9b2;color:#3d6d57}.step.done i{background:#9cc9b2;color:#fff;border-color:#9cc9b2}
+.step.cur{border-color:var(--green);color:var(--green);font-weight:600}.step.cur i{background:var(--green);color:#fff;border-color:var(--green)}
+.ptabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:10px}
+.ptabs button{border:0;background:none;border-radius:0;padding:9px 0;border-bottom:2px solid transparent;color:#7d8a83;font-size:12px}
+.ptabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;margin-top:14px}
+.card h3{font-size:13.5px;margin:0 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv th{width:28%}
+.miss{color:var(--amber)}
+.checklist{background:var(--amber-light);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px}
+.checklist b{color:var(--amber)}
+.checklist ul{margin:4px 0 0;padding-left:20px}
+.cands{display:grid;gap:12px;margin-top:12px}
+.cand{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.cand.off{opacity:.55}
+.photo{border-radius:9px;min-height:96px;position:relative;overflow:hidden;display:grid;place-items:end start;padding:8px;color:#fff;font-size:10px;font-weight:600;text-shadow:0 1px 2px #0005}
+.photo svg{position:absolute;right:8px;top:8px;width:44px;height:44px;opacity:.85}
+.cand-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cand-h b{font-size:13.5px}
+.cand .spec{font-size:11.5px;color:#5f6d66;margin:2px 0 6px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:999px;padding:1px 8px;background:var(--green-light);color:var(--green)}
+.chip.no{background:#f3f3f1;color:#9a8f7a;text-decoration:line-through}
+.owner{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bubble{border-radius:10px;padding:8px 11px;font-size:12px;max-width:520px;line-height:1.7}
+.bubble.out{background:#e9f6ee}
+.bubble.in{background:#f2f3f5}
+.bubble .tr{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.vac{font-size:11px;font-weight:600}
+.doc{border:1px solid var(--line);border-radius:6px;padding:28px 30px;background:#fff;box-shadow:0 6px 20px #2237310d;max-width:760px}
+.doc h4{margin:0;font-size:18px}
+.doc .to{font-size:13px;margin:14px 0 4px}
+.doc .lead{font-size:12px;color:#5d6b64;margin:0 0 14px}
+.doc-prop{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding:14px 0}
+.doc-prop .photo{min-height:104px}
+.route{display:grid;gap:0;margin-top:6px}
+.route div{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;font-size:12px;align-items:start}
+.route .ln{width:2px;background:#cfe3d7;justify-self:center;height:100%}
+.route .pt{width:10px;height:10px;border-radius:50%;background:var(--green);margin:5px auto 0}
+.foot-bar{position:sticky;bottom:0;background:#fffffff2;border-top:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.foot-bar .sum{margin-right:auto;font-size:11.5px;color:var(--muted)}
+/* sns */
+.sns-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.post-prev{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:420px}
+.post-prev .ph{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:12px}
+.post-prev .ph .avatar{width:28px;height:28px;font-size:11px;background:var(--green);color:#fff}
+.post-prev .photo{border-radius:0;min-height:200px}
+.post-prev .tx{white-space:pre-wrap;padding:12px;font-size:12.5px;line-height:1.75}
+.line-prev{background:#8cabd9;border-radius:12px;padding:14px;max-width:420px}
+.line-prev .lb{background:#fff;border-radius:14px;padding:12px;white-space:pre-wrap;font-size:12.5px;line-height:1.75}
+.line-prev .photo{border-radius:12px;margin-bottom:8px;min-height:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;font-size:11.5px}
+.seg button.on{background:var(--green);color:#fff}
+.cal{display:grid;gap:6px}
+.cal-day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.cal-day b{font-size:11.5px}
+.cal-day .it{font-size:11px;margin-top:4px;display:flex;gap:6px;align-items:center}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:6px 0}
+.toggle input{margin-top:3px;accent-color:var(--green)}
+/* misc */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#21352f;color:#fff;border-radius:10px;padding:10px 16px;font-size:12.5px;box-shadow:0 8px 24px #0003;z-index:50;max-width:92vw}
+.modal-bg{position:fixed;inset:0;background:#1d2b2680;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px 24px}
+.modal h3{margin:0 0 8px;font-size:17px}
+.modal ol{padding-left:20px;margin:8px 0}
+.modal li{margin:6px 0}
+.cta-box{background:var(--green-light);border:1px solid #bfdccb;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:12.5px}
+.cta-box b{color:var(--green)}
+.paste textarea{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px}
+.mobile-tabs{display:none}
+@media (max-width:900px){
+  .topbar{padding:0 12px;gap:10px;height:56px}
+  .crumb,.help span{display:none}
+  .brand{flex:1}
+  .demo-pill{font-size:10px;padding:3px 6px}
+  .demo-pill .long{display:none}
+  .ws-head{flex-wrap:wrap}
+  .brand b{max-width:52vw;font-size:14px}
+  .layout{display:block;height:auto}
+  .nav{display:none}
+  .mobile-tabs{display:flex;gap:4px;background:#f3f6f3;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5;overflow-x:auto}
+  .mobile-tabs button{border:0;background:none;padding:8px 10px;font-size:12px;border-radius:8px}
+  .mobile-tabs button.active{background:#dcebe1;color:#145c44;font-weight:600}
+  .workspace{overflow:visible}
+  .ws-head{padding:10px 14px;min-height:0}
+  .ws-head h1{font-size:16px}
+  .body{display:block}
+  .list-pane{border-right:0;border-bottom:1px solid var(--line);max-height:300px}
+  .detail{overflow:visible}
+  .detail-inner{padding:16px 14px 30px}
+  .foot-bar{padding:10px 14px}
+  .steps{grid-template-columns:1fr}
+  .cand{grid-template-columns:1fr}
+  .cand .photo{min-height:120px}
+  .doc{padding:18px 16px}
+  .doc-prop{grid-template-columns:1fr}
+  .sns-grid{grid-template-columns:1fr}
+}
+@media print{
+  body *{visibility:hidden}
+  #printDoc,#printDoc *{visibility:visible}
+  #printDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  .modal-bg{position:static;background:none}
+}
+
+</style>
+<style>
+:root{--green:#3d4f86;--green-2:#2f3e6c;--green-light:#eceff8}
+.nav button.active,.mobile-tabs button.active{background:#e0e4f2;color:#2f3e6c}
+.nav{background:#f4f5f9}.nav button:hover{background:#e8eaf3}
+.row.active{background:#eff1f8}
+.badge.green{background:#e4e8f5;color:#3d4f86}
+.bubble.out{background:#e9ecf7}
+button:hover:not(:disabled){background:#f1f3f9}
+.route .ln{background:#d3d9ec}
+.step.done{border-color:#aeb8da;color:#44527f}.step.done i{background:#aeb8da;border-color:#aeb8da}
+.dl{display:grid;gap:10px;margin-top:12px}
+.dli{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.dli .st{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700}
+.st.ok{background:#e3f2e8;color:#2e7350}.st.missing{background:var(--red-light);color:var(--red)}.st.check{background:var(--amber-light);color:var(--amber)}.st.asking{background:#eef0f3;color:#7b8794}
+.dli b{font-size:13px}
+.dli .sub{font-size:11px;color:var(--muted)}
+.dli .note{font-size:12px;margin-top:4px}
+.tr-box{background:#f6f7fa;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px;color:#5d6675;white-space:pre-wrap;line-height:1.8}
+.tr-box b{color:var(--ink);font-size:11px;display:block;margin-bottom:2px}
+.est td.num{width:140px}
+.est tr.total td{font-weight:700;border-top:2px solid var(--ink)}
+.disc{font-size:10.5px;color:var(--muted);margin-top:10px}
+.svc{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.cal-day .it.due .badge{background:var(--red-light);color:var(--red)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+/* ============================================================ helpers */
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return Number(n).toLocaleString("en-US")}
+var IC={
+ mail:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ folder:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 13l2 2 4-4"/></svg>',
+ share:'<svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+ list:'<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+ reset:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ help:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>',
+ spark:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+ send:'<svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>',
+ clip:'<svg class="icon" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>',
+ doc:'<svg class="icon" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+ plus:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cal:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+ chat:'<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>'
+};
+
+/* ============================================================ personalization (?c=&s= and #c-<hex>) */
+function hexDecode(h){
+ try{if(!h||h.length%2)return "";var b=new Uint8Array(h.length/2);for(var i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);
+  return window.TextDecoder?new TextDecoder("utf-8").decode(b):decodeURIComponent(escape(String.fromCharCode.apply(null,b)))}catch(e){return ""}
+}
+var q;try{q=new URLSearchParams(location.search)}catch(e){q={get:function(){return null}}}
+var HC="",HS="";
+(function(){var m=(location.hash||"").match(/#c-([0-9a-fA-F]+)(?:-s-([0-9a-fA-F]+))?/);if(m){HC=hexDecode(m[1]);HS=m[2]?hexDecode(m[2]):""}})();
+var COMPANY=(q.get("c")||HC||"").slice(0,60).trim();
+var SERVICES=(q.get("s")||HS||"").split(/[|,、｜]/).map(function(x){return x.trim().slice(0,24)}).filter(Boolean).slice(0,4);
+var BRAND=COMPANY||"サンプル会計事務所";
+var STAFF="田中",STAFF_EN="Tanaka",STAFF_TH="นก",STAFF_THJ="ノック";
+
+/* ============================================================ dates */
+var NOW=new Date();
+function addD(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+function md(d){return (d.getMonth()+1)+"/"+d.getDate()}
+function ymd(d){return d.getFullYear()+"/"+md(d)}
+function wdJ(d){return "日月火水木金土"[d.getDay()]}
+function mdw(d){return md(d)+"（"+wdJ(d)+"）"}
+var MON_EN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var MON_TH=["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+function mdEn(d){return MON_EN[d.getMonth()]+" "+d.getDate()}
+function mdwEn(d){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+mdEn(d)}
+function mdTh(d){return d.getDate()+" "+MON_TH[d.getMonth()]}
+function workday(d){while(d.getDay()===0||d.getDay()===6)d=addD(d,1);return d}
+var Y=addD(NOW,-1);
+function stamp(d,h){return md(d)+" "+h}
+var NEXTM=new Date(NOW.getFullYear(),NOW.getMonth()+1,1);
+var ARR=workday(new Date(NEXTM.getFullYear(),NEXTM.getMonth(),15));     // 駐在員の着任日
+var FBASE=NOW.getDate()<=10?new Date(NOW.getFullYear(),NOW.getMonth(),1):NEXTM; // 申告月
+var PREVM=new Date(FBASE.getFullYear(),FBASE.getMonth()-1,1);              // 記帳する月
+function dom(base,n){return new Date(base.getFullYear(),base.getMonth(),n)}
+var FYE=new Date(NOW.getMonth()>=10?NOW.getFullYear():NOW.getFullYear(),11,31); // 決算日 12/31
+function monJa(d){return (d.getMonth()+1)+"月"}
+
+/* ============================================================ documents master */
+var DOCS={
+ pp:{ja:"パスポートのコピー（全ページ）",en:"Passport copy (all pages)",th:"สำเนาหนังสือเดินทาง (ทุกหน้า)",kw:/パスポート|passport|พาสปอร์ต|หนังสือเดินทาง/i},
+ photo:{ja:"顔写真（3×4cm・6か月以内）",en:"Photos (3x4 cm, within 6 months)",th:"รูปถ่าย 3x4 ซม.",kw:/写真|photo|รูปถ่าย/i},
+ edu:{ja:"最終学歴の卒業証明書（英文）",en:"Graduation certificate (English)",th:"ใบรับรองการศึกษา (ภาษาอังกฤษ)",kw:/卒業|学歴|degree|graduat|การศึกษา/i},
+ cv:{ja:"履歴書・職歴証明書（英文）",en:"CV / employment certificate (English)",th:"ประวัติการทำงาน (ภาษาอังกฤษ)",kw:/履歴書|職歴|resume|cv\b|ประวัติ/i},
+ med:{ja:"健康診断書（タイの病院・1か月以内）",en:"Medical certificate (Thai hospital)",th:"ใบรับรองแพทย์",kw:/健康診断|診断書|medical|ใบรับรองแพทย์/i},
+ reg:{ja:"会社登記簿謄本・株主名簿（6か月以内）",en:"Company affidavit & shareholder list",th:"หนังสือรับรองบริษัทและบัญชีผู้ถือหุ้น",kw:/登記簿|謄本|株主名簿|affidavit|หนังสือรับรองบริษัท/i},
+ sso:{ja:"社会保険の納付記録（タイ人従業員数）",en:"Social security payment record",th:"หลักฐานการจ่ายประกันสังคม",kw:/社会保険|social security|ประกันสังคม/i},
+ visa:{ja:"Non-Bビザ（入国前に取得）",en:"Non-B visa",th:"วีซ่า Non-B",kw:/non-?b|ビザ|visa|วีซ่า/i},
+ name:{ja:"会社名の候補（英語で3つ）",en:"Three company name options",th:"ชื่อบริษัทที่ต้องการจอง 3 ชื่อ",kw:/社名|会社名|company name|ชื่อบริษัท/i},
+ obj:{ja:"事業目的",en:"Business objectives",th:"วัตถุประสงค์ของบริษัท",kw:/事業|目的|business|objective|ธุรกิจ/i},
+ office:{ja:"本店の賃貸契約書・住所の承諾書",en:"Office lease & owner's consent",th:"สัญญาเช่าสำนักงาน",kw:/物件|賃貸|店舗|事務所|office|lease|สำนักงาน/i},
+ cap:{ja:"資本金と出資比率（タイ側51%）",en:"Capital & shareholding (Thai 51%)",th:"ทุนจดทะเบียนและสัดส่วนผู้ถือหุ้น",kw:/資本金|出資|capital|ทุน/i},
+ dir:{ja:"取締役・署名者の情報",en:"Directors & authorized signatory",th:"ข้อมูลกรรมการและผู้มีอำนาจลงนาม",kw:/取締役|director|กรรมการ/i},
+ spp:{ja:"株主全員のパスポート・IDカードのコピー",en:"Passport / ID copies of all shareholders",th:"สำเนาพาสปอร์ต/บัตรประชาชนผู้ถือหุ้นทุกคน",kw:/IDカード|id card|บัตรประชาชน/i},
+ sales:{ja:"売上の請求書・タックスインボイス控え",en:"Sales invoices / output tax invoices",th:"ใบกำกับภาษีขาย",kw:/売上|請求書|sales invoice|ใบกำกับภาษีขาย/i},
+ buy:{ja:"仕入・経費のタックスインボイス",en:"Purchase & expense tax invoices",th:"ใบกำกับภาษีซื้อ",kw:/仕入|経費|purchase|expense|ใบกำกับภาษีซื้อ/i},
+ bank:{ja:"銀行の取引明細（全口座）",en:"Bank statements (all accounts)",th:"รายการเดินบัญชีธนาคาร",kw:/銀行|明細|bank|statement|ธนาคาร/i},
+ wht:{ja:"源泉徴収証明書（50 Tawi）",en:"Withholding tax certificates (50 Tawi)",th:"หนังสือรับรองการหักภาษี ณ ที่จ่าย (50 ทวิ)",kw:/源泉|withholding|50\s*tawi|50 ทวิ|หัก ณ ที่จ่าย/i},
+ pay:{ja:"給与台帳・社会保険の明細",en:"Payroll & social security",th:"รายงานเงินเดือนและประกันสังคม",kw:/給与|payroll|เงินเดือน/i},
+ petty:{ja:"小口現金の領収書",en:"Petty cash receipts",th:"ใบเสร็จเงินสดย่อย",kw:/小口|領収書|receipt|ใบเสร็จ/i},
+ tb:{ja:"試算表（年度末）",en:"Trial balance (year-end)",th:"งบทดลอง (สิ้นปี)",kw:/試算表|trial balance|งบทดลอง/i},
+ fa:{ja:"固定資産台帳",en:"Fixed asset register",th:"ทะเบียนทรัพย์สิน",kw:/固定資産|fixed asset|ทรัพย์สิน/i},
+ inv:{ja:"在庫の棚卸表（期末日）",en:"Stock count sheet (year-end)",th:"รายงานตรวจนับสินค้าคงเหลือ",kw:/棚卸|在庫|stock|inventory|สินค้าคงเหลือ/i},
+ bal:{ja:"銀行残高証明書（期末日）",en:"Bank balance confirmation",th:"หนังสือรับรองยอดเงินฝาก",kw:/残高証明|balance confirmation|ยอดเงินฝาก/i},
+ exp:{ja:"駐在員のビザ・WPの期限一覧",en:"Visa / work permit expiry list",th:"รายการวันหมดอายุวีซ่าและใบอนุญาตทำงาน",kw:/期限一覧|expiry|วันหมดอายุ/i}
+};
+var TYPES={
+ wp:{ja:"ワークパーミット・ビザ申請",en:"Work Permit & Visa",th:"ใบอนุญาตทำงานและวีซ่า",docs:["pp","photo","edu","cv","med","reg","sso","visa"],
+  out:{ja:"必要書類のご案内と申請スケジュール",en:"Document checklist & application schedule",th:"รายการเอกสารและกำหนดการยื่นขอ"},kw:/ワークパーミット|work ?permit|\bWP\b|ビザ|visa|駐在|ใบอนุญาตทำงาน|วีซ่า/i},
+ setup:{ja:"会社設立（外資49%）",en:"Company registration",th:"จดทะเบียนบริษัท",docs:["name","obj","office","cap","dir","spp"],
+  out:{ja:"会社設立のお見積りとスケジュール",en:"Company registration quote & schedule",th:"ใบเสนอราคาและกำหนดการจดทะเบียนบริษัท"},kw:/会社設立|設立|登記|法人を作|company registration|incorporat|set ?up a company|จดทะเบียนบริษัท/i},
+ monthly:{ja:"月次の記帳・申告",en:"Monthly bookkeeping & filing",th:"ทำบัญชีและยื่นภาษีรายเดือน",docs:["sales","buy","bank","wht","pay","petty"],
+  out:{ja:"書類受領のご報告と申告スケジュール",en:"Documents received & filing schedule",th:"แจ้งรับเอกสารและกำหนดยื่นภาษี"},kw:/記帳|月次|領収書|請求書|bookkeeping|monthly|receipt|บัญชีเดือน|เอกสารบัญชี/i},
+ yearend:{ja:"決算・監査とビザ更新の期限",en:"Year-end closing & visa renewals",th:"ปิดงบประจำปีและต่ออายุวีซ่า",docs:["tb","fa","inv","bal","exp"],
+  out:{ja:"決算・ビザ更新の期限一覧",en:"Year-end & visa renewal deadlines",th:"กำหนดการปิดงบและต่ออายุวีซ่า"},kw:/決算|監査|株主総会|year-?end|audit|closing|ปิดงบ/i}
+};
+function schedule(c){
+ var t=c.type;
+ if(t==="wp")return [
+  {d:workday(addD(NOW,7)),ja:"不足書類のご提出",en:"Submit missing documents",th:"ส่งเอกสารที่ขาด",due:true},
+  {d:addD(ARR,-21),ja:"招聘状のお渡し → 在日タイ大使館でNon-Bビザ取得",en:"Invitation letter → Non-B visa in Japan",th:"ส่งหนังสือเชิญ → ขอวีซ่า Non-B"},
+  {d:ARR,ja:"着任・入国",en:"Arrival in Thailand",th:"เดินทางถึงประเทศไทย"},
+  {d:workday(addD(ARR,1)),ja:"健康診断（病院は当方で予約）",en:"Medical check-up (we book the hospital)",th:"ตรวจสุขภาพ"},
+  {d:workday(addD(ARR,3)),ja:"ワークパーミット申請（労働省）",en:"Work permit application",th:"ยื่นขอใบอนุญาตทำงาน"},
+  {d:workday(addD(ARR,12)),ja:"ワークパーミット受領（予定）",en:"Work permit issued (est.)",th:"รับใบอนุญาตทำงาน (โดยประมาณ)"},
+  {d:workday(addD(ARR,16)),ja:"ビザ延長（1年）の申請（入国管理局）",en:"1-year visa extension (Immigration)",th:"ยื่นต่ออายุวีซ่า 1 ปี",due:true}];
+ if(t==="setup")return [
+  {d:workday(addD(NOW,7)),ja:"会社名の候補・株主情報のご提出",en:"Send name options & shareholder info",th:"ส่งชื่อบริษัทและข้อมูลผู้ถือหุ้น",due:true},
+  {d:workday(addD(NOW,9)),ja:"社名の予約（商務省）",en:"Name reservation (DBD)",th:"จองชื่อบริษัท"},
+  {d:workday(addD(NOW,16)),ja:"基本定款・創立総会の書類づくりと署名",en:"Memorandum & statutory meeting documents",th:"จัดทำหนังสือบริคณห์สนธิ"},
+  {d:workday(addD(NOW,21)),ja:"会社登記の申請",en:"Company registration",th:"ยื่นจดทะเบียนบริษัท"},
+  {d:workday(addD(NOW,28)),ja:"税務登録・VAT登録",en:"Tax ID & VAT registration",th:"จดทะเบียนภาษีมูลค่าเพิ่ม"},
+  {d:workday(addD(NOW,35)),ja:"銀行口座の開設（ご来タイ時に同行）",en:"Bank account opening",th:"เปิดบัญชีธนาคาร"}];
+ if(t==="monthly")return [
+  {d:dom(FBASE,5),ja:"不足書類のご提出",en:"Submit missing documents",th:"ส่งเอกสารที่ขาด",due:true},
+  {d:dom(FBASE,15),ja:"源泉税 PND1・3・53 の電子申告",en:"WHT filing PND1/3/53 (e-filing)",th:"ยื่น ภ.ง.ด.1, 3, 53 (ออนไลน์)",due:true},
+  {d:dom(FBASE,15),ja:"社会保険料の納付",en:"Social security contribution",th:"ชำระเงินประกันสังคม",due:true},
+  {d:dom(FBASE,20),ja:monJa(PREVM)+"の月次報告書のお届け",en:"Monthly report for "+MON_EN[PREVM.getMonth()],th:"ส่งรายงานประจำเดือน"+MON_TH[PREVM.getMonth()]},
+  {d:dom(FBASE,23),ja:"VAT（PP30）の電子申告",en:"VAT filing PP30 (e-filing)",th:"ยื่น ภ.พ.30 (ออนไลน์)",due:true}];
+ var fy=FYE,y1=fy.getFullYear()+1;
+ return [
+  {d:addD(NOW,40),ja:"駐在員A.S.様 ビザ・WP更新の申請開始",en:"Start visa / WP renewal for A.S.",th:"เริ่มต่ออายุวีซ่าของ A.S.",due:true},
+  {d:fy,ja:"決算日・棚卸（立ち会います）",en:"Year-end & stock count",th:"วันสิ้นงวดและตรวจนับสินค้า"},
+  {d:new Date(y1,1,15),ja:"監査の開始（監査人への資料提出）",en:"Audit fieldwork starts",th:"เริ่มตรวจสอบบัญชี"},
+  {d:addD(NOW,75),ja:"駐在員K.M.様 ビザ・WP更新の申請開始",en:"Start visa / WP renewal for K.M.",th:"เริ่มต่ออายุวีซ่าของ K.M.",due:true},
+  {d:new Date(y1,3,30),ja:"定時株主総会（決算後4か月以内）",en:"AGM (within 4 months)",th:"ประชุมผู้ถือหุ้นสามัญประจำปี",due:true},
+  {d:new Date(y1,4,30),ja:"財務諸表の提出（総会後1か月以内）",en:"Financial statements to DBD",th:"ส่งงบการเงิน",due:true},
+  {d:new Date(y1,4,30),ja:"法人税 PND50 の申告（決算後150日以内）",en:"Corporate income tax PND50",th:"ยื่น ภ.ง.ด.50",due:true}];
+}
+var ESTIMATE=[["会社設立の手続き代行（社名予約〜登記）","Company registration service",35000],["登録免許税・印紙などの実費（概算）","Government fees (approx.)",6500],["税務登録・VAT登録","Tax ID & VAT registration",8000],["銀行口座の開設サポート（同行・通訳）","Bank account opening support",5000]];
+
+/* ============================================================ sample requests (4 cases, all fictional) */
+var CASES=[
+ {id:"C1",type:"wp",lang:"ja",from:"株式会社サンプル工業（タイランド） 総務部",addr:"soumu@sample-kogyo.example.com",init:"工",date:stamp(Y,"16:40"),
+  subject:"【ご依頼】新任駐在員のワークパーミット・ビザ手続き",tag:"WP・ビザ",client:"株式会社サンプル工業（タイランド）",who:"佐藤様（技術担当・新任駐在員）",area:"チョンブリ（シラチャ）",
+  body:"いつもお世話になっております。サンプル工業（タイランド）総務部の森です。\n\n来月、日本本社から佐藤（技術担当）が駐在員として着任します。ワークパーミットとビザの手続きをお願いできますでしょうか。\n\n本日、以下の書類をお送りします。\n・佐藤のパスポートのコピー\n・卒業証明書\n・履歴書\n・会社の登記簿謄本と株主名簿\n・社会保険の納付記録（先月分）\n\n着任は"+md(ARR)+"の予定です。ほかに必要なものがあれば教えてください。",
+  docs:{pp:{s:"check",note:"有効期限を確認します",res:"ok",resNote:"残存期間は2年以上。問題ありません",th:"เช็กแล้วค่ะ พาสปอร์ตยังเหลืออายุมากกว่า 2 ปี ใช้ได้ค่ะ",tr:"確認しました。パスポートの残りは2年以上あり、問題ありません。"},
+   photo:{s:"missing"},edu:{s:"check",note:"届いた証明書の言語を確認します",res:"missing",resNote:"日本語の証明書のみ。英文の証明書が必要です",th:"เช็กแล้วค่ะ ใบรับรองเป็นภาษาญี่ปุ่นเท่านั้น ต้องขอฉบับภาษาอังกฤษค่ะ",tr:"確認しました。証明書は日本語のみです。英文のものが必要です。"},
+   cv:{s:"ok",note:"英文の履歴書を受領"},med:{s:"missing",note:"着任後にタイの病院で受診（当方で予約します）"},reg:{s:"ok",note:"発行日は先月。期限内です"},
+   sso:{s:"check",note:"タイ人従業員の人数を確認します",res:"ok",resNote:"タイ人従業員は条件を満たしています",th:"เช็กแล้วค่ะ จำนวนพนักงานไทยครบตามเงื่อนไขค่ะ",tr:"確認しました。タイ人従業員の人数は条件を満たしています。"},
+   visa:{s:"missing",note:"着任前に在日タイ大使館で取得。招聘状は当方で作成します"}},
+  checks:["佐藤様の役職と月給（申請書に記載します）","ご家族の帯同の有無（帯同の場合はご家族のビザも手続きします）","着任後の勤務地（工場の住所）"],
+  addressee:"株式会社サンプル工業（タイランド）\n総務部 森様",
+  follow:"ご案内ありがとうございます。\n顔写真と英文の卒業証明書は、今週中にお送りします。\n佐藤の役職は技術マネージャーです。家族は帯同しません。\n引き続きよろしくお願いいたします。"},
+ {id:"C2",type:"setup",lang:"ja",from:"サンプル食堂 開業準備室 大野",addr:"ohno@sample-shokudo.example.com",init:"大",date:stamp(NOW,"07:55"),
+  subject:"バンコクでの会社設立について（日本食レストラン）",tag:"会社設立",client:"サンプル食堂 開業準備室",who:"大野様（日本の和食店オーナー）",area:"バンコク（トンロー）",
+  body:"はじめてご連絡します。日本で和食店を経営している大野と申します。\n\nバンコク（トンロー周辺）で日本食レストランを開くため、タイで会社を作りたいと考えています。\n\n・出資はタイ人の知人と一緒に（私は49%）\n・資本金は200万バーツくらいを考えています\n・店舗の物件はいま探しているところです\n・来年の春ごろに開店したいです\n\n手続きの流れと費用、私が用意するものを教えていただけますか。来月バンコクに行く予定です。",
+  docs:{name:{s:"missing"},obj:{s:"check",note:"メールの内容から事業目的を作ります",res:"ok",resNote:"日本食レストランの経営・ケータリングで作成します",th:"เช็กแล้วค่ะ วัตถุประสงค์ร้านอาหารญี่ปุ่นและจัดเลี้ยง ใช้ได้ค่ะ",tr:"確認しました。日本食レストラン・ケータリングの事業目的で問題ありません。"},
+   office:{s:"missing",note:"物件が決まりしだい。決まるまでは仮の住所も相談できます"},cap:{s:"check",note:"出資比率を確認します",res:"ok",resNote:"200万バーツ・タイ側51%／大野様49%で進められます",th:"เช็กแล้วค่ะ ทุน 2 ล้านบาท ไทย 51% ญี่ปุ่น 49% ทำได้ค่ะ",tr:"確認しました。資本金200万バーツ、タイ側51%・日本側49%で進められます。"},
+   dir:{s:"missing"},spp:{s:"missing",note:"タイ側の株主様はIDカードのコピー"}},
+  checks:["会社名の候補（英語で3つ）","タイ側の株主様のお名前と出資額","来月のバンコクご滞在の日程（銀行口座の開設に同行します）"],
+  addressee:"サンプル食堂 開業準備室\n大野様",
+  follow:"詳しいご案内とお見積り、ありがとうございます。\n会社名の候補を3つ考えました。来週タイ側の株主の情報と一緒にお送りします。\nバンコクには"+md(addD(NOW,30))+"から1週間滞在します。銀行の同行もお願いします。"},
+ {id:"C3",type:"monthly",lang:"th",from:"คุณมาลี (ฝ่ายบัญชี) Sample Foods (Thailand)",addr:"account@sample-foods.example.com",init:"M",date:stamp(NOW,"09:20"),
+  subject:"ส่งเอกสารบัญชีเดือน"+MON_TH[PREVM.getMonth()],tag:"タイ語・月次",client:"Sample Foods (Thailand) Co., Ltd.",who:"マリーさん（先方の経理担当・タイ人）",area:"バンコク（スクンビット）",
+  body:"เรียน ทีมบัญชี\n\nส่งเอกสารบัญชีเดือน"+MON_TH[PREVM.getMonth()]+"มาให้ตามไฟล์แนบค่ะ\n- ใบกำกับภาษีขาย\n- ใบกำกับภาษีซื้อ (บางส่วน)\n- รายการเดินบัญชีธนาคาร (บัญชีหลัก)\n- รายงานเงินเดือน\n\nใบเสร็จเงินสดย่อยจะส่งตามมาภายในสัปดาห์นี้ค่ะ\n\nขอบคุณค่ะ\nมาลี",
+  tr:"経理チーム御中\n\n"+monJa(PREVM)+"分の経理書類を添付でお送りします。\n・売上のタックスインボイス\n・仕入のタックスインボイス（一部）\n・銀行の取引明細（メイン口座）\n・給与台帳\n\n小口現金の領収書は今週中にお送りします。\nマリー",
+  docs:{sales:{s:"ok",note:"42枚を受領。売上帳と一致"},buy:{s:"check",note:"「一部」とあるため、仕入先ごとに確認します",res:"missing",resNote:"仕入先3社分のタックスインボイスが不足",th:"เช็กแล้วค่ะ ขาดใบกำกับภาษีซื้อของซัพพลายเออร์ 3 รายค่ะ",tr:"確認しました。仕入先3社分のタックスインボイスが足りません。"},
+   bank:{s:"check",note:"口座の数を確認します",res:"missing",resNote:"サブ口座（USD）の明細が不足",th:"เช็กแล้วค่ะ ยังขาดรายการเดินบัญชี USD อีก 1 บัญชีค่ะ",tr:"確認しました。USD口座の明細がまだ1口座分足りません。"},
+   wht:{s:"missing"},pay:{s:"ok",note:"社会保険の明細を含めて受領"},petty:{s:"missing",note:"今週中に届く予定"}},
+  checks:[{x:"รายชื่อลูกค้าที่ยังไม่ชำระเงิน",ja:"未入金のお客様の一覧"},{x:"ค่าใช้จ่ายพิเศษของเดือนนี้ (ถ้ามี)",ja:"今月の特別な支出（あれば）"}],
+  addressee:"คุณมาลี",
+  follow:"ขอบคุณค่ะ จะส่งใบกำกับภาษีซื้อที่ขาดและรายการเดินบัญชี USD ภายในวันพรุ่งนี้ค่ะ",followTr:"ありがとうございます。不足している仕入のタックスインボイスとUSD口座の明細は、明日までにお送りします。"},
+ {id:"C4",type:"yearend",lang:"en",from:"Khun Ploy (HR & Admin) Sample Precision",addr:"ploy.hr@sample-precision.example.com",init:"P",date:stamp(NOW,"10:35"),
+  subject:"Year-end closing schedule and visa renewals",tag:"英語・決算",client:"Sample Precision (Thailand) Co., Ltd.",who:"Khun Ploy（総務人事マネージャー）",area:"チョンブリ（シラチャ）",
+  body:"Dear Accounting Team,\n\nOur Japanese MD asked me to prepare a schedule for the year-end closing (our fiscal year ends December 31) and the visa renewals of our two Japanese staff.\n\nAttached are:\n- Trial balance as of October\n- Fixed asset register\n- List of visa / work permit expiry dates\n\nCould you tell us the deadlines for the audit, the shareholders' meeting and the tax filing? We would also like to know when to start the visa renewals.\n\nBest regards,\nPloy",
+  docs:{tb:{s:"check",note:"10月末の試算表。年度末版が必要か確認します",res:"missing",resNote:"年度末（12月末）の試算表は締め後にご提出ください",th:"เช็กแล้วค่ะ เป็นงบทดลองเดือนตุลาคม ต้องใช้ฉบับสิ้นปีหลังปิดบัญชีค่ะ",tr:"確認しました。10月の試算表です。決算後に年度末版が必要です。"},
+   fa:{s:"ok",note:"今年の取得分を含めて受領"},inv:{s:"missing",note:"12/31の棚卸に立ち会います"},bal:{s:"missing",note:"期末日の後に銀行へ依頼してください"},
+   exp:{s:"check",note:"2名の期限を読み取ります",res:"ok",resNote:"A.S.様・K.M.様の期限を期限表に入れました",th:"เช็กแล้วค่ะ ใส่วันหมดอายุของทั้ง 2 ท่านในตารางแล้วค่ะ",tr:"確認しました。お二人の期限を期限表に入れました。"}},
+  checks:["Preferred date for the stock count on Dec 31","Auditor (same as last year?)","Who will sign the AGM minutes"],
+  addressee:"Khun Ploy",
+  follow:"Thank you for the clear schedule.\nThe auditor is the same as last year. The stock count can start at 9:00 on Dec 31.\nPlease remind us one week before each deadline.\n\nBest regards,\nPloy"}
+];
+function C(id){for(var i=0;i<CASES.length;i++)if(CASES[i].id===id)return CASES[i];return state.custom[id]||null}
+function chk(x,lang){return typeof x==="string"?x:(lang==="ja"?x.ja:x.x)}
+function tName(c,l){return TYPES[c.type][l||"ja"]}
+
+/* ============================================================ free-text parser (for pasted requests) */
+function parse(t){
+ var en=!/[぀-ヿ一-鿿฀-๿]/.test(t),th=/[฀-๿]/.test(t)&&!/[぀-ヿ]/.test(t);
+ var type="monthly";["wp","setup","yearend","monthly"].some(function(k){if(TYPES[k].kw.test(t)){type=k;return true}});
+ var docs={};TYPES[type].docs.forEach(function(k){docs[k]=DOCS[k].kw.test(t)?{s:"check",note:"本文に記載あり。届いた書類を確認します",res:"ok",resNote:"届いた書類を確認しました",th:"เช็กแล้วค่ะ เอกสารครบค่ะ",tr:"確認しました。書類はそろっています。"}:{s:"missing"}});
+ var co=(t.match(/([^\s、。\n]{2,24}(?:株式会社|Co\.,?\s*Ltd\.?|タイランド|事務所))/)||[])[1]||(en?"Client":"お客様");
+ var checks=en?["Deadline you have in mind","Contact person for documents"]:["ご希望の期限","書類のご担当者"];
+ return {type:type,lang:en?"en":th?"th":"ja",client:co,who:"",area:/シラチャ|sriracha|ศรีราชา/i.test(t)?"チョンブリ（シラチャ）":/バンコク|bangkok|กรุงเทพ/i.test(t)?"バンコク":"",docs:docs,checks:checks,addressee:co,
+  follow:en?"Thank you. We will send the missing documents this week.":th?"ขอบคุณค่ะ จะส่งเอกสารที่ขาดภายในสัปดาห์นี้ค่ะ":"ご案内ありがとうございます。不足の書類は今週中にお送りします。",followTr:th?"ありがとうございます。不足の書類は今週中にお送りします。":""};
+}
+
+/* ============================================================ state */
+var KEY="nova-cs-ws-v1:"+BRAND;
+function fresh(){
+ var mails=CASES.map(function(c){return {id:"M"+c.id,folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:c.date,subject:c.subject,body:c.body,tr:c.tr||"",tags:[{t:"ご依頼",k:"green"},{t:c.tag,k:c.lang!=="ja"?"blue":"gray"}],caseId:c.id,unread:true}});
+ mails.reverse();
+ var posts=[
+  {id:"N1",topic:"monthly",status:"draft",ch:"line",when:"",auto:true,why:"毎月の申告期限から"},
+  {id:"N2",topic:"visa",status:"draft",ch:"mail",when:"",auto:true,why:"お客様のビザ期限から"},
+  {id:"N3",topic:"yearend",status:"posted",ch:"facebook",when:stamp(addD(NOW,-3),"12:00"),auto:false}
+ ];
+ return {view:"mail",folder:"inbox",selMail:mails[0].id,selCase:"C1",ptab:"cond",cases:{},custom:{},mails:mails,posts:posts,selPost:"N1",lang:"ja",auto:{draft:true,remind:true,approve:true},seq:1,seen:false,compose:null};
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+if(!state||!state.mails||!state.posts)state=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cs(id){if(!state.cases[id])state.cases[id]={step:0,extracted:false,dst:{},attached:false,sent:false,registered:false};return state.cases[id]}
+function dstat(c,st,k){var v=st.dst[k];return v||c.docs[k].s}
+function docKeys(c){return TYPES[c.type].docs}
+function counts2(c,st){var o={ok:0,missing:0,check:0,asking:0};docKeys(c).forEach(function(k){o[dstat(c,st,k)]++});return o}
+function dnote(c,st,k){var d=c.docs[k],s=dstat(c,st,k);if(st.dst[k]&&st.dst[k]!=="asking"&&d.resNote)return d.resNote;if(st.dst[k]==="ok"&&st.registered&&d.s==="missing")return "受領しました";return d.note||""}
+
+/* ============================================================ toast / modal */
+var toastT;
+function toast(msg){var el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},3200)}
+function modal(html){var bg=document.createElement("div");bg.className="modal-bg";bg.innerHTML='<div class="modal" role="dialog">'+html+'</div>';bg.addEventListener("click",function(e){if(e.target===bg||e.target.closest("[data-close]"))bg.remove()});document.body.appendChild(bg);return bg}
+
+/* ============================================================ render: shell */
+function allCases(){return CASES.concat(Object.keys(state.custom).map(function(k){return state.custom[k]}))}
+function counts(){
+ return {inbox:state.mails.filter(function(m){return m.folder==="inbox"&&m.unread}).length,
+  open:allCases().filter(function(c){return !cs(c.id).sent}).length,
+  drafts:state.posts.filter(function(p){return p.status==="draft"}).length};
+}
+var VIEWS={mail:{t:"メール",d:"お客様からのご依頼・書類の受信から、書類チェックの結果とスケジュールを添えた返信まで。"},
+ case:{t:"手続き・記帳",d:"ご依頼の読み取り、届いた書類のチェックと不足の連絡、申請スケジュール・見積・期限表まで。"},
+ notice:{t:"お知らせ配信",d:"申告期限・ビザ更新などのお知らせを日本語・タイ語・英語で作り、LINE・メールで自動配信。"}};
+function navHtml(n){
+ return '<button data-view="mail" class="'+(state.view==="mail"?"active":"")+'">'+IC.mail+'メール<span class="count '+(n.inbox?"hot":"")+'">'+(n.inbox||"")+'</span></button>'+
+  '<button data-view="case" class="'+(state.view==="case"?"active":"")+'">'+IC.folder+'手続き・記帳<span class="count">'+(n.open||"")+'</span></button>'+
+  '<button data-view="notice" class="'+(state.view==="notice"?"active":"")+'">'+IC.share+'お知らせ配信<span class="count">'+(n.drafts||"")+'</span></button>';
+}
+function render(){
+ var n=counts(),v=VIEWS[state.view]||VIEWS.mail,nav=navHtml(n);
+ var html='<header class="topbar"><div class="brand"><div class="brand-symbol">'+esc(BRAND.charAt(0))+'</div><div><b>'+esc(BRAND)+'</b><small>ACCOUNTING &amp; VISA WORKSPACE</small></div></div>'+
+  '<div class="crumb">ワークスペース　/　'+v.t+'</div><span class="demo-pill">DEMO<span class="long"> · 実際には送信しません</span></span>'+
+  '<button class="help" data-act="help">'+IC.help+'<span>使い方</span></button></header>'+
+  '<div class="layout"><nav class="nav"><div class="nav-label">WORKSPACE</div>'+nav+
+  '<div class="nav-bottom"><button data-act="clients">'+IC.list+'顧客・期限一覧</button><button data-act="reset">'+IC.reset+'デモをリセット</button>'+
+  '<div class="note">● このブラウザに自動保存<br>会社・人物・書類はすべて架空のサンプルです</div></div></nav>'+
+  '<main class="workspace"><div class="mobile-tabs">'+nav+'<button data-act="clients">一覧</button><button data-act="reset">リセット</button><button data-act="help">使い方</button></div>'+
+  '<div class="ws-head"><div><h1>'+v.t+'</h1><p>'+v.d+'</p>'+(SERVICES.length&&state.view==="case"?'<div class="svc">'+SERVICES.map(function(s){return '<span class="badge gray">'+esc(s)+'</span>'}).join("")+'</div>':'')+'</div><div class="head-actions">'+headActions()+'</div></div>'+
+  (state.view==="mail"?viewMail():state.view==="case"?viewCase():viewNotice())+'</main></div>';
+ $("#app").innerHTML=html;
+ save();
+}
+function headActions(){
+ if(state.view==="mail")return '<button class="btn-i" data-act="paste">'+IC.plus+'問い合わせを貼り付けて試す</button>';
+ if(state.view==="case")return '<button class="btn-i" data-act="gomail">'+IC.mail+'関連メール</button>';
+ return '<button class="btn-i" data-act="newpost">'+IC.plus+'お知らせを作る</button>';
+}
+
+/* ============================================================ view: mail */
+function viewMail(){
+ var f=state.folder,list=state.mails.filter(function(m){return m.folder===f});
+ var rows=list.map(function(m){
+  return '<button class="row '+(m.id===state.selMail?"active":"")+'" data-mail="'+m.id+'"><div class="row-top">'+(m.unread?'<span class="dot"></span>':'')+'<b>'+esc(f==="inbox"?m.from:"宛先："+(m.toName||m.addr))+'</b><time>'+esc(m.date)+'</time></div><div class="subj">'+esc(m.subject)+'</div><div class="snip">'+esc(m.body.slice(0,90))+'</div><div class="row-foot">'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join("")+(m.attach?'<span class="badge green">添付あり</span>':'')+'</div></button>';
+ }).join("")||'<div class="empty"><div><p class="tiny">'+(f==="sent"?"送信済みのメールはまだありません":f==="draft"?"下書きはありません":"受信メールはありません")+'</p></div></div>';
+ var tabs=[["inbox","受信箱"],["sent","送信済み"],["draft","下書き"]].map(function(t){var c=state.mails.filter(function(m){return m.folder===t[0]}).length;return '<button data-folder="'+t[0]+'" class="'+(f===t[0]?"active":"")+'">'+t[1]+(c?" "+c:"")+'</button>'}).join("");
+ var sel=state.mails.filter(function(m){return m.id===state.selMail&&m.folder===f})[0]||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools"><div class="tabs">'+tabs+'</div></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルメール / 外部のメールとは接続していません</div></section>'+
+  '<section class="detail">'+(sel?mailDetail(sel):'<div class="empty"><div><div class="em-i">'+IC.mail+'</div><h3>メールを選んでください</h3></div></div>')+'</section></div>';
+}
+function mailDetail(m){
+ if(m.unread){m.unread=false;setTimeout(save,0)}
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(m.subject)+'</h2><div>'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join(" ")+'</div></div>'+
+  '<div class="sender"><div class="avatar">'+esc(m.init||"?")+'</div><div><b>'+esc(m.folder==="inbox"?m.from:BRAND+" "+STAFF)+'</b><span>'+esc(m.folder==="inbox"?m.addr:"宛先："+m.addr)+'</span></div><time>'+esc(m.date)+'</time></div>'+
+  '<div class="mail-body">'+esc(m.body)+'</div>'+(m.tr?'<div class="tr-box"><b>日本語訳（自動）</b>'+esc(m.tr)+'</div>':'');
+ if(m.attach)h+='<div class="actions"><span class="attach">'+IC.doc+esc(m.attach)+'</span><button class="small" data-act="viewdoc" data-case="'+m.caseId+'">開く</button></div>';
+ if(m.folder==="inbox"&&m.caseId){
+  var st=cs(m.caseId);
+  if(m.kind==="follow"){
+   h+='<div class="actions"><button class="primary btn-i" data-act="register" data-case="'+m.caseId+'" '+(st.registered?"disabled":"")+'>'+IC.cal+(st.registered?"受領を記録し、期限表に登録済み":"受領を記録して期限表に登録")+'</button><span class="tiny muted">返信の内容を案件に記録し、期限の1週間前のリマインドを設定。受領の連絡メールを作ります</span></div>';
+  }else{
+   h+='<div class="actions"><button class="primary btn-i" data-act="tocase" data-case="'+m.caseId+'">'+IC.folder+(st.extracted?"手続きの続きを開く":"このメールから手続きを作る")+'</button><span class="tiny muted">'+(st.sent?"ご案内を送信済みです":"案件票 → 書類チェック・不足の確認 → ご案内書と期限表")+'</span></div>';
+  }
+  h+=replyBox(m);
+ }
+ if(m.folder==="draft")h+=replyBox(m,true);
+ return h+'</div>';
+}
+function replyBox(m,isDraft){
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ var d=state.compose&&state.compose.mail===m.id?state.compose:null;
+ if(!d){
+  var body="",att=null,subj="Re: "+m.subject.replace(/^Re:\s*/,"");
+  if(isDraft){body=m.body;att=m.attach;subj=m.subject}
+  else if(st&&st.attached&&!st.sent&&m.kind!=="follow"){var pm=replyMail(c,st);body=pm.body;att=docName(c)}
+  d={mail:m.id,to:m.addr,subject:subj,body:body,attach:att,tr:""};
+ }
+ var canInsert=st&&st.extracted&&!st.sent&&m.kind!=="follow";
+ return '<div class="reply" id="replyBox" data-attach="'+esc(d.attach||"")+'"><div class="reply-h">↩ 宛先 <input id="rTo" value="'+esc(d.to)+'" aria-label="宛先"><button class="small btn-i" data-act="insertdoc" data-mail="'+m.id+'" '+(canInsert?"":"disabled")+' title="手続き・記帳で作ったご案内書を添付し、本文を作ります">'+IC.clip+(st&&st.attached?"ご案内書を添付済み":"作成中のご案内書を挿入")+'</button></div>'+
+  '<div class="reply-h" style="background:#fff">件名 <input id="rSubj" value="'+esc(d.subject)+'" aria-label="件名"></div>'+
+  '<textarea id="rBody" aria-label="本文" placeholder="'+(st&&!st.attached&&m.kind!=="follow"?"「手続き・記帳」でご案内書を作ると、ここに返信の本文が入ります":"本文")+'">'+esc(d.body)+'</textarea>'+
+  (d.tr?'<div class="tr-box" style="margin:0 14px 12px"><b>日本語訳（確認用・送信されません）</b>'+esc(d.tr)+'</div>':'')+
+  '<div class="reply-f">'+(d.attach?'<span class="attach">'+IC.doc+esc(d.attach)+'</span>':'<span class="tiny muted">添付なし</span>')+'<span style="flex:1"></span><button data-act="savedraft" data-mail="'+m.id+'">下書き保存</button><button class="primary btn-i" data-act="send" data-mail="'+m.id+'">'+IC.send+'送信（デモ）</button></div></div>';
+}
+function docName(c){var o=TYPES[c.type].out;return c.lang==="en"?o.en.replace(/[^A-Za-z]+/g,"_")+".pdf":c.lang==="th"?"Documents_Received_"+MON_EN[PREVM.getMonth()]+".pdf":o.ja.replace(/[\s・]/g,"")+".pdf"}
+
+/* ============================================================ view: case */
+function viewCase(){
+ var list=allCases();
+ var rows=list.map(function(c,i){var st=cs(c.id);var lab=st.registered?["期限表に登録","green"]:st.sent?["ご案内済み","green"]:st.step>=1?["対応中","amber"]:["未着手","gray"];
+  var n=st.extracted?counts2(c,st):null;
+  return '<button class="row '+(c.id===state.selCase?"active":"")+'" data-case="'+c.id+'"><div class="row-top"><b>'+esc(c.client)+'</b><span class="badge '+lab[1]+'">'+lab[0]+'</span></div><div class="subj">'+esc(tName(c))+'</div><div class="snip">'+esc((c.area||"地域未定")+" / "+({ja:"日本語",en:"英語",th:"タイ語"})[c.lang]+"でのやり取り"+(n?" / 不足 "+n.missing+"件":""))+'</div><div class="row-foot"><span class="badge gray">'+(c.custom?"貼り付けた問い合わせ":"事例"+(i+1)+" · "+esc(c.tag))+'</span></div></button>'}).join("");
+ var c=C(state.selCase)||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">ご依頼を選択</b> <span class="badge gray">'+list.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">読み取りは4事例を使ったデモ再現です（貼り付けた問い合わせは簡易読み取り）</div></section>'+
+  '<section class="detail">'+caseDetail(c)+'</section></div>';
+}
+function caseDetail(c){
+ var st=cs(c.id);
+ var lab=["案件票をつくる","書類チェック・不足の確認","ご案内書と期限表"];
+ var steps=lab.map(function(s,i){var cl=st.step>i+1||(i===2&&st.attached)?"done":(st.step===i+1||(st.step===0&&i===0))?"cur":"";return '<button class="step '+cl+'" data-ptab="'+["cond","docs","doc"][i]+'"><i>'+(i+1)+'</i>'+s+'</button>'}).join("");
+ var tabs=[["cond","案件票"],["docs","書類チェック"],["doc","ご案内書・期限表"],["mail","元のメール"]].map(function(t){return '<button data-ptab="'+t[0]+'" class="'+(state.ptab===t[0]?"active":"")+'">'+t[1]+'</button>'}).join("");
+ var h='<div class="detail-inner"><div class="p-head"><div><h2>'+esc(tName(c))+'</h2><div class="meta">CASE-'+c.id+' · '+esc(c.client)+' · 担当 '+STAFF+'</div></div><span class="badge '+(st.sent?"green":"amber")+'">'+(st.registered?"期限表に登録済み":st.sent?"ご案内を送信済み":"対応中")+'</span></div>'+
+  '<div class="steps">'+steps+'</div><div class="ptabs">'+tabs+'</div>';
+ if(state.ptab==="mail")h+='<div class="card"><div class="mail-body" style="border:0;padding:0">'+esc(c.body)+'</div>'+(c.tr?'<div class="tr-box"><b>日本語訳（自動）</b>'+esc(c.tr)+'</div>':'')+'</div>';
+ else if(!st.extracted)h+='<div class="empty"><div><div class="em-i">'+IC.spark+'</div><h3>メールから案件票をつくります</h3><p class="tiny">手続きの種類・お客様・対象の方・期限を読み取り、必要書類のリストと照合します。<br>届いた書類・足りない書類・確認が必要な書類に分け、お客様への質問もまとめます。</p><button class="primary btn-i" data-act="extract" data-case="'+c.id+'">'+IC.spark+'案件票をつくる</button></div></div>';
+ else if(state.ptab==="cond")h+=condTab(c,st);
+ else if(state.ptab==="docs")h+=docsTab(c,st);
+ else h+=outTab(c,st);
+ h+='</div>';
+ var n=st.extracted?counts2(c,st):null,ready=st.extracted&&n.check===0&&n.asking===0;
+ h+='<div class="foot-bar"><span class="sum">'+(n?"必要書類 "+docKeys(c).length+"点 ／ 受領 "+n.ok+" ／ 不足 "+n.missing+(n.check+n.asking?" ／ 確認中 "+(n.check+n.asking):""):"案件票をつくってください")+'</span>'+
+  '<button class="btn-i" data-act="viewdoc" data-case="'+c.id+'" '+(ready?"":"disabled")+'>'+IC.doc+'ご案内書プレビュー</button>'+
+  '<button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(ready&&!st.sent?"":"disabled")+'>'+IC.send+(st.sent?"送信済み":"返信へ添付")+'</button></div>';
+ return h;
+}
+function condTab(c,st){
+ var n=counts2(c,st),sc=schedule(c);
+ var rows=[["お客様",c.client],["手続き",tName(c)],["対象の方",c.who],["地域",c.area],["やり取りの言語",({ja:"日本語",en:"英語（返信も英語）",th:"タイ語（返信もタイ語・日本語訳つき）"})[c.lang]],["必要書類",docKeys(c).length+"点（受領 "+n.ok+"・不足 "+n.missing+"・要確認 "+(n.check+n.asking)+"）"],["最初の期限",mdw(sc[0].d)+"　"+sc[0].ja]];
+ return '<div class="card"><h3>案件票</h3><table class="kv">'+rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+(r[1]?esc(r[1]):'<span class="miss">記載なし</span>')+'</td></tr>'}).join("")+'</table>'+
+  '<div class="checklist"><b>お客様に確認したいこと（返信メールで質問します）</b><ul>'+c.checks.map(function(x){return '<li>'+esc(chk(x,"ja"))+(typeof x==="string"?"":'<span class="muted tiny">（'+esc(x.x)+'）</span>')+'</li>'}).join("")+'</ul></div></div>'+
+  (state.auto.draft&&(c.type==="monthly"||c.type==="wp"||c.type==="yearend")?'<p class="tiny muted" style="margin:10px 0 0">● この案件の期限を「お知らせ配信」のリマインド候補に入れました</p>':'')+
+  '<div class="actions"><button class="primary btn-i" data-ptab="docs">'+IC.folder+'届いた書類をチェックする</button><span class="tiny muted">必要書類のリストと、メール・添付の内容を照合します</span></div>';
+}
+function docsTab(c,st){
+ var n=counts2(c,st);
+ var h='<div class="card" style="padding:12px 16px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:13px">必要書類 '+docKeys(c).length+' 点のうち、受領 '+n.ok+'・不足 '+n.missing+'・要確認 '+(n.check+n.asking)+'</b><span class="tiny muted">要確認の書類は、タイ人スタッフにLINE（タイ語）で確認を頼めます</span><span style="flex:1"></span><button class="small btn-i" data-act="askall" data-case="'+c.id+'" '+(n.check?"":"disabled")+'>'+IC.chat+'要確認をまとめて依頼</button></div></div><div class="dl">';
+ docKeys(c).forEach(function(k){
+  var D=DOCS[k],d=c.docs[k],s=dstat(c,st,k);
+  var ic={ok:"✓",missing:"!",check:"?",asking:"…"}[s],lab={ok:"受領済み",missing:"不足（お客様に依頼）",check:"要確認",asking:"確認中…"}[s];
+  h+='<div class="dli"><span class="st '+s+'" aria-hidden="true">'+ic+'</span><div><div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap"><b>'+esc(D.ja)+'</b><span class="badge '+({ok:"green",missing:"red",check:"amber",asking:"gray"})[s]+'">'+lab+'</span></div><div class="sub">'+esc(c.lang==="th"?D.th:D.en)+'</div>'+(dnote(c,st,k)?'<div class="note">'+esc(dnote(c,st,k))+'</div>':'');
+  if(s==="check")h+='<div class="owner"><button class="small btn-i" data-act="ask" data-doc="'+k+'" data-case="'+c.id+'">'+IC.chat+STAFF_THJ+'さんに確認を依頼（LINE・タイ語）</button></div>';
+  if(st.dst[k]&&d.th){h+='<div class="owner" style="flex-direction:column"><div class="bubble out">คุณ'+STAFF_TH+' ช่วยเช็ก「'+esc(D.th)+'」ของ '+esc(c.client)+' ให้หน่อยครับ<span class="tr">（訳）'+STAFF_THJ+'さん、'+esc(c.client)+'の「'+esc(D.ja)+'」を確認してください。</span></div>';
+   if(st.dst[k]!=="asking")h+='<div class="bubble in">'+esc(d.th)+'<span class="tr">（訳）'+esc(d.tr)+'</span></div>';
+   h+='</div>'}
+  h+='</div></div>';
+ });
+ var ready=n.check===0&&n.asking===0;
+ return h+'</div><div class="actions"><button class="primary btn-i" data-ptab="doc" '+(ready?"":"disabled")+'>'+IC.doc+'ご案内書と期限表を作る</button><span class="tiny muted">'+(ready?"不足 "+n.missing+" 点のお願いと、今後のスケジュールをまとめます":"要確認の書類をチェックしてください")+'</span></div>';
+}
+function docHtml(c,st,forPrint){
+ var L=c.lang,en=L==="en",th=L==="th",sc=schedule(c),T=TYPES[c.type];
+ var miss=docKeys(c).filter(function(k){return dstat(c,st,k)==="missing"}),ok=docKeys(c).filter(function(k){return dstat(c,st,k)==="ok"});
+ function nm(k){return en?DOCS[k].en:th?DOCS[k].th+"／"+DOCS[k].ja:DOCS[k].ja}
+ var h='<div class="doc" '+(forPrint?'id="printDoc"':'')+'><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h4>'+esc(en?T.out.en:th?T.out.th:T.out.ja)+'</h4>'+(th?'<div class="tiny muted">'+esc(T.out.ja)+'</div>':'')+'<div class="tiny muted">'+esc(BRAND)+' · '+ymd(NOW)+' · '+(en?"Prepared by "+STAFF_EN:"担当 "+(th?STAFF_THJ+"・"+STAFF:STAFF))+'</div></div><div class="tiny muted" style="text-align:right">CASE-'+c.id+'</div></div>'+
+  '<div class="to">'+esc(c.addressee.replace(/\n/g," "))+'</div><p class="lead">'+esc(en?"Thank you for your request regarding "+T.en.toLowerCase()+". Below are the documents we have checked and the schedule ahead.":th?"สรุปเอกสารที่ได้รับ เอกสารที่ยังขาด และกำหนดการ（受領書類・不足書類・今後の予定のまとめ）":"「"+T.ja+"」のご依頼について、届いた書類の確認結果と今後のスケジュールをまとめました。")+'</p>';
+ h+='<table><tr><th>'+(en?"Document":th?"เอกสาร／書類":"書類")+'</th><th>'+(en?"Status":th?"สถานะ／状況":"状況")+'</th></tr>';
+ ok.forEach(function(k){h+='<tr><td>'+esc(nm(k))+'</td><td><span class="badge green">'+(en?"Received":th?"ได้รับแล้ว":"受領済み")+'</span></td></tr>'});
+ miss.forEach(function(k){h+='<tr><td>'+esc(nm(k))+(c.docs[k].note&&!en&&!th?'<div class="tiny muted">'+esc(dnote(c,st,k))+'</div>':'')+'</td><td><span class="badge red">'+(en?"Please send":th?"รบกวนส่งเพิ่ม":"ご提出をお願いします")+'</span></td></tr>'});
+ h+='</table>';
+ if(c.type==="setup"){var tot=0;h+='<div style="margin-top:14px"><b style="font-size:13px">'+(en?"Quotation":"お見積り")+'</b><table class="est">'+ESTIMATE.map(function(r){tot+=r[2];return '<tr><td>'+esc(en?r[1]:r[0])+'</td><td class="num">'+fmt(r[2])+' B</td></tr>'}).join("")+'<tr class="total"><td>'+(en?"Total (excl. VAT)":"合計（税別）")+'</td><td class="num">'+fmt(tot)+' B</td></tr></table></div>'}
+ h+='<div style="border-top:1px solid var(--line);padding-top:12px;margin-top:14px"><b style="font-size:13px">'+(en?"Schedule":th?"กำหนดการ／スケジュール":"今後のスケジュール")+'</b><div class="route">';
+ sc.forEach(function(x){h+='<div><b>'+(en?mdEn(x.d):th?mdTh(x.d):mdw(x.d))+'</b><span class="pt"'+(x.due?' style="background:var(--red)"':'')+'></span><span>'+esc(en?x.en:th?x.th+"／"+x.ja:x.ja)+(x.due?(en?" (deadline)":th?"（กำหนดส่ง）":"（期限）"):"")+'</span></div>'});
+ h+='</div><p class="disc">'+(en?"Dates and amounts in this demo are illustrative samples. Actual requirements follow the latest regulations.":"このデモの日付・金額・必要書類は説明用のサンプルです。実際の手続きは最新の制度に合わせて確認します。")+'</p></div></div>';
+ return h;
+}
+function outTab(c,st){
+ var n=counts2(c,st);
+ if(n.check||n.asking)return '<div class="empty"><div><div class="em-i">'+IC.doc+'</div><h3>確認中の書類があります</h3><p class="tiny">「書類チェック」で要確認の書類を確認してください。</p><button data-ptab="docs">書類チェックへ</button></div></div>';
+ if(st.step<3){st.step=3;setTimeout(save,0)}
+ return '<div class="card" style="background:#fbfbfd">'+docHtml(c,st)+'</div><div class="actions"><button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.sent?"disabled":"")+'>'+IC.send+'ご案内書を返信メールに添付</button><span class="tiny muted">メール画面に移り、ご案内書付きの返信が入ります</span></div>';
+}
+function replyMail(c,st){
+ var L=c.lang,sc=schedule(c),T=TYPES[c.type];
+ var miss=docKeys(c).filter(function(k){return dstat(c,st,k)==="missing"});
+ var first=sc[0];
+ if(L==="en"){
+  var s="Dear "+c.addressee+",\n\nThank you for your email and the attached documents. We have prepared the "+T.out.en.toLowerCase()+".\n\n";
+  if(miss.length){s+="Could you send us the following:\n";miss.forEach(function(k){s+="- "+DOCS[k].en+"\n"});s+="\n"}
+  s+="Key dates:\n";sc.forEach(function(x){if(x.due)s+="- "+mdEn(x.d)+": "+x.en+"\n"});
+  s+="\nWe would also like to confirm:\n";c.checks.forEach(function(x){s+="- "+chk(x,"en")+"\n"});
+  return {body:s+"\nThe full schedule is in the attached file. We will remind you one week before each deadline.\n\nBest regards,\n"+STAFF_EN+"\n"+BRAND,tr:""};
+ }
+ if(L==="th"){
+  var t="เรียน "+c.addressee+"\n\nได้รับเอกสารบัญชีเดือน"+MON_TH[PREVM.getMonth()]+"เรียบร้อยแล้วค่ะ ขอบคุณค่ะ\n\n";
+  var j=c.addressee.replace("คุณ","")+"さん\n\n"+monJa(PREVM)+"分の経理書類を受け取りました。ありがとうございます。\n\n";
+  if(miss.length){t+="เอกสารที่ยังขาด:\n";j+="まだ足りない書類：\n";miss.forEach(function(k){t+="- "+DOCS[k].th+"\n";j+="・"+DOCS[k].ja+"\n"});
+   t+="\nรบกวนส่งภายในวันที่ "+mdTh(first.d)+" เพื่อให้ยื่นภาษีทันกำหนดค่ะ\n\n";j+="\n申告の期限に間に合うよう、"+md(first.d)+"までにお送りください。\n\n"}
+  t+="กำหนดการ:\n";j+="スケジュール：\n";sc.slice(1).forEach(function(x){t+="- "+mdTh(x.d)+" "+x.th+"\n";j+="・"+md(x.d)+" "+x.ja+"\n"});
+  t+="\nขอสอบถามเพิ่มเติม:\n";j+="\nあわせて教えてください：\n";c.checks.forEach(function(x){t+="- "+chk(x,"th")+"\n";j+="・"+chk(x,"ja")+"\n"});
+  return {body:t+"\nรายละเอียดอยู่ในไฟล์แนบค่ะ\nขอบคุณค่ะ\n"+STAFF_TH+" ("+BRAND+")",tr:j+"\n詳細は添付ファイルをご覧ください。\n"+STAFF_THJ+"（"+BRAND+"）"};
+ }
+ var s2=c.addressee+"\n\nいつもお世話になっております。"+BRAND+"の"+STAFF+"です。\n"+(c.type==="setup"?"お問い合わせいただき、ありがとうございます。":"書類をお送りいただき、ありがとうございます。")+"\n「"+T.ja+"」について、"+(c.type==="setup"?"手続きの流れとお見積り":"届いた書類の確認結果と今後のスケジュール")+"を添付にまとめました。\n\n";
+ if(miss.length){s2+="■ ご用意をお願いしたいもの\n";miss.forEach(function(k){s2+="・"+DOCS[k].ja+(c.docs[k].note?"（"+c.docs[k].note+"）":"")+"\n"})}
+ s2+="\n■ 主な期限\n";sc.forEach(function(x){if(x.due)s2+="・"+mdw(x.d)+" "+x.ja+"\n"});
+ s2+="\n■ あわせて教えてください\n";c.checks.forEach(function(x){s2+="・"+chk(x,"ja")+"\n"});
+ return {body:s2+"\n各期限の1週間前に、あらためてご連絡いたします。\n引き続きよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF,tr:""};
+}
+
+/* ============================================================ view: notice */
+var TOPICS={
+ monthly:{ja:"今月の申告・納付期限",tg:"毎月"},
+ visa:{ja:"90日レポート・ビザ更新のリマインド",tg:"ビザ"},
+ yearend:{ja:"12月決算の会社様へ：決算・監査の準備",tg:"決算"},
+ setup:{ja:"会社設立・BOIのご相談会",tg:"設立"}
+};
+function postText(p,lang,v){
+ v=v||0;var M=FBASE,mo=monJa(M),pm=monJa(PREVM),ch=p.ch;
+ var tag=ch==="facebook";
+ if(p.topic==="monthly"){
+  if(lang==="th")return ["【แจ้งกำหนดยื่นภาษีเดือน"+MON_TH[M.getMonth()]+"】","【อย่าลืม! กำหนดยื่นภาษีเดือนนี้】"][v%2]+"\n• ภ.ง.ด.1, 3, 53 (ออนไลน์) ภายใน "+mdTh(dom(M,15))+"\n• ประกันสังคม ภายใน "+mdTh(dom(M,15))+"\n• ภ.พ.30 (ออนไลน์) ภายใน "+mdTh(dom(M,23))+"\n\nกรุณาส่งเอกสารบัญชีเดือน"+MON_TH[PREVM.getMonth()]+"ภายใน "+mdTh(dom(M,5))+" ค่ะ"+(tag?"\n\n#บัญชี #ภาษี #"+BRAND.replace(/\s/g,""):"");
+  if(lang==="en")return ["Filing deadlines this month","Reminder: tax deadlines in "+MON_EN[M.getMonth()]][v%2]+"\n- WHT (PND1/3/53, e-filing): by "+mdEn(dom(M,15))+"\n- Social security: by "+mdEn(dom(M,15))+"\n- VAT (PP30, e-filing): by "+mdEn(dom(M,23))+"\n\nPlease send your "+MON_EN[PREVM.getMonth()]+" documents by "+mdEn(dom(M,5))+"."+(tag?"\n\n#ThailandTax #Accounting":"");
+  return ["【"+mo+"の申告・納付期限のお知らせ】","【お忘れなく】"+mo+"の申告期限"][v%2]+"\n・源泉税（PND1・3・53／電子申告）："+mdw(dom(M,15))+"まで\n・社会保険料："+mdw(dom(M,15))+"まで\n・VAT（PP30／電子申告）："+mdw(dom(M,23))+"まで\n\n"+pm+"分の請求書・領収書・銀行明細は、"+md(dom(M,5))+"までにお送りください。"+(tag?"\n\n#タイ会計 #タイ税務 #バンコク":"");
+ }
+ if(p.topic==="visa"){
+  if(lang==="th")return "【แจ้งเตือนรายงานตัว 90 วันและต่ออายุวีซ่า】\nพนักงานชาวต่างชาติต้องรายงานตัวทุก 90 วัน และต่ออายุวีซ่าและใบอนุญาตทำงานก่อนหมดอายุ\nเราตรวจสอบกำหนดการของพนักงานทุกท่านให้ และแจ้งล่วงหน้า 1 เดือนค่ะ";
+  if(lang==="en")return "Reminder: 90-day report and visa renewals\nForeign staff must report their address every 90 days and renew their visa and work permit before expiry.\nWe track the dates for all your staff and remind you one month ahead.";
+  return ["【駐在員の皆様へ】90日レポートとビザ更新のお知らせ","【ご確認ください】ビザ・ワークパーミットの期限"][v%2]+"\n・90日ごとの居住地の報告（90日レポート）\n・ビザ・ワークパーミットの更新（期限の前に申請）\n\n期限が近い方には、1か月前に個別にご連絡しています。ご家族のビザもあわせて確認できます。"+(tag?"\n\n#タイ駐在 #タイビザ #ワークパーミット":"");
+ }
+ if(p.topic==="setup"){
+  if(lang==="th")return "【ปรึกษาการจดทะเบียนบริษัทและ BOI】\nสำหรับนักธุรกิจญี่ปุ่นที่ต้องการเปิดบริษัทในประเทศไทย ปรึกษาได้ทั้งภาษาญี่ปุ่นและภาษาไทยค่ะ";
+  if(lang==="en")return "Company registration & BOI consultation\nFor Japanese business owners planning to open a company in Thailand. Consultations in Japanese, Thai and English.";
+  return "【タイでの会社設立・BOIのご相談】\nタイで会社を作りたい方、BOIの恩典を検討している方へ。\n手続きの流れ・必要書類・費用の目安を、日本語でご説明します。オンラインでも対応します。"+(tag?"\n\n#タイ起業 #会社設立 #BOI":"");
+ }
+ var y=FYE.getFullYear();
+ if(lang==="th")return "【สำหรับบริษัทที่ปิดงบ 31 ธันวาคม】\n• ตรวจนับสินค้าคงเหลือ 31 ธันวาคม\n• ประชุมผู้ถือหุ้นภายใน 4 เดือน\n• ยื่น ภ.ง.ด.50 ภายใน 150 วัน\nเตรียมตัวตั้งแต่วันนี้ค่ะ";
+ if(lang==="en")return "For companies with a December 31 year-end\n- Stock count on Dec 31\n- AGM within 4 months\n- Corporate tax (PND50) within 150 days\nLet's plan the schedule now.";
+ return "【"+y+"年12月決算の会社様へ】\n・12/31の棚卸（立ち会いもご相談ください）\n・決算後4か月以内に株主総会\n・決算後150日以内に法人税（PND50）の申告\n\n監査人との日程は早めに決めておくと安心です。"+(tag?"\n\n#タイ決算 #タイ会計":"");
+}
+function slots(){var out=[];for(var i=0;i<14&&out.length<4;i++){var d=addD(NOW,i+1);if(d.getDay()===2||d.getDay()===5)out.push(d)}return out}
+var CHN={line:"LINE配信",facebook:"Facebook",mail:"メール一斉送信"};
+function viewNotice(){
+ var posts=state.posts;
+ var rows=posts.map(function(s){var b=s.status==="posted"?["配信済み","gray"]:s.status==="scheduled"?["予約済み","green"]:["下書き","amber"];
+  return '<button class="row '+(s.id===state.selPost?"active":"")+'" data-post="'+s.id+'"><div class="row-top"><b>'+esc(TOPICS[s.topic].ja)+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div class="row-foot"><span class="badge blue">'+CHN[s.ch]+'</span>'+(s.auto?'<span class="badge gray">自動作成：'+esc(s.why||"")+'</span>':'')+(s.when?'<span class="badge gray">'+esc(s.when)+'</span>':'')+'</div></button>'}).join("");
+ var s=posts.filter(function(x){return x.id===state.selPost})[0]||posts[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">配信するお知らせ</b> <span class="badge gray">'+posts.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">申告期限・お客様のビザ期限から、お知らせの下書きが自動でできます</div></section>'+
+  '<section class="detail">'+(s?postDetail(s):"")+'</section></div>';
+}
+function postDetail(s){
+ var lang=state.lang,txt=s.text||postText(s,lang,s.v);
+ var ch=[["line","LINE配信"],["facebook","Facebook"],["mail","メール一斉送信"]].map(function(x){return '<button data-ch="'+x[0]+'" class="'+(s.ch===x[0]?"on":"")+'" '+(s.status!=="draft"?"disabled":"")+'>'+x[1]+'</button>'}).join("");
+ var lg=[["ja","日本語"],["th","ไทย"],["en","English"]].map(function(x){return '<button data-lang="'+x[0]+'" class="'+(lang===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+ var hue={monthly:230,visa:190,yearend:30,setup:280}[s.topic];
+ var ph='<div class="photo" style="background:linear-gradient(135deg,hsl('+hue+',35%,55%),hsl('+((hue+40)%360)+',38%,36%));min-height:120px"><span>'+esc(TOPICS[s.topic].ja)+'</span></div>';
+ var prev=s.ch==="line"?'<div class="line-prev">'+ph+'<div class="lb">'+esc(txt)+'</div></div>':s.ch==="mail"?'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><div><b>'+esc(BRAND)+'</b><div class="tiny muted">宛先：顧問先のご担当者（サンプル24社）</div></div></div><div class="tx">'+esc(txt)+'</div></div>':'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><b>'+esc(BRAND)+'</b></div>'+ph+'<div class="tx">'+esc(txt)+'</div></div>';
+ var sl=slots().map(function(d){return '<option value="'+stamp(d,"09:00")+'">'+mdw(d)+' 09:00</option>'}).join("");
+ return '<div class="detail-inner"><div class="sns-grid"><div><div class="p-head"><div><h2>'+esc(TOPICS[s.topic].ja)+'</h2><div class="meta">'+esc(CHN[s.ch])+(s.why?" · "+s.why:"")+'</div></div></div>'+
+  '<div class="actions"><div class="seg">'+ch+'</div><div class="seg">'+lg+'</div><button class="small btn-i" data-act="regen" '+(s.status!=="draft"?"disabled":"")+'>'+IC.spark+'文面を作り直す</button></div>'+prev+
+  '<div class="actions">'+(s.status==="draft"?'<select id="slot" aria-label="配信日時">'+sl+'</select><button class="primary btn-i" data-act="schedule">'+IC.cal+'この日時に予約</button><button data-act="postnow">今すぐ配信（デモ）</button>':s.status==="scheduled"?'<span class="badge green">'+esc(s.when)+' に配信予定</span><button class="small" data-act="unschedule">予約を取り消す</button>':'<span class="badge gray">'+esc(s.when)+' に配信済み</span>')+'</div></div>'+
+  '<div><div class="card" style="margin-top:0"><h3>'+IC.cal+' 期限と配信のカレンダー</h3>'+calendar()+'</div>'+
+  '<div class="card"><h3>自動運用のルール</h3>'+
+  '<label class="toggle"><input type="checkbox" data-auto="draft" '+(state.auto.draft?"checked":"")+'><span>毎月1日に、その月の申告期限のお知らせを自動で下書き（日本語・タイ語・英語）</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="remind" '+(state.auto.remind?"checked":"")+'><span>期限表に登録した期限の1週間前に、お客様へリマインドを自動送信</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="approve" '+(state.auto.approve?"checked":"")+'><span>配信の前に担当者の確認を入れる</span></label>'+
+  '<p class="tiny muted" style="margin:6px 0 0">本番では、顧問先の決算月・ビザの期限・申告の予定をもとに、この画面の操作なしで動きます。</p></div></div></div></div>';
+}
+function calendar(){
+ var out="",items=[];
+ allCases().forEach(function(c){if(cs(c.id).registered)schedule(c).forEach(function(x){if(x.due)items.push({d:x.d,t:c.client.replace(/株式会社|\(Thailand\) Co\., Ltd\./g,"").trim()+"："+x.ja})})});
+ [5,15,23].forEach(function(n){var d=dom(FBASE,n);items.push({d:d,t:n===5?"顧問先の書類締め":n===15?"源泉税・社会保険":"VAT（PP30）",std:true})});
+ for(var i=-1;i<12;i++){var d=addD(NOW,i);var key=md(d);
+  var its=state.posts.filter(function(s){return s.when&&s.when.split(" ")[0]===key});
+  var dues=items.filter(function(x){return md(x.d)===key&&x.d.getFullYear()===d.getFullYear()});
+  if(!its.length&&!dues.length&&i!==0)continue;
+  out+='<div class="cal-day"><b>'+mdw(d)+(i===0?"　今日":"")+'</b>'+its.map(function(s){return '<div class="it"><span class="badge '+(s.status==="posted"?"gray":"green")+'">'+s.when.split(" ")[1]+'</span>'+esc(TOPICS[s.topic].ja)+'</div>'}).join("")+dues.map(function(x){return '<div class="it due"><span class="badge">期限</span>'+esc(x.t)+'</div>'}).join("")+(its.length||dues.length?"":'<div class="it muted">—</div>')+'</div>'}
+ return '<div class="cal">'+out+'</div>';
+}
+
+/* ============================================================ actions */
+function go(view){state.view=view;render();window.scrollTo(0,0)}
+function openCase(id){state.selCase=id;var s=cs(id);state.ptab=s.extracted?(s.step>=3?"doc":s.step>=2?"docs":"cond"):"cond";go("case")}
+function captureCompose(mailId){var to=$("#rTo"),sj=$("#rSubj"),b=$("#rBody");if(!to)return null;var tr=state.compose&&state.compose.mail===mailId?state.compose.tr:"";return {mail:mailId,to:to.value,subject:sj.value,body:b.value,attach:$("#replyBox").dataset.attach||null,tr:tr||""}}
+function ask(caseId,k){
+ var st=cs(caseId),c=C(caseId);if(dstat(c,st,k)!=="check")return;
+ st.dst[k]="asking";if(st.step<2)st.step=2;render();
+ setTimeout(function(){var d=c.docs[k];st.dst[k]=d.res||"ok";if(st.dst[k]==="missing")toast("「"+DOCS[k].ja+"」は不足に回しました。お客様への依頼に入ります");render()},1300);
+}
+function attachDoc(caseId){
+ var st=cs(caseId),c=C(caseId);st.attached=true;st.step=3;
+ var mid=state.mails.filter(function(m){return m.caseId===caseId&&m.folder==="inbox"&&m.kind!=="follow"})[0];
+ var pm=replyMail(c,st);
+ state.compose={mail:mid.id,to:mid.addr,subject:"Re: "+mid.subject,body:pm.body,attach:docName(c),tr:pm.tr};
+ state.folder="inbox";state.selMail=mid.id;go("mail");
+ setTimeout(function(){var r=$("#replyBox");if(r)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("ご案内書を添付し、返信の本文を作りました。内容を確認して送信してください");
+}
+function nowHM(){return new Date().toTimeString().slice(0,5)}
+function sendMail(mailId){
+ var m=state.mails.filter(function(x){return x.id===mailId})[0],d=captureCompose(mailId);if(!d||!m)return;
+ if(!d.to||!d.body.trim()){toast("宛先と本文を入れてください");return}
+ var sent={id:"M"+(++state.seq)+"s",folder:"sent",from:BRAND,addr:d.to,toName:m.folder==="inbox"?m.from:m.toName,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,tr:d.tr||"",attach:d.attach,caseId:m.caseId,tags:[{t:"送信済み",k:"gray"}]};
+ state.mails.unshift(sent);state.compose=null;
+ if(m.folder==="draft")state.mails=state.mails.filter(function(x){return x.id!==m.id});
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ if(st&&d.attach&&m.kind!=="follow"&&!st.sent){st.sent=true;
+  setTimeout(function(){
+   state.mails.unshift({id:"M"+(++state.seq)+"r",folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:stamp(NOW,nowHM()),subject:"Re: "+d.subject.replace(/^Re:\s*/,""),body:c.follow,tr:c.followTr||"",caseId:c.id,kind:"follow",tags:[{t:"お客様の返信",k:"green"}],unread:true});
+   render();toast(c.from+" から返信が届きました");
+  },3500);
+ }
+ state.folder="sent";state.selMail=sent.id;render();toast("送信しました（デモのため、実際には送信していません）");
+}
+function register(caseId,mailId){
+ var st=cs(caseId),c=C(caseId),m=state.mails.filter(function(x){return x.id===mailId})[0];
+ st.registered=true;
+ var miss=docKeys(c).filter(function(k){return dstat(c,st,k)==="missing"}).slice(0,2);
+ var L=c.lang,sc=schedule(c),dues=sc.filter(function(x){return x.due});
+ var body,tr="";
+ if(L==="en"){body="Dear "+c.addressee+",\n\nThank you for your reply. We have registered the following deadlines and will remind you one week before each:\n";dues.forEach(function(x){body+="- "+mdEn(x.d)+": "+x.en+"\n"});body+="\nBest regards,\n"+STAFF_EN+"\n"+BRAND}
+ else if(L==="th"){body="เรียน "+c.addressee+"\n\nขอบคุณค่ะ ได้บันทึกกำหนดการไว้แล้ว และจะแจ้งเตือนล่วงหน้า 1 สัปดาห์ค่ะ\n";dues.forEach(function(x){body+="- "+mdTh(x.d)+" "+x.th+"\n"});body+="\nขอบคุณค่ะ\n"+STAFF_TH+" ("+BRAND+")";
+  tr=c.addressee.replace("คุณ","")+"さん\n\nありがとうございます。期限を登録しました。各期限の1週間前にお知らせします。\n";dues.forEach(function(x){tr+="・"+md(x.d)+" "+x.ja+"\n"})}
+ else{body=c.addressee+"\n\nご返信ありがとうございます。"+BRAND+"の"+STAFF+"です。\nいただいた内容を記録し、以下の期限を期限表に登録しました。各期限の1週間前にあらためてご連絡いたします。\n\n";dues.forEach(function(x){body+="・"+mdw(x.d)+" "+x.ja+"\n"});body+="\n書類が届きしだい、受領のご連絡をいたします。\n引き続きよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF}
+ state.compose={mail:mailId,to:m.addr,subject:"Re: "+m.subject.replace(/^Re:\s*/,""),body:body,attach:null,tr:tr};
+ render();setTimeout(function(){var r=$("#replyBox");if(r)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("期限表に登録し、リマインドを設定しました（"+dues.length+"件）。確認のメールを作りました");
+}
+function help(){
+ modal('<h3>このワークスペースの使い方</h3><p class="tiny muted">'+esc(BRAND)+'様の業務に近い形で動かせるデモです。会社・人物・書類はすべて架空のサンプルで、メールも実際には送信しません。</p>'+
+ '<ol><li><b>メール</b>：お客様からのご依頼（ワークパーミット・会社設立・月次の記帳・決算）を開き、「このメールから手続きを作る」を押します。</li><li><b>手続き・記帳</b>：①案件票をつくる → ②届いた書類を必要書類のリストと照合し、要確認の書類はタイ人スタッフにLINE（タイ語）で確認 → ③ご案内書（不足書類・期限表・お見積り）を作る → 「返信へ添付」。</li><li><b>メール</b>：ご案内を送ると、お客様から返信が届きます。「受領を記録して期限表に登録」で、期限のリマインドと確認メールまで作ります。</li><li><b>お知らせ配信</b>：申告期限・ビザ更新・決算のお知らせが、日本語・タイ語・英語で自動で下書きされます。日時を選んで予約できます。</li></ol>'+
+ (SERVICES.length?'<p class="tiny">想定した業務：'+SERVICES.map(esc).join("・")+'</p>':'')+
+ '<div class="cta-box"><b>このデモを、'+esc(BRAND)+'様の実際のメールと顧客リストで動かします。</b><br>Gmail・Outlook、Excel・スプレッドシートの顧客・期限リスト、LINE公式アカウントと連携できます。<br>開発費 0円 ／ 1機能 月額 5,000バーツ（税別）。まずは30分、お困りの業務をお聞かせください。<br><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</div>'+
+ '<div class="actions" style="justify-content:flex-end"><button class="primary" data-close>はじめる</button></div>');
+}
+var CLIENTS=[
+ ["株式会社サンプル工業（タイランド）","チョンブリ","3月","WP・ビザ 4名","月次記帳"],
+ ["Sample Precision (Thailand)","チョンブリ","12月","WP・ビザ 2名","月次記帳・決算"],
+ ["Sample Foods (Thailand)","バンコク","12月","—","月次記帳・給与計算"],
+ ["サンプル商事タイランド","バンコク","3月","WP・ビザ 3名","月次記帳・BOI"],
+ ["サンプル物流（タイ）","アユタヤ","12月","WP・ビザ 1名","決算・監査対応"],
+ ["サンプル食堂 開業準備室","バンコク","—","—","会社設立"]
+];
+function clientsModal(){
+ var y=FYE.getFullYear()+1;
+ modal('<h3>顧客・期限一覧（サンプル）</h3><p class="tiny muted">本番では、貴社のExcel・スプレッドシートの顧問先リストをそのまま使い、決算月・ビザ期限から期限を自動で並べます。</p><div style="overflow-x:auto"><table><tr><th>お客様</th><th>地域</th><th>決算月</th><th>ビザ・WP</th><th>ご契約</th></tr>'+CLIENTS.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td class="tiny">'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td class="tiny">'+esc(r[3])+'</td><td class="tiny">'+esc(r[4])+'</td></tr>'}).join("")+'</table></div>'+
+ '<div class="card"><h3>直近の期限</h3><table><tr><td>'+mdw(dom(FBASE,15))+'</td><td>源泉税（PND1・3・53）・社会保険　全顧問先</td></tr><tr><td>'+mdw(dom(FBASE,23))+'</td><td>VAT（PP30）　全顧問先</td></tr><tr><td>'+mdw(addD(NOW,40))+'</td><td>Sample Precision　A.S.様 ビザ更新の申請開始</td></tr><tr><td>'+mdw(new Date(y,3,30))+'</td><td>12月決算の会社　定時株主総会の期限</td></tr></table></div><div class="actions" style="justify-content:flex-end"><button data-close>閉じる</button></div>');
+}
+function pasteModal(){
+ var bg=modal('<h3>問い合わせを貼り付けて試す</h3><p class="tiny muted">実際に届くメール・LINEに近い文面を貼り付けると、受信箱に追加して書類チェックまで試せます（簡易読み取り。日本語・英語・タイ語）。</p><div class="paste"><textarea id="pasteText" aria-label="問い合わせの文面" placeholder="例）来月着任する駐在員のワークパーミットをお願いします。パスポートと履歴書を送ります。勤務地はシラチャです。"></textarea></div><div class="actions" style="justify-content:flex-end"><button data-close>キャンセル</button><button class="primary" id="pasteGo">受信箱に追加</button></div>');
+ $("#pasteGo",bg).onclick=function(){var t=$("#pasteText",bg).value.trim();if(!t)return;
+  var r=parse(t),id="X"+(++state.seq),dt=stamp(NOW,nowHM());
+  var c={id:id,custom:true,type:r.type,lang:r.lang,from:r.client,addr:"client@example.com",init:r.client.charAt(0),date:dt,subject:t.split("\n")[0].slice(0,40),tag:"貼り付け",client:r.client,who:r.who,area:r.area,body:t,docs:r.docs,checks:r.checks,addressee:r.addressee,follow:r.follow,followTr:r.followTr};
+  state.custom[id]=c;
+  state.mails.unshift({id:"M"+id,folder:"inbox",from:r.client,addr:"client@example.com",init:r.client.charAt(0),date:dt,subject:c.subject,body:t,tags:[{t:"ご依頼",k:"green"},{t:"貼り付け",k:"gray"}],caseId:id,unread:true});
+  state.folder="inbox";state.selMail="M"+id;bg.remove();state.view="mail";render();toast("受信箱に追加しました（"+TYPES[r.type].ja+"として読み取り）");
+ };
+}
+
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t||t.disabled)return;
+ var ds=t.dataset;
+ if(t.hasAttribute("data-close"))return;
+ if(ds.view){go(ds.view);return}
+ if(ds.folder){state.folder=ds.folder;var f=state.mails.filter(function(m){return m.folder===ds.folder})[0];state.selMail=f?f.id:null;render();return}
+ if(ds.mail&&!ds.act){state.selMail=ds.mail;state.mails.forEach(function(m){if(m.id===ds.mail)m.unread=false});render();return}
+ if(ds.case&&!ds.act){state.selCase=ds.case;var st0=cs(ds.case);state.ptab=st0.extracted?(st0.step>=3?"doc":st0.step>=2?"docs":"cond"):"cond";render();return}
+ if(ds.ptab){if(ds.ptab!=="mail"&&ds.ptab!=="cond"&&!cs(state.selCase).extracted){toast("先に案件票をつくってください");return}state.ptab=ds.ptab;var s1=cs(state.selCase);if(ds.ptab==="docs"&&s1.step<2)s1.step=2;render();return}
+ if(ds.post){state.selPost=ds.post;render();return}
+ if(ds.ch){var sp=state.posts.filter(function(x){return x.id===state.selPost})[0];sp.ch=ds.ch;sp.text=null;render();return}
+ if(ds.lang){state.lang=ds.lang;state.posts.forEach(function(x){if(x.status==="draft")x.text=null});render();return}
+ switch(ds.act){
+  case "help":help();break;
+  case "clients":clientsModal();break;
+  case "reset":if(window.confirm("デモを最初の状態に戻しますか？")){state=fresh();state.seen=true;render();toast("最初の状態に戻しました")}break;
+  case "paste":pasteModal();break;
+  case "gomail":var mm=state.mails.filter(function(m){return m.caseId===state.selCase&&m.folder==="inbox"})[0];if(mm){state.folder="inbox";state.selMail=mm.id}go("mail");break;
+  case "tocase":openCase(ds.case);break;
+  case "extract":var st=cs(ds.case);t.disabled=true;t.innerHTML=IC.spark+"案件票をつくっています…";setTimeout(function(){st.extracted=true;st.step=1;state.ptab="cond";render()},900);break;
+  case "ask":ask(ds.case,ds.doc);break;
+  case "askall":var c0=C(ds.case),st2=cs(ds.case);docKeys(c0).filter(function(k){return dstat(c0,st2,k)==="check"}).forEach(function(k,i){setTimeout(function(){ask(ds.case,k)},i*300)});break;
+  case "viewdoc":var c2=C(ds.case),st3=cs(ds.case);if(!st3.extracted){toast("先に案件票をつくってください");break}modal(docHtml(c2,st3,true)+'<div class="actions" style="justify-content:flex-end"><button data-act="print">印刷・PDFで保存</button><button class="primary" data-close>閉じる</button></div>');break;
+  case "print":window.print();break;
+  case "attach":attachDoc(ds.case);break;
+  case "insertdoc":var mi=state.mails.filter(function(x){return x.id===ds.mail})[0];var sti=cs(mi.caseId),ci=C(mi.caseId),ni=counts2(ci,sti);if(ni.check||ni.asking){toast("要確認の書類があります。「手続き・記帳」で確認してください");openCase(mi.caseId);state.ptab="docs";render();break}attachDoc(mi.caseId);break;
+  case "savedraft":var d=captureCompose(ds.mail);if(!d)break;var src=state.mails.filter(function(x){return x.id===ds.mail})[0];
+   if(src.folder==="draft"){src.body=d.body;src.subject=d.subject;src.addr=d.to}else{state.mails.unshift({id:"M"+(++state.seq)+"d",folder:"draft",from:BRAND,addr:d.to,toName:src.from,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:src.caseId,tags:[{t:"下書き",k:"amber"}]})}
+   state.compose=null;render();toast("下書きに保存しました");break;
+  case "send":sendMail(ds.mail);break;
+  case "register":register(ds.case,state.selMail);break;
+  case "regen":var sp2=state.posts.filter(function(x){return x.id===state.selPost})[0];sp2.v=(sp2.v||0)+1;sp2.text=null;render();break;
+  case "schedule":var sp3=state.posts.filter(function(x){return x.id===state.selPost})[0];sp3.when=$("#slot").value;sp3.status="scheduled";sp3.text=postText(sp3,state.lang,sp3.v);render();toast("予約しました："+sp3.when+"（"+CHN[sp3.ch]+"）");break;
+  case "unschedule":var sp4=state.posts.filter(function(x){return x.id===state.selPost})[0];sp4.status="draft";sp4.when="";sp4.text=null;render();break;
+  case "postnow":var sp5=state.posts.filter(function(x){return x.id===state.selPost})[0];sp5.status="posted";sp5.when=stamp(NOW,nowHM());sp5.text=postText(sp5,state.lang,sp5.v);render();toast("配信しました（デモのため、実際には配信していません）");break;
+  case "newpost":var used=state.posts.map(function(p){return p.topic});var free=Object.keys(TOPICS).filter(function(k){return used.indexOf(k)<0})[0]||"monthly";var nid="N"+(++state.seq)+"n";state.posts.unshift({id:nid,topic:free,status:"draft",ch:"facebook",when:"",auto:false});state.selPost=nid;render();break;
+ }
+});
+document.addEventListener("change",function(e){
+ var t=e.target;
+ if(t.dataset&&t.dataset.auto){state.auto[t.dataset.auto]=t.checked;save();return}
+});
+document.addEventListener("input",function(e){
+ var t=e.target;if(t.id==="rBody"||t.id==="rTo"||t.id==="rSubj"){var tr=state.compose&&state.compose.mail===state.selMail?state.compose.tr:"";state.compose={mail:state.selMail,to:$("#rTo").value,subject:$("#rSubj").value,body:$("#rBody").value,attach:$("#replyBox").dataset.attach||null,tr:tr};save()}
+});
+window.addEventListener("hashchange",function(){location.reload()});
+
+render();
+if(!state.seen){state.seen=true;save();help()}
+})();
+</script>
+</body>
+</html>
