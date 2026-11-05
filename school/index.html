@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>体験・振替ワークスペース｜Nova Strategy</title>
+<meta name="description" content="保護者からの体験の申込み・欠席連絡から、時間割の空き枠の仮押さえ・講師への共有・ご案内づくり、お知らせのLINE配信までをひとつの画面で。学習塾・語学学校・習い事教室向けの業務デモ。">
+<style>
+:root{--bg:#f6f8fa;--paper:#fff;--ink:#223731;--muted:#788680;--line:#e4eae7;--green:#16654e;--green-2:#104c3a;--green-light:#eaf5ee;--amber:#926417;--amber-light:#fff5df;--red:#b04438;--red-light:#fbeae6;--blue:#476c9f;--blue-light:#e9f0fb;--nav:176px;
+--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:13px/1.65 var(--font);color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;white-space:nowrap;transition:background .15s}
+button:hover:not(:disabled){background:#f0f6f2}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #75baa2;outline-offset:2px}
+.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--green-2)}
+.small{font-size:11px;padding:5px 9px}
+.subtle{border:0;background:transparent}
+.muted{color:var(--muted)}.tiny{font-size:11px}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.btn-i{display:inline-flex;align-items:center;gap:7px}
+/* top */
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-symbol{width:31px;height:31px;background:var(--green);border-radius:9px;color:#fff;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.brand b{font-size:15px;letter-spacing:.02em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.brand small{display:block;font-size:9px;line-height:1.2;letter-spacing:.16em;color:#6b7c73}
+.crumb{font-size:12px;color:#7b8b83;flex:1}
+.demo-pill{background:#f8f2df;color:#856e30;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.help{border:0;background:none;display:flex;gap:6px;align-items:center;font-size:12px}
+/* layout */
+.layout{height:calc(100vh - 60px);display:grid;grid-template-columns:var(--nav) minmax(0,1fr)}
+.nav{border-right:1px solid var(--line);padding:22px 12px;background:#f3f6f3;display:flex;flex-direction:column;gap:6px}
+.nav-label{font-size:10px;letter-spacing:.12em;color:#859389;padding:0 12px 10px}
+.nav button{display:flex;align-items:center;gap:10px;text-align:left;border:0;padding:11px 12px;background:none;border-radius:8px;font-weight:500;font-size:12.5px;width:100%}
+.nav button.active{background:#dcebe1;color:#145c44}
+.nav button:hover{background:#e5eee7}
+.nav .count:empty{display:none}.nav .count{margin-left:auto;background:#fff9;border-radius:6px;padding:0 6px;font-size:10px}
+.nav .count.hot{background:var(--green);color:#fff}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.nav .note{font-size:9.5px;color:#829083;padding:12px 12px 0;line-height:1.6}
+.workspace{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{min-height:72px;flex-shrink:0;display:flex;align-items:center;padding:10px 26px;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);gap:16px}
+.ws-head h1{font-size:19px;line-height:1.5;margin:0;font-weight:600}
+.ws-head p{font-size:11px;color:#7b8981;margin:2px 0 0}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr)}
+.list-pane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.list-tools{padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:16px;padding-top:4px}
+.tabs button{border:0;background:none;padding:6px 0;border-bottom:2px solid transparent;border-radius:0;color:#829087;font-size:11.5px}
+.tabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+.row{width:100%;display:block;border:0;border-bottom:1px solid #edf0ee;border-radius:0;text-align:left;padding:15px 17px;white-space:normal;background:#fff}
+.row.active{background:#eef6f0;box-shadow:3px 0 0 var(--green) inset}
+.row:hover{background:#f5f8f5}
+.row-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.row-top b{font-size:11.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-top time{font-size:10px;color:#8a968f}
+.dot{width:7px;height:7px;border-radius:50%;background:#267658;flex-shrink:0}
+.row .subj{font-size:12.5px;font-weight:500;line-height:1.6;margin:2px 0}
+.row .snip{font-size:11px;color:#8c968f;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row-foot{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap;line-height:1.7}
+.badge.green{background:#e5f2e9;color:#377355}.badge.amber{background:var(--amber-light);color:var(--amber)}.badge.blue{background:var(--blue-light);color:var(--blue)}.badge.gray{background:#f0f2f1;color:#7e8982}.badge.red{background:var(--red-light);color:#a65a4b}
+.list-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.detail{min-width:0;overflow:auto;background:#fff}
+.detail-inner{padding:24px 30px 40px;max-width:980px}
+.mail-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mail-h h2{font-size:19px;margin:0 0 14px;font-weight:600;line-height:1.5}
+.sender{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#efe9da;color:#7a6331;display:grid;place-items:center;font-size:13px;font-weight:600;flex-shrink:0}
+.sender b{font-size:12.5px;display:block}.sender span{font-size:11px;color:var(--muted)}
+.sender time{margin-left:auto;font-size:11px;color:var(--muted)}
+.mail-body{white-space:pre-wrap;font-size:13px;line-height:1.95;border-bottom:1px solid var(--line);padding-bottom:20px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.reply{border:1px solid var(--line);border-radius:12px;margin-top:18px;overflow:hidden}
+.reply-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;background:#fafbfa;flex-wrap:wrap}
+.reply-h input{border:0;background:transparent;flex:1;min-width:160px;padding:2px}
+.reply textarea{width:100%;border:0;min-height:220px;padding:14px;resize:vertical;line-height:1.8;font-size:12.5px;background:#fff}
+.reply-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfa;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green);border-radius:6px;padding:3px 9px;font-size:11px}
+.empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .em-i{width:58px;height:58px;border:1px solid var(--line);border-radius:14px;display:grid;place-items:center;margin:0 auto 14px;color:var(--green);background:#fff}
+.empty h3{color:var(--ink);font-size:16px;font-weight:500;margin:0 0 6px}
+/* proposal */
+.p-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.p-head h2{margin:0;font-size:18px;font-weight:600}
+.p-head .meta{font-size:11px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px}
+.step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#8a978f;border:0;background:none;padding:6px 0;text-align:left;border-radius:0;border-top:3px solid #e5ebe7}
+.step i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid #cfd8d3;display:grid;place-items:center;font-size:10px;flex-shrink:0}
+.step.done{border-color:#9cc9b2;color:#3d6d57}.step.done i{background:#9cc9b2;color:#fff;border-color:#9cc9b2}
+.step.cur{border-color:var(--green);color:var(--green);font-weight:600}.step.cur i{background:var(--green);color:#fff;border-color:var(--green)}
+.ptabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:10px}
+.ptabs button{border:0;background:none;border-radius:0;padding:9px 0;border-bottom:2px solid transparent;color:#7d8a83;font-size:12px}
+.ptabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;margin-top:14px}
+.card h3{font-size:13.5px;margin:0 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv th{width:28%}
+.miss{color:var(--amber)}
+.checklist{background:var(--amber-light);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px}
+.checklist b{color:var(--amber)}
+.checklist ul{margin:4px 0 0;padding-left:20px}
+.cands{display:grid;gap:12px;margin-top:12px}
+.cand{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.cand.off{opacity:.55}
+.photo{border-radius:9px;min-height:96px;position:relative;overflow:hidden;display:grid;place-items:end start;padding:8px;color:#fff;font-size:10px;font-weight:600;text-shadow:0 1px 2px #0005}
+.photo svg{position:absolute;right:8px;top:8px;width:44px;height:44px;opacity:.85}
+.cand-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cand-h b{font-size:13.5px}
+.cand .spec{font-size:11.5px;color:#5f6d66;margin:2px 0 6px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:999px;padding:1px 8px;background:var(--green-light);color:var(--green)}
+.chip.no{background:#f3f3f1;color:#9a8f7a;text-decoration:line-through}
+.owner{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bubble{border-radius:10px;padding:8px 11px;font-size:12px;max-width:520px;line-height:1.7}
+.bubble.out{background:#e9f6ee}
+.bubble.in{background:#f2f3f5}
+.bubble .tr{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.vac{font-size:11px;font-weight:600}
+.doc{border:1px solid var(--line);border-radius:6px;padding:28px 30px;background:#fff;box-shadow:0 6px 20px #2237310d;max-width:760px}
+.doc h4{margin:0;font-size:18px}
+.doc .to{font-size:13px;margin:14px 0 4px}
+.doc .lead{font-size:12px;color:#5d6b64;margin:0 0 14px}
+.doc-prop{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding:14px 0}
+.doc-prop .photo{min-height:104px}
+.route{display:grid;gap:0;margin-top:6px}
+.route div{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;font-size:12px;align-items:start}
+.route .ln{width:2px;background:#cfe3d7;justify-self:center;height:100%}
+.route .pt{width:10px;height:10px;border-radius:50%;background:var(--green);margin:5px auto 0}
+.foot-bar{position:sticky;bottom:0;background:#fffffff2;border-top:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.foot-bar .sum{margin-right:auto;font-size:11.5px;color:var(--muted)}
+/* sns */
+.sns-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.post-prev{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:420px}
+.post-prev .ph{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:12px}
+.post-prev .ph .avatar{width:28px;height:28px;font-size:11px;background:var(--green);color:#fff}
+.post-prev .photo{border-radius:0;min-height:200px}
+.post-prev .tx{white-space:pre-wrap;padding:12px;font-size:12.5px;line-height:1.75}
+.line-prev{background:#8cabd9;border-radius:12px;padding:14px;max-width:420px}
+.line-prev .lb{background:#fff;border-radius:14px;padding:12px;white-space:pre-wrap;font-size:12.5px;line-height:1.75}
+.line-prev .photo{border-radius:12px;margin-bottom:8px;min-height:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;font-size:11.5px}
+.seg button.on{background:var(--green);color:#fff}
+.cal{display:grid;gap:6px}
+.cal-day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.cal-day b{font-size:11.5px}
+.cal-day .it{font-size:11px;margin-top:4px;display:flex;gap:6px;align-items:center}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:6px 0}
+.toggle input{margin-top:3px;accent-color:var(--green)}
+/* misc */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#21352f;color:#fff;border-radius:10px;padding:10px 16px;font-size:12.5px;box-shadow:0 8px 24px #0003;z-index:50;max-width:92vw}
+.modal-bg{position:fixed;inset:0;background:#1d2b2680;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px 24px}
+.modal h3{margin:0 0 8px;font-size:17px}
+.modal ol{padding-left:20px;margin:8px 0}
+.modal li{margin:6px 0}
+.cta-box{background:var(--green-light);border:1px solid #bfdccb;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:12.5px}
+.cta-box b{color:var(--green)}
+.paste textarea{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px}
+.mobile-tabs{display:none}
+@media (max-width:900px){
+  .topbar{padding:0 12px;gap:10px;height:56px}
+  .crumb,.help span{display:none}
+  .brand{flex:1}
+  .demo-pill{font-size:10px;padding:3px 6px}
+  .demo-pill .long{display:none}
+  .ws-head{flex-wrap:wrap}
+  .brand b{max-width:52vw;font-size:14px}
+  .layout{display:block;height:auto}
+  .nav{display:none}
+  .mobile-tabs{display:flex;gap:4px;background:#f3f6f3;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5;overflow-x:auto}
+  .mobile-tabs button{border:0;background:none;padding:8px 10px;font-size:12px;border-radius:8px}
+  .mobile-tabs button.active{background:#dcebe1;color:#145c44;font-weight:600}
+  .workspace{overflow:visible}
+  .ws-head{padding:10px 14px;min-height:0}
+  .ws-head h1{font-size:16px}
+  .body{display:block}
+  .list-pane{border-right:0;border-bottom:1px solid var(--line);max-height:300px}
+  .detail{overflow:visible}
+  .detail-inner{padding:16px 14px 30px}
+  .foot-bar{padding:10px 14px}
+  .steps{grid-template-columns:1fr}
+  .cand{grid-template-columns:1fr}
+  .cand .photo{min-height:120px}
+  .doc{padding:18px 16px}
+  .doc-prop{grid-template-columns:1fr}
+  .sns-grid{grid-template-columns:1fr}
+}
+@media print{
+  body *{visibility:hidden}
+  #printDoc,#printDoc *{visibility:visible}
+  #printDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  .modal-bg{position:static;background:none}
+}
+
+</style>
+<style>
+:root{--green:#a0522d;--green-2:#83421f;--green-light:#fbf0e8}
+.nav{background:#f8f4f0}.nav button:hover{background:#f0e7df}
+.nav button.active,.mobile-tabs button.active{background:#f2e1d3;color:#83421f}
+.mobile-tabs{background:#f8f4f0}
+.row.active{background:#fcf3ec}
+.badge.green{background:#f6e6da;color:#8a4524}
+.bubble.out{background:#fbeee4}
+button:hover:not(:disabled){background:#faf3ee}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline-color:#d7a37f}
+.route .ln{background:#ecd6c6}
+.step.done{border-color:#dcb79c;color:#8a5a3c}.step.done i{background:#dcb79c;border-color:#dcb79c}
+.cta-box{border-color:#e8cdb9}
+.cand{grid-template-columns:104px minmax(0,1fr)}
+.dblock{border-radius:10px;min-height:96px;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;text-align:center;padding:8px 4px;line-height:1.25}
+.dblock .dd{font-size:21px;font-weight:700;letter-spacing:.02em}
+.dblock .dw{font-size:11px;opacity:.95}
+.dblock .dt{font-size:11px;margin-top:4px;background:#ffffff2b;border-radius:5px;padding:1px 6px}
+.cand.full .dblock{filter:grayscale(.85)}
+.rank{font-size:10.5px;font-weight:600;color:#fff;background:var(--green);border-radius:5px;padding:1px 7px}
+.trn{display:block;margin-top:10px;padding:10px 12px;background:#f6f7f8;border-radius:8px;font-size:12px;color:#5d6a64;white-space:pre-wrap}
+.doc table td,.doc table th{font-size:12px}
+.seat{font-size:11px;font-weight:600}
+.post-prev .photo,.line-prev .photo{display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:12px;font-size:12px;font-weight:600}
+.post-prev .photo svg,.line-prev .photo svg{position:absolute;right:12px;top:12px;width:46px;height:46px;opacity:.9}
+.blog-prev{border:1px solid var(--line);border-radius:12px;max-width:520px;background:#fff;overflow:hidden}
+.blog-prev .photo{border-radius:0;min-height:170px}
+.blog-prev .tx{white-space:pre-wrap;padding:14px 16px;font-size:12.5px;line-height:1.85}
+.blog-prev h3{margin:14px 16px 0;font-size:16px}
+@media (max-width:900px){.cand{grid-template-columns:1fr}.dblock{min-height:64px;flex-direction:row;gap:10px}.dblock .dt{margin-top:0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+/* ============================================================ helpers */
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return Number(n).toLocaleString("en-US")}
+var IC={
+ mail:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ book:'<svg class="icon" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h5"/></svg>',
+ share:'<svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+ list:'<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+ reset:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ help:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>',
+ spark:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+ send:'<svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>',
+ clip:'<svg class="icon" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>',
+ doc:'<svg class="icon" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+ plus:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cal:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+ chat:'<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+ bigbook:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.3"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M8 7h7M8 11h5"/></svg>'
+};
+
+/* ============================================================ personalization (?c=&s= or #c-<hex>) */
+var q;try{q=new URLSearchParams(location.search)}catch(e){q={get:function(){return null}}}
+function fromHex(h){try{h=String(h).replace(/[^0-9a-f]/gi,"");if(h.length%2)h=h.slice(0,-1);var b=new Uint8Array(h.length/2);for(var i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);return new TextDecoder("utf-8").decode(b)}catch(e){return ""}}
+var HASH=location.hash||"";
+var hc=HASH.match(/^#c-([0-9a-f]+)/i),hs=HASH.match(/[#&\-]s-([0-9a-f]+)/i);
+var COMPANY=(q.get("c")||(hc?fromHex(hc[1]):"")||"").replace(/[\u0000-\u001f]/g,"").slice(0,60).trim();
+var SERVICES=(q.get("s")||(hs?fromHex(hs[1]):"")||"").split(/[,、|｜]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,4);
+var BRAND=COMPANY||"サンプル学院";
+var BRAND_EN=COMPANY||"Sample Academy";
+function brandL(lg){return lg==="ja"?BRAND:BRAND_EN}
+var STAFF="松田",STAFF_EN="Matsuda",STAFF_TH="มัตสึดะ";
+window.addEventListener("hashchange",function(){location.reload()});
+
+/* ============================================================ dates */
+var NOW=(function(){var t=q.get("today");if(t&&/^\d{4}-\d{2}-\d{2}$/.test(t)){var a=t.split("-");return new Date(+a[0],a[1]-1,+a[2],9,0)}return new Date()})();
+function addD(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+function md(d){return (d.getMonth()+1)+"/"+d.getDate()}
+function ymd(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+function wdJ(d){return "日月火水木金土"[d.getDay()]}
+function mdw(d){return md(d)+"（"+wdJ(d)+"）"}
+function mdwEn(d){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getDate()}
+var TH_D=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],TH_M=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function mdwTh(d){return TH_D[d.getDay()]+"ที่ "+d.getDate()+" "+TH_M[d.getMonth()]}
+function dl(d,lg){return lg==="en"?mdwEn(d):lg==="th"?mdwTh(d):mdw(d)}
+function nextDow(dow,from){var d=addD(from||NOW,1);while(d.getDay()!==dow)d=addD(d,1);return d}
+function nowHM(){var n=new Date();return ("0"+n.getHours()).slice(-2)+":"+("0"+n.getMinutes()).slice(-2)}
+function stamp(d,h){return md(d)+" "+h}
+var Y=addD(NOW,-1);
+var ABS=nextDow(3,addD(NOW,1));          // 欠席日（次の水曜）
+var ND=nextDow(0,addD(NOW,6));           // 休講日（翌週以降の日曜）
+var SEASON=(function(){var m=NOW.getMonth()+1;if(m>=11||m===1)return {ja:"冬期講習",en:"Winter Course",th:"คอร์สช่วงปิดเทอมฤดูหนาว"};if(m<=4)return {ja:"春期講習",en:"Spring Course",th:"คอร์สช่วงปิดเทอม"};if(m<=8)return {ja:"夏期講習",en:"Summer Course",th:"คอร์สภาคฤดูร้อน"};return {ja:"秋の特訓講座",en:"Autumn Intensive",th:"คอร์สเข้มข้น"}})();
+
+/* ============================================================ master data (all fictional) */
+var CAMPUS={
+ "プロンポン校":{en:"Phrom Phong",th:"สาขาพร้อมพงษ์",ja2:"スクンビット ソイ39 サンプルビル3F（架空）",en2:"Sample Bldg. 3F, Sukhumvit Soi 39 (fictional)",park:{ja:"ビル地下に駐車場（2時間無料）",en:"Parking in the basement (2 hours free)",th:"ที่จอดรถชั้นใต้ดิน (ฟรี 2 ชั่วโมง)"},hue:20,aud:"pp"},
+ "シラチャ校":{en:"Sriracha",th:"สาขาศรีราชา",ja2:"シラチャ スクンビット通り サンプルプラザ2F（架空）",en2:"Sample Plaza 2F, Sukhumvit Rd., Sriracha (fictional)",park:{ja:"建物の前に駐車スペースあり",en:"Parking in front of the building",th:"มีที่จอดรถหน้าอาคาร"},hue:190,aud:"sr"},
+ "オンライン":{en:"Online (Zoom)",th:"ออนไลน์ (Zoom)",ja2:"Zoom（URLは前日にお送りします）",en2:"Zoom (link sent the day before)",park:{ja:"",en:"",th:""},hue:260,aud:"on"}
+};
+function campusL(k,lg){var x=CAMPUS[k]||CAMPUS["プロンポン校"];return lg==="en"?x.en:lg==="th"?x.th:k}
+function addrL(k,lg){var x=CAMPUS[k]||CAMPUS["プロンポン校"];return lg==="ja"?x.ja2:x.en2}
+var CLS=[
+ {id:"A1",campus:"プロンポン校",name:"中学受験 算数",en:"Math (entrance exam prep)",th:"คณิตศาสตร์ เตรียมสอบเข้า",tags:["算数","受験"],g:[4,6],sl:[[1,"17:00","18:30"],[4,"17:00","18:30"]],t:"高木",tEn:"Takagi",tl:"ja",cap:8,enr:6},
+ {id:"A2",campus:"プロンポン校",name:"国語・作文",en:"Japanese reading & writing",th:"ภาษาญี่ปุ่น (สำหรับเด็กญี่ปุ่น)",tags:["国語","作文"],g:[3,6],sl:[[2,"17:00","18:20"],[5,"16:30","17:50"]],t:"大川",tEn:"Okawa",tl:"ja",cap:8,enr:7},
+ {id:"A3",campus:"プロンポン校",name:"中学 数学・英語",en:"Junior high Math & English",th:"คณิต-อังกฤษ ม.ต้น",tags:["数学","英語"],g:[7,9],sl:[[3,"18:00","19:30"],[6,"10:00","11:30"]],t:"森",tEn:"Mori",tl:"ja",cap:10,enr:8},
+ {id:"A4",campus:"プロンポン校",name:"キッズ英会話",en:"Kids English",th:"ภาษาอังกฤษสำหรับเด็ก",tags:["英会話","英語"],g:[1,4],sl:[[3,"16:00","16:50"],[6,"13:00","13:50"]],t:"エミリー",tEn:"Emily",tl:"en",cap:6,enr:5},
+ {id:"K1",campus:"プロンポン校",name:"キッズ日本語（タイのお子さま）",en:"Kids Japanese (for Thai children)",th:"ภาษาญี่ปุ่นสำหรับเด็ก",tags:["日本語"],g:[2,7],thai:true,sl:[[6,"10:00","11:00"],[0,"10:00","11:00"]],t:"ファー",tEn:"Fah",tl:"th",cap:8,enr:6},
+ {id:"B1",campus:"シラチャ校",name:"小学生 算数・国語",en:"Elementary Math & Japanese",th:"คณิต-ภาษาญี่ปุ่น ระดับประถม",tags:["算数","国語"],g:[1,6],sl:[[2,"17:00","18:00"],[4,"17:00","18:00"]],t:"中島",tEn:"Nakajima",tl:"ja",cap:8,enr:5},
+ {id:"B2",campus:"シラチャ校",name:"キッズ英会話",en:"Kids English",th:"ภาษาอังกฤษสำหรับเด็ก",tags:["英会話","英語"],g:[1,4],sl:[[6,"09:30","10:20"],[6,"11:00","11:50"]],t:"ダニエル",tEn:"Daniel",tl:"en",cap:6,enr:4},
+ {id:"B3",campus:"シラチャ校",name:"社会人 日本語 N4〜N3",en:"Japanese for working adults (N4–N3)",th:"ภาษาญี่ปุ่นสำหรับคนทำงาน N4–N3",tags:["日本語","JLPT"],g:[13,99],thai:true,sl:[[2,"19:00","20:30"],[4,"19:00","20:30"]],t:"ノック",tEn:"Nok",tl:"th",cap:10,enr:7},
+ {id:"O1",campus:"オンライン",name:"中学 数学・英語（オンライン）",en:"Junior high Math & English (online)",th:"คณิต-อังกฤษ ม.ต้น (ออนไลน์)",tags:["数学","英語"],g:[7,9],sl:[[1,"20:00","21:00"],[5,"20:00","21:00"]],t:"森",tEn:"Mori",tl:"ja",cap:6,enr:3}
+];
+function CL(id){for(var i=0;i<CLS.length;i++)if(CLS[i].id===id)return CLS[i];return null}
+function cname(c,lg){return lg==="en"?c.en:lg==="th"?c.th:c.name}
+function tname(c,lg){if(lg==="ja")return c.t+"先生"+(c.tl==="th"?"（タイ人講師）":c.tl==="en"?"（ネイティブ講師）":"");if(lg==="th")return "ครู"+c.tEn;return (c.tl==="th"?"Kru ":"")+c.tEn+(c.tl==="ja"?" sensei":"")}
+function mins(s){var a=s.split(":");return +a[0]*60+ +a[1]}
+function gl(g,lg){if(g>=13)return lg==="en"?"Adult":lg==="th"?"วัยทำงาน":"社会人";if(g>=7)return lg==="en"?"Grade "+g:lg==="th"?"ม."+(g-6):"中"+(g-6);if(g>=1)return lg==="en"?"Grade "+g:lg==="th"?"ป."+g:"小"+g;return lg==="en"?"(not stated)":lg==="th"?"(ไม่ระบุ)":"未確認"}
+function grng(c){return c.g[0]>=13?"社会人":gl(c.g[0],"ja")+"〜"+gl(c.g[1],"ja")}
+function seatsOf(c,d,s){var h=(d.getDate()*31+d.getMonth()*7+c.id.charCodeAt(0)*3+c.id.charCodeAt(1)+parseInt(s,10))%6;var base=c.cap-c.enr;return h===0?0:Math.max(0,base-(h%2))}
+function mk(c,d,x){return {c:c,d:d,s:x[1],e:x[2],seats:seatsOf(c,d,x[1]),key:c.id+"|"+ymd(d)+"|"+x[1]}}
+function slotByKey(k){var p=String(k).split("|"),c=CL(p[0])||CLS[0],a=(p[1]||ymd(NOW)).split("-"),d=new Date(+a[0],a[1]-1,+a[2]);var x=c.sl.filter(function(y){return y[1]===p[2]})[0]||c.sl[0];return mk(c,d,x)}
+function allSlots(n){var out=[];for(var i=1;i<=n;i++){var d=addD(NOW,i);CLS.forEach(function(c){c.sl.forEach(function(x){if(x[0]===d.getDay())out.push(mk(c,d,x))})})}return out}
+
+/* ============================================================ sample inquiries (4 cases) */
+var CASES=[
+ {id:"C1",from:"田中 美咲（保護者）",addr:"tanaka.family@example.com",init:"田",date:stamp(Y,"21:10"),
+  subject:"小5の娘の体験授業をお願いしたいです（算数・中学受験）",tag:"体験・小5",
+  body:"はじめてご連絡します。田中と申します。\n\nバンコクの日本人学校に通う小学5年生の娘（陽菜）がおります。再来年に日本へ本帰国する予定で、中学受験を考えています。\n算数が苦手なので、まず算数の体験授業を受けさせたいです。国語も気になっています。\n\n・学校が終わってからなので、平日17時以降\n・できれば月曜か木曜\n・プロンポン校に通う予定です（車で送迎します）\n\n体験授業の費用や、当日の持ち物も教えていただけますか。\nよろしくお願いいたします。",
+  cond:{type:"trial",student:"田中 陽菜",studentEn:"Hina",grade:5,campus:"プロンポン校",subj:["算数","国語"],days:[1,4],after:"17:00",thai:false,online:false,lang:"ja"},
+  checks:["算数の学習状況（使っている問題集・苦手な単元）","受験の予定時期と志望地域","お迎えの方（保護者さま／ドライバー）"],
+  addressee:"田中 美咲 様"},
+ {id:"C2",from:"鈴木 由紀（中2 鈴木 蓮 の保護者）",addr:"suzuki.yuki@example.com",init:"鈴",date:stamp(NOW,"07:45"),
+  subject:"【欠席連絡】水曜の授業の欠席と振替のお願い（中2 鈴木蓮）",tag:"振替・中2",
+  body:"いつもお世話になっております。中2の鈴木蓮の母です。\n\n"+mdw(ABS)+"は学校行事（校外学習）で帰りが遅くなるため、数学・英語の授業を欠席させてください。\n\nできれば振替をお願いしたいです。土曜の午前なら送れますが、難しければオンラインでも構いません。\nお手数ですが、よろしくお願いいたします。",
+  cond:{type:"makeup",student:"鈴木 蓮",studentEn:"Ren",grade:8,campus:"プロンポン校",subj:["数学","英語"],days:[6],after:"",thai:false,online:true,lang:"ja",cls:"A3",absent:ymd(ABS)},
+  checks:["欠席分のプリントの受け取り方法（メール／次回の授業）","オンラインの場合のZoomの環境"],
+  addressee:"鈴木 由紀 様"},
+ {id:"C3",from:"Khun Ploy (parent)",addr:"ploy.parent@example.com",init:"P",date:stamp(NOW,"09:20"),
+  subject:"Trial Japanese lesson for my daughter (10 years old)",tag:"英語・キッズ日本語",
+  body:"Hello,\n\nMy daughter Mint is 10 years old (Grade 4, international school). She loves Japanese anime and wants to learn Japanese. She is a complete beginner.\n\nDo you have a Japanese class for Thai children on weekends? We live near Phrom Phong.\nCould she join a trial lesson? Please also let me know the monthly fee.\n\nThank you,\nPloy",
+  tr:"（訳）娘のミント（10歳・インター校の4年生）がアニメ好きで日本語を習いたがっています。まったくの初心者です。週末にタイの子ども向けの日本語クラスはありますか。プロンポンの近くに住んでいます。体験はできますか。月謝も教えてください。",
+  cond:{type:"trial",student:"Mint",studentEn:"Mint",grade:4,campus:"プロンポン校",subj:["日本語"],days:[6,0],after:"",thai:true,online:false,lang:"en"},
+  checks:["Which day suits you better (Saturday or Sunday)","Whether Mint can read hiragana yet","Who will pick her up after class"],
+  addressee:"Khun Ploy"},
+ {id:"C4",from:"Khun Wanida（LINE公式アカウントから転送）",addr:"wanida.line@example.com",init:"W",date:stamp(NOW,"11:05"),
+  subject:"สอบถามคอร์สภาษาญี่ปุ่น N3 ตอนเย็น",tag:"タイ語・社会人",
+  body:"สวัสดีค่ะ\nดิฉันทำงานที่โรงงานญี่ปุ่นในศรีราชา ตอนนี้สอบผ่าน N4 แล้ว อยากสอบ N3 ในรอบถัดไปค่ะ\nเรียนได้วันอังคารหรือพฤหัสบดี หลัง 18:30 ค่ะ\nขอทดลองเรียนก่อนได้ไหมคะ และค่าเรียนเท่าไหร่คะ\n\nขอบคุณค่ะ\nวนิดา",
+  tr:"（訳）シラチャの日系工場で働いています。N4に合格したので、次の回でN3を受けたいです。火曜か木曜の18:30以降なら通えます。まず体験できますか。授業料はいくらですか。ワニダ",
+  cond:{type:"trial",student:"Wanida",studentEn:"Wanida",studentTh:"วนิดา",grade:20,campus:"シラチャ校",subj:["日本語","JLPT"],days:[2,4],after:"18:30",thai:true,online:false,lang:"th"},
+  checks:["N4に合格した時期と使ったテキスト","会社の受講補助の有無（領収書の宛名）","目標（N3合格／仕事の会話）"],
+  checksMail:["สอบผ่าน N4 เมื่อไหร่ และใช้ตำราเล่มไหน","บริษัทช่วยออกค่าเรียนหรือไม่ (ชื่อในใบเสร็จ)","เป้าหมาย (สอบ N3 / ใช้สนทนาในงาน)"],
+  addressee:"คุณวนิดา"}
+];
+function C(id){for(var i=0;i<CASES.length;i++)if(CASES[i].id===id)return CASES[i];return state.custom[id]||null}
+function stuL(k,lg){return lg==="th"?(k.studentTh||k.student):lg==="en"?(k.studentEn||k.student):k.student}
+function absD(k){var a=String(k.absent||ymd(ABS)).split("-");return new Date(+a[0],a[1]-1,+a[2])}
+
+/* ============================================================ matching */
+function match(k){
+ var res=[],base=k.type==="makeup"?CL(k.cls):null;
+ allSlots(14).forEach(function(sl){
+  var c=sl.c,hit=[],miss=[],s=0;
+  if(k.type==="makeup"){
+   if(!base)return;
+   if(c.id!==base.id&&!(c.tags.join()===base.tags.join()&&c.g[0]===base.g[0]))return;
+   if(c.id===base.id&&ymd(sl.d)===ymd(absD(k)))return;
+   if(c.id===base.id){s+=15;hit.push("いつものクラス")}else hit.push(c.campus==="オンライン"?"同じ内容のオンライン授業":"同じ内容のクラス");
+  }else{
+   if(!!c.thai!==!!k.thai)return;
+   if(k.grade&&(k.grade<c.g[0]||k.grade>c.g[1]))return;
+   if(k.subj&&k.subj.length){var ov=c.tags.filter(function(t){return k.subj.indexOf(t)>=0});if(!ov.length)return;s+=ov.length*10;ov.forEach(function(t){hit.push(t)})}
+   if(k.grade)hit.push(gl(k.grade,"ja")+"に対応");
+  }
+  if(c.campus===k.campus){s+=20;hit.push(k.campus)}
+  else if(c.campus==="オンライン"&&k.online){miss.push("オンライン")}
+  else return;
+  if(k.days&&k.days.length){if(k.days.indexOf(sl.d.getDay())>=0){s+=25;hit.push("希望の"+wdJ(sl.d)+"曜")}else{miss.push("希望の曜日以外")}}
+  if(k.after){if(sl.s>=k.after)s+=5;else{miss.push(k.after+"より前");s-=15}}
+  if(sl.seats<=0){miss.push("満席");s-=60}else if(sl.seats===1)hit.push("残り1席");else hit.push("空き"+sl.seats+"席");
+  s-=Math.round((sl.d-NOW)/864e5)*0.6;
+  res.push({sl:sl,s:s,hit:hit,miss:miss});
+ });
+ return res.sort(function(a,b){return b.s-a.s||a.sl.d-b.sl.d}).slice(0,6);
+}
+
+/* ============================================================ free-text parser (pasted inquiries) */
+var DAYS_RE=[[1,/月曜|monday|mon\b|จันทร์/i],[2,/火曜|tuesday|tue\b|อังคาร/i],[3,/水曜|wednesday|wed\b|พุธ/i],[4,/木曜|thursday|thu\b|พฤหัส/i],[5,/金曜|friday|fri\b|ศุกร์/i],[6,/土曜|saturday|sat\b|เสาร์/i],[0,/日曜|sunday|sun\b|อาทิตย์/i]];
+function parse(t){
+ var th=/[฀-๿]/.test(t),ja=/[぀-ヿ一-鿿]/.test(t),lg=th?"th":ja?"ja":"en";
+ var k={type:/振替|欠席|お休み|absent|make-?up|ชดเชย|ลาเรียน/i.test(t)?"makeup":"trial",student:lg==="ja"?"お子さま":lg==="th"?"ผู้เรียน":"your child",studentEn:"Student",grade:0,campus:/シラチャ|sriracha|ศรีราชา/i.test(t)?"シラチャ校":"プロンポン校",subj:[],days:[],after:"",thai:false,online:/オンライン|online|ออนไลน์|zoom/i.test(t),lang:lg};
+ var m;
+ if((m=t.match(/小学?\s*([1-6１-６])\s*年?/)))k.grade=+String(m[1]).replace(/[１-６]/,function(x){return "１２３４５６".indexOf(x)+1});
+ else if((m=t.match(/中学?\s*([1-3１-３])\s*年?|中([1-3])/)))k.grade=6+(+String(m[1]||m[2]).replace(/[１-３]/,function(x){return "１２３".indexOf(x)+1}));
+ else if((m=t.match(/grade\s*(\d{1,2})/i)))k.grade=Math.min(9,+m[1]);
+ else if((m=t.match(/ป\.\s*([1-6])/)))k.grade=+m[1];
+ else if((m=t.match(/ม\.\s*([1-3])/)))k.grade=6+(+m[1]);
+ else if((m=t.match(/(\d{1,2})\s*(?:歳|才|years?\s*old|y\.?o\.?|ขวบ)/i)))k.grade=Math.max(1,Math.min(9,+m[1]-6));
+ if(/社会人|会社員|働いて|仕事で|ทำงาน|working|office/i.test(t))k.grade=20;
+ if(/日本語|japanese|ญี่ปุ่น|JLPT|\bN[1-5]\b/i.test(t)&&(lg!=="ja"||/タイ人/.test(t)))k.thai=true;
+ if(k.thai){k.subj=["日本語"];if(/JLPT|\bN[1-5]\b/i.test(t))k.subj.push("JLPT")}
+ else{
+  if(/算数|math|คณิต/i.test(t))k.subj.push(k.grade>=7?"数学":"算数");
+  if(/数学/.test(t)&&k.subj.indexOf("数学")<0)k.subj.push("数学");
+  if(/国語|作文/.test(t))k.subj.push("国語");
+  if(/英会話|speaking/i.test(t))k.subj.push("英会話");
+  else if(/英語|english|อังกฤษ/i.test(t))k.subj.push("英語");
+  if(/受験/.test(t))k.subj.push("受験");
+ }
+ DAYS_RE.forEach(function(d){if(d[1].test(t))k.days.push(d[0])});
+ if(!k.days.length){if(/土日|週末|weekend|เสาร์-อาทิตย์/i.test(t))k.days=[6,0];else if(/平日|weekday|วันธรรมดา/i.test(t))k.days=[1,2,3,4,5]}
+ if((m=t.match(/(\d{1,2})\s*(?:[:：]\s*(\d{2}))?\s*時?\s*(?:以降|から|過ぎ)|after\s*(\d{1,2})(?:[:.](\d{2}))?|หลัง\s*(\d{1,2})[:.]?(\d{2})?/i))){var hh=+(m[1]||m[3]||m[5]);if(hh&&hh<12&&!/am|午前/i.test(t))hh+=12;var mm=m[2]||m[4]||m[6]||"00";k.after=("0"+hh).slice(-2)+":"+mm}
+ if(k.type==="makeup"){
+  var cand=CLS.filter(function(c){return !c.thai===!k.thai&&c.campus!=="オンライン"&&(!k.grade||(k.grade>=c.g[0]&&k.grade<=c.g[1]))&&(!k.subj.length||c.tags.some(function(x){return k.subj.indexOf(x)>=0}))&&(c.campus===k.campus)})[0]||CL("A3");
+  k.cls=cand.id;var sl=allSlots(10).filter(function(s){return s.c.id===cand.id})[0];k.absent=ymd(sl?sl.d:ABS);k.online=true;
+ }
+ var checks=[];
+ if(!k.grade)checks.push(lg==="en"?"Grade / age of the student":lg==="th"?"อายุหรือชั้นเรียนของผู้เรียน":"学年（年齢）");
+ if(!k.subj.length)checks.push(lg==="en"?"Subject you are interested in":lg==="th"?"วิชาที่สนใจ":"希望の科目");
+ if(!k.days.length)checks.push(lg==="en"?"Preferred days and times":lg==="th"?"วันและเวลาที่สะดวก":"通える曜日・時間帯");
+ checks.push(lg==="en"?"Student's name":lg==="th"?"ชื่อผู้เรียน":"生徒さんのお名前");
+ return {cond:k,checks:checks,addressee:lg==="en"?"Dear Parent":lg==="th"?"เรียนผู้ปกครอง":"保護者様"};
+}
+
+/* ============================================================ wording (ja / en / th) */
+var TX={
+ ja:{trT:"体験授業のご案内",mkT:"振替授業のご案内",by:"担当 "+STAFF,opt:function(i){return "第"+(i+1)+"候補"},cols:["","日時","クラス","講師","場所"],
+  lead:function(k){return k.type==="makeup"?stuL(k,"ja")+"さん（"+gl(k.grade,"ja")+"）の"+mdw(absD(k))+"の欠席、承知しました。振替授業を以下の日時でご用意しました（席を仮押さえ済み）。":stuL(k,"ja")+"さん（"+gl(k.grade,"ja")+"）の体験授業を、以下の日時でご用意しました（席を仮押さえ済み）。ご都合のよい日時をお知らせください。"},
+  absent:"欠席",place:"場所",bring:"持ち物",bringV:"筆記用具・ノート（教材は当日お渡しします）",fee:"体験料",feeV:"無料（1回）",flow:"当日の流れ",
+  flowV:function(m,ad){return "授業（"+m+"分）→ "+(ad?"ご本人":"保護者の方")+"との面談（15分）：学習の状況をお伺いし、コースをご案内します"},
+  mkNote:"振替は月2回まで、前日18時までのご連絡で承ります。欠席分のプリントはメールでお送りします。",note:"ご注意",
+  foot:"ご都合が合わない場合は、ほかの日時もご用意します。仮押さえは"+mdw(addD(NOW,3))+"まで有効です。"},
+ en:{trT:"Trial Lesson Information",mkT:"Make-up Lesson Information",by:"Coordinator: "+STAFF_EN,opt:function(i){return "Option "+(i+1)},cols:["","Date & time","Class","Teacher","Place"],
+  lead:function(k){return k.type==="makeup"?"We have noted "+stuL(k,"en")+"'s absence on "+mdwEn(absD(k))+". The make-up lessons below are available (seats reserved).":"Thank you for your interest. We have reserved a trial lesson for "+stuL(k,"en")+" ("+gl(k.grade,"en")+") on the dates below. Please let us know which one suits you."},
+  absent:"Absence",place:"Location",bring:"What to bring",bringV:"A pencil case and a notebook (materials are provided)",fee:"Trial fee",feeV:"Free (one lesson)",flow:"On the day",
+  flowV:function(m,ad){return "Lesson ("+m+" min) → 15-minute chat "+(ad?"":"with the parent ")+"about goals and courses"},
+  mkNote:"Up to two make-up lessons per month; please contact us by 6 pm the day before.",note:"Note",
+  foot:"If none of these times work, we will be happy to find another. Seats are held until "+mdwEn(addD(NOW,3))+"."},
+ th:{trT:"ข้อมูลการทดลองเรียน",mkT:"ข้อมูลการเรียนชดเชย",by:"ผู้ประสานงาน: "+STAFF_TH,opt:function(i){return "ตัวเลือกที่ "+(i+1)},cols:["","วันเวลา","คลาส","ผู้สอน","สถานที่"],
+  lead:function(k){return k.type==="makeup"?"รับทราบการลาเรียนของคุณ"+stuL(k,"th")+" วัน"+mdwTh(absD(k))+" เราได้จองที่นั่งเรียนชดเชยไว้ตามวันเวลาด้านล่าง":"ขอบคุณที่สนใจเรียนกับเรา เราได้จองที่นั่งทดลองเรียนสำหรับคุณ"+stuL(k,"th")+" ("+gl(k.grade,"th")+") ไว้ตามวันเวลาด้านล่าง กรุณาแจ้งวันที่สะดวก"},
+  absent:"วันที่ลา",place:"สถานที่",bring:"สิ่งที่ต้องนำมา",bringV:"เครื่องเขียนและสมุดโน้ต (มีเอกสารให้ในวันเรียน)",fee:"ค่าทดลองเรียน",feeV:"ฟรี (1 ครั้ง)",flow:"ลำดับในวันเรียน",
+  flowV:function(m,ad){return "เรียน "+m+" นาที → พูดคุยเรื่องเป้าหมายและคอร์สเรียน 15 นาที"},
+  mkNote:"เรียนชดเชยได้เดือนละ 2 ครั้ง กรุณาแจ้งภายใน 18:00 ของวันก่อนเรียน",note:"หมายเหตุ",
+  foot:"หากวันเวลาไม่สะดวก ยินดีจัดวันอื่นให้ค่ะ ที่นั่งจะจองไว้ถึงวัน"+mdwTh(addD(NOW,3))}
+};
+function slotLine(sl,lg){return dl(sl.d,lg)+" "+sl.s+"–"+sl.e}
+
+/* ============================================================ state */
+var KEY="nova-school-ws-v1:"+BRAND;
+function fresh(){
+ var mails=CASES.map(function(c){var tr=c.cond.type==="makeup";return {id:"M"+c.id,folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:c.date,subject:c.subject,body:c.body,tr:c.tr||"",tags:[{t:tr?"欠席・振替":"体験の申込み",k:tr?"amber":"green"},{t:c.tag,k:c.cond.lang==="ja"?"gray":"blue"}],caseId:c.id,unread:true}});
+ mails.reverse();
+ var posts=[
+  {id:"S1",kind:"notice",status:"posted",ch:"line",aud:"all",when:stamp(addD(NOW,-2),"18:00"),auto:false},
+  {id:"S2",kind:"season",status:"draft",ch:"facebook",aud:"all",when:"",auto:true,why:"時間割から"},
+  {id:"S3",kind:"blog",status:"draft",ch:"blog",aud:"all",when:"",auto:true,why:"授業記録から"}
+ ];
+ return {view:"mail",folder:"inbox",selMail:mails[0].id,selCase:"C1",ptab:"cond",cases:{},custom:{},mails:mails,posts:posts,selPost:"S2",lang:"ja",auto:{draft:true,weekly:true,remind:true,approve:true},seq:1,seen:false,compose:null};
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+if(!state||!state.mails||!state.posts)state=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cs(id){if(!state.cases[id])state.cases[id]={step:0,extracted:false,picked:[],share:"none",attached:false,sent:false,booking:null};return state.cases[id]}
+
+/* ============================================================ toast / modal */
+var toastT;
+function toast(msg){var el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},3400)}
+function modal(html){var bg=document.createElement("div");bg.className="modal-bg";bg.innerHTML='<div class="modal" role="dialog" aria-modal="true">'+html+'</div>';bg.addEventListener("click",function(e){if(e.target===bg||e.target.closest("[data-close]"))bg.remove()});document.body.appendChild(bg);return bg}
+
+/* ============================================================ render: shell */
+function allCases(){return CASES.concat(Object.keys(state.custom).map(function(k){return state.custom[k]}))}
+function counts(){
+ return {inbox:state.mails.filter(function(m){return m.folder==="inbox"&&m.unread}).length,
+  open:allCases().filter(function(c){var s=cs(c.id);return !(s.booking&&s.booking.confirmed)}).length,
+  drafts:state.posts.filter(function(p){return p.status==="draft"}).length};
+}
+var VIEWS={
+ mail:{t:"メール",d:"保護者・生徒からの体験の申込み、欠席・振替の連絡を受けて、ご案内を添えて返信するまで。"},
+ desk:{t:"体験・振替の受付",d:"申込みの読み取り、時間割の空き枠との照合と仮押さえ、講師への共有、ご案内づくりまで。"},
+ sns:{t:"お知らせ・LINE配信",d:"休講・講習・体験募集のお知らせや前日リマインドを、日本語・タイ語・英語で作って決まった時間に配信。"}
+};
+function render(){
+ var n=counts(),v=VIEWS[state.view]||VIEWS.mail;
+ var nav='<button data-view="mail" class="'+(state.view==="mail"?"active":"")+'">'+IC.mail+'メール<span class="count '+(n.inbox?"hot":"")+'">'+(n.inbox||"")+'</span></button>'+
+  '<button data-view="desk" class="'+(state.view==="desk"?"active":"")+'">'+IC.book+'体験・振替<span class="count">'+(n.open||"")+'</span></button>'+
+  '<button data-view="sns" class="'+(state.view==="sns"?"active":"")+'">'+IC.share+'お知らせ・LINE<span class="count">'+(n.drafts||"")+'</span></button>';
+ var html='<header class="topbar"><div class="brand"><div class="brand-symbol">'+esc(BRAND.charAt(0))+'</div><div><b>'+esc(BRAND)+'</b><small>SCHOOL WORKSPACE</small></div></div>'+
+  '<div class="crumb">ワークスペース　/　'+v.t+'</div><span class="demo-pill">DEMO<span class="long"> · 実際には送信しません</span></span>'+
+  '<button class="help" data-act="help">'+IC.help+'<span>使い方</span></button></header>'+
+  '<div class="layout"><nav class="nav" aria-label="ワークスペース"><div class="nav-label">WORKSPACE</div>'+nav+
+  '<div class="nav-bottom"><button data-act="timetable">'+IC.list+'時間割・空き状況</button><button data-act="reset">'+IC.reset+'デモをリセット</button>'+
+  '<div class="note">● このブラウザに自動保存<br>生徒・保護者・講師はすべて架空のサンプルです</div></div></nav>'+
+  '<main class="workspace"><div class="mobile-tabs">'+nav+'<button data-act="timetable">時間割</button><button data-act="help">使い方</button><button data-act="reset">リセット</button></div>'+
+  '<div class="ws-head"><div><h1>'+v.t+'</h1><p>'+v.d+'</p></div><div class="head-actions">'+headActions()+'</div></div>'+
+  (state.view==="mail"?viewMail():state.view==="desk"?viewDesk():viewSns())+'</main></div>';
+ $("#app").innerHTML=html;
+ save();
+}
+function headActions(){
+ if(state.view==="mail")return '<button class="btn-i" data-act="paste">'+IC.plus+'問い合わせを貼り付けて試す</button>';
+ if(state.view==="desk")return '<button class="btn-i" data-act="gomail">'+IC.mail+'関連メール</button>';
+ return '<button class="btn-i" data-act="newpost">'+IC.plus+'お知らせを作る</button>';
+}
+
+/* ============================================================ view: mail */
+function viewMail(){
+ var f=state.folder,list=state.mails.filter(function(m){return m.folder===f});
+ var rows=list.map(function(m){
+  return '<button class="row '+(m.id===state.selMail?"active":"")+'" data-mail="'+m.id+'"><div class="row-top">'+(m.unread?'<span class="dot"></span>':'')+'<b>'+esc(f==="inbox"?m.from:"宛先："+(m.toName||m.addr))+'</b><time>'+esc(m.date)+'</time></div><div class="subj">'+esc(m.subject)+'</div><div class="snip">'+esc(m.body.slice(0,90))+'</div><div class="row-foot">'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join("")+(m.attach?'<span class="badge green">添付あり</span>':'')+'</div></button>';
+ }).join("")||'<div class="empty"><div><p class="tiny">'+(f==="sent"?"送信済みのメールはまだありません":f==="draft"?"下書きはありません":"受信メールはありません")+'</p></div></div>';
+ var tabs=[["inbox","受信箱"],["sent","送信済み"],["draft","下書き"]].map(function(t){var c=state.mails.filter(function(m){return m.folder===t[0]}).length;return '<button data-folder="'+t[0]+'" class="'+(f===t[0]?"active":"")+'">'+t[1]+(c?" "+c:"")+'</button>'}).join("");
+ var sel=state.mails.filter(function(m){return m.id===state.selMail&&m.folder===f})[0]||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools"><div class="tabs">'+tabs+'</div></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルメール / 外部のメールとは接続していません</div></section>'+
+  '<section class="detail">'+(sel?mailDetail(sel):'<div class="empty"><div><div class="em-i">'+IC.mail+'</div><h3>メールを選んでください</h3></div></div>')+'</section></div>';
+}
+function mailDetail(m){
+ if(m.unread){m.unread=false;setTimeout(function(){save()},0)}
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(m.subject)+'</h2><div>'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join(" ")+'</div></div>'+
+  '<div class="sender"><div class="avatar">'+esc(m.init||"?")+'</div><div><b>'+esc(m.folder==="inbox"?m.from:BRAND+" "+STAFF)+'</b><span>'+esc(m.folder==="inbox"?m.addr:"宛先："+m.addr)+'</span></div><time>'+esc(m.date)+'</time></div>'+
+  '<div class="mail-body">'+esc(m.body)+(m.tr?'<span class="trn">'+esc(m.tr)+'</span>':'')+'</div>';
+ if(m.attach)h+='<div class="actions"><span class="attach">'+IC.doc+esc(m.attach)+'</span><button class="small" data-act="viewdoc" data-case="'+m.caseId+'">開く</button></div>';
+ if(m.folder==="inbox"&&m.caseId&&C(m.caseId)){
+  var st=cs(m.caseId),k=C(m.caseId).cond;
+  if(m.kind==="confirm"){
+   var b=st.booking;
+   h+='<div class="actions"><button class="primary btn-i" data-act="confirm" data-case="'+m.caseId+'" '+(b&&b.made?"disabled":"")+'>'+IC.cal+(b&&b.made?"予約を確定済み":"予約を確定して返信を作る")+'</button><span class="tiny muted">返信から希望の日時を読み取り、確認メールと前日のLINEリマインドを作ります</span></div>';
+  }else{
+   var lab=k.type==="makeup"?"振替":"体験授業";
+   h+='<div class="actions"><button class="primary btn-i" data-act="todesk" data-case="'+m.caseId+'">'+IC.book+(st.extracted?lab+"の受付の続きを開く":"このメールから"+lab+"の受付を作る")+'</button><span class="tiny muted">'+(st.sent?"ご案内を送信済みです":"内容の読み取り → 空き枠の照合・仮押さえ → ご案内と返信")+'</span></div>';
+  }
+  h+=replyBox(m);
+ }
+ if(m.folder==="draft")h+=replyBox(m,true);
+ h+='</div>';
+ return h;
+}
+function docName(c){var k=c.cond,mkp=k.type==="makeup";if(k.lang==="ja")return (mkp?"振替授業のご案内_":"体験授業のご案内_")+k.student.replace(/\s/g,"")+".pdf";return (mkp?"Makeup_Lesson_":"Trial_Lesson_")+String(k.studentEn||"Student").replace(/[^A-Za-z0-9]+/g,"_")+".pdf"}
+function replyBox(m,isDraft){
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ var d=state.compose&&state.compose.mail===m.id?state.compose:null;
+ if(!d){
+  var body="",att=null,subj="Re: "+m.subject.replace(/^Re:\s*/,"");
+  if(isDraft){body=m.body;att=m.attach;subj=m.subject}
+  else if(st&&st.attached&&!st.sent&&m.kind!=="confirm"){body=replyMail(c,st);att=docName(c)}
+  d={mail:m.id,to:m.addr,subject:subj,body:body,attach:att};
+ }
+ var canInsert=st&&st.share==="ok"&&!st.sent&&m.kind!=="confirm";
+ return '<div class="reply" id="replyBox" data-attach="'+esc(d.attach||"")+'"><div class="reply-h">↩ 宛先 <input id="rTo" value="'+esc(d.to)+'" aria-label="宛先"><button class="small btn-i" data-act="insertdoc" data-mail="'+m.id+'" '+(canInsert?"":"disabled")+' title="体験・振替の受付で作ったご案内を添付し、本文を作ります">'+IC.clip+(st&&st.attached?"ご案内を添付済み":"作成中のご案内を挿入")+'</button></div>'+
+  '<div class="reply-h" style="background:#fff">件名 <input id="rSubj" value="'+esc(d.subject)+'" aria-label="件名"></div>'+
+  '<textarea id="rBody" aria-label="本文" placeholder="'+(st&&!st.attached&&m.kind!=="confirm"?"「体験・振替」でご案内を作ると、ここに返信の本文が入ります":"本文")+'">'+esc(d.body)+'</textarea>'+
+  '<div class="reply-f">'+(d.attach?'<span class="attach">'+IC.doc+esc(d.attach)+'</span>':'<span class="tiny muted">添付なし</span>')+'<span style="flex:1"></span><button data-act="savedraft" data-mail="'+m.id+'">下書き保存</button><button class="primary btn-i" data-act="send" data-mail="'+m.id+'">'+IC.send+'送信（デモ）</button></div></div>';
+}
+
+/* ============================================================ view: desk (体験・振替) */
+function statusOf(st){return st.booking&&st.booking.confirmed?["予約確定","green"]:st.sent?["ご案内済み","green"]:st.step>=1?["対応中","amber"]:["未着手","gray"]}
+function viewDesk(){
+ var list=allCases();
+ var rows=list.map(function(c,i){var st=cs(c.id),lab=statusOf(st),k=c.cond;
+  return '<button class="row '+(c.id===state.selCase?"active":"")+'" data-case="'+c.id+'"><div class="row-top"><b>'+esc(k.student)+'（'+esc(gl(k.grade,"ja"))+'）</b><span class="badge '+lab[1]+'">'+lab[0]+'</span></div><div class="subj">'+(k.type==="makeup"?"振替："+esc((CL(k.cls)||CLS[0]).name):"体験："+esc(k.subj.join("・")||"科目未定"))+'</div><div class="snip">'+esc(k.campus+" / "+(k.days.length?k.days.map(function(d){return "日月火水木金土"[d]}).join("・")+"曜":"曜日未定")+(k.after?" "+k.after+"以降":"")+" / "+({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+"で連絡")+'</div><div class="row-foot"><span class="badge gray">'+(c.custom?"貼り付けた問い合わせ":"事例"+(i+1)+" · "+esc(c.tag))+'</span></div></button>'}).join("");
+ var c=C(state.selCase)||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">申込み・連絡を選択</b> <span class="badge gray">'+list.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">読み取りは4事例を使ったデモ再現です（貼り付けた問い合わせは簡易読み取り）</div></section>'+
+  '<section class="detail">'+caseDetail(c)+'</section></div>';
+}
+function caseDetail(c){
+ var st=cs(c.id),k=c.cond,mkp=k.type==="makeup";
+ var stepLab=["内容を読み取る","空き枠の照合・仮押さえ","ご案内と返信"];
+ var steps=stepLab.map(function(s,i){var cl=st.step>i+1||(i===2&&st.attached)?"done":(st.step===i+1||(st.step===0&&i===0))?"cur":"";return '<button class="step '+cl+'" data-ptab="'+["cond","slot","doc"][i]+'"><i>'+(i+1)+'</i>'+s+'</button>'}).join("");
+ var tabs=[["cond","申込み内容"],["slot","空き枠・仮押さえ"],["doc","ご案内"],["mail","元のメール"]].map(function(t){return '<button data-ptab="'+t[0]+'" class="'+(state.ptab===t[0]?"active":"")+'">'+t[1]+'</button>'}).join("");
+ var lab=statusOf(st);
+ var h='<div class="detail-inner"><div class="p-head"><div><h2>'+(mkp?"振替":"体験授業")+'：'+esc(k.student)+'（'+esc(gl(k.grade,"ja"))+'）</h2><div class="meta">No. '+c.id+' · '+esc(k.campus)+' · 担当 '+STAFF+'</div></div><span class="badge '+lab[1]+'">'+lab[0]+'</span></div>'+
+  '<div class="steps">'+steps+'</div><div class="ptabs">'+tabs+'</div>';
+ if(state.ptab==="mail")h+='<div class="card"><div class="mail-body" style="border:0;padding:0">'+esc(c.body)+(c.tr?'<span class="trn">'+esc(c.tr)+'</span>':'')+'</div></div>';
+ else if(!st.extracted)h+='<div class="empty"><div><div class="em-i">'+IC.spark+'</div><h3>メールから'+(mkp?"欠席・振替の連絡":"体験の申込み")+'を読み取ります</h3><p class="tiny">生徒さん・学年・校舎・希望の科目・曜日と時間・連絡に使う言葉を取り出し、<br>足りない情報は「確認したいこと」にまとめます。タイ語・英語のメールにも対応します。</p><button class="primary btn-i" data-act="extract" data-case="'+c.id+'">'+IC.spark+'内容を読み取る</button></div></div>';
+ else if(state.ptab==="cond")h+=condTab(c,st);
+ else if(state.ptab==="slot")h+=slotTab(c,st);
+ else h+=docTab(c,st);
+ h+='</div>';
+ var picked=st.picked.map(slotByKey);
+ h+='<div class="foot-bar"><span class="sum">'+(st.extracted?"候補 "+picked.length+" 枠"+(picked[0]?"（第1候補 "+mdw(picked[0].d)+" "+picked[0].s+"）":"")+" ／ "+(st.share==="ok"?"仮押さえ・講師共有済み":st.share==="asking"?"講師に共有中…":"未仮押さえ"):"内容を読み取ってください")+'</span>'+
+  '<button class="btn-i" data-act="viewdoc" data-case="'+c.id+'" '+(st.share==="ok"?"":"disabled")+'>'+IC.doc+'ご案内プレビュー</button>'+
+  '<button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.share==="ok"&&!st.sent?"":"disabled")+'>'+IC.send+(st.sent?"送信済み":"返信へ添付")+'</button></div>';
+ return h;
+}
+function condTab(c,st){
+ var k=c.cond,mkp=k.type==="makeup",base=mkp?CL(k.cls):null;
+ var rows=[["種別",mkp?"欠席・振替の連絡":"体験授業の申込み"],["生徒",k.student],["学年",k.grade?gl(k.grade,"ja"):""],["校舎",k.campus+(k.online?"（オンラインも可）":"")]];
+ if(mkp)rows.push(["欠席する授業",base?mdw(absD(k))+" "+(base.sl.filter(function(x){return x[0]===absD(k).getDay()})[0]||base.sl[0])[1]+"〜　"+base.name+"（"+base.t+"先生）":""]);
+ rows.push(["希望の科目",k.subj.join("・")],["希望の曜日・時間",(k.days.length?k.days.map(function(d){return "日月火水木金土"[d]}).join("・")+"曜":"")+(k.after?"　"+k.after+"以降":"")],["連絡に使う言葉",({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+(k.lang!=="ja"?"（ご案内・返信も"+({en:"英語",th:"タイ語"})[k.lang]+"で作ります）":"")]);
+ var h='<div class="card"><h3>'+(mkp?"欠席・振替の受付票":"体験の受付票")+'</h3><table class="kv">'+rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+(r[1]?esc(r[1]):'<span class="miss">記載なし</span>')+'</td></tr>'}).join("")+'</table>'+
+  '<div class="checklist"><b>確認したいこと（返信で質問します）</b><ul>'+c.checks.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div></div>';
+ if(mkp)h+='<div class="card"><h3>出欠の記録</h3><table><tr><th>日付</th><th>授業</th><th>出欠</th><th>振替</th></tr><tr><td>'+mdw(absD(k))+'</td><td>'+esc(base?base.name:"")+'</td><td><span class="badge amber">欠席（連絡あり）</span></td><td>'+(st.booking&&st.booking.confirmed?'<span class="badge green">振替確定</span>':'<span class="badge gray">調整中</span>')+'</td></tr></table><p class="tiny muted" style="margin:8px 0 0">今月の振替：1回目（上限2回）。欠席分のプリントは担当講師に自動で依頼します。</p></div>';
+ else h+='<div class="card"><h3>生徒カルテ（自動作成）</h3><p class="tiny" style="margin:0">「'+esc(k.student)+'」さんのカルテを作り、問い合わせ内容・希望科目・連絡先を登録しました。体験後の面談メモと入会手続きもここに残ります。</p>'+(state.auto.draft?'<p class="tiny muted" style="margin:6px 0 0">● 空きのあるクラスの体験募集を「お知らせ・LINE配信」に下書きしました</p>':'')+'</div>';
+ h+='<div class="actions"><button class="primary btn-i" data-ptab="slot">'+IC.cal+'時間割の空き枠と照合する</button><span class="tiny muted">向こう2週間の時間割（'+CLS.length+'クラス）から条件に合う枠を探します</span></div>';
+ return h;
+}
+function dblock(sl){var hue=(CAMPUS[sl.c.campus]||{hue:20}).hue;return '<div class="dblock" style="background:linear-gradient(135deg,hsl('+hue+',42%,52%),hsl('+((hue+35)%360)+',44%,36%))"><span class="dd">'+md(sl.d)+'</span><span class="dw">'+wdJ(sl.d)+'曜</span><span class="dt">'+sl.s+'〜'+sl.e+'</span></div>'}
+function teacherMsg(sl,k){
+ var c=sl.c,mkp=k.type==="makeup",stu=k.student+"さん（"+gl(k.grade,"ja")+"）";
+ if(c.tl==="th")return {txt:"ครู"+c.tEn+" ค่ะ วัน"+mdwTh(sl.d)+" "+sl.s+" คลาส "+c.th+" มีผู้"+(mkp?"เรียนชดเชย":"ทดลองเรียน")+" 1 ท่าน ("+stuL(k,"th")+") ฝากเตรียมเอกสารด้วยนะคะ",tr:"（訳）"+md(sl.d)+" "+sl.s+"の「"+c.name+"」に"+(mkp?"振替":"体験")+"の生徒が1名入ります（"+stu+"）。教材の準備をお願いします。"};
+ if(c.tl==="en")return {txt:"Hi "+c.tEn+", one "+(mkp?"make-up":"trial")+" student ("+stuL(k,"en")+", "+gl(k.grade,"en")+") will join "+c.en+" on "+mdwEn(sl.d)+" at "+sl.s+". Could you prepare the materials?",tr:"（訳）"+md(sl.d)+" "+sl.s+"の「"+c.name+"」に"+(mkp?"振替":"体験")+"の生徒が1名入ります。教材の準備をお願いします。"};
+ return {txt:c.t+"先生\nお疲れさまです、"+STAFF+"です。"+mdw(sl.d)+" "+sl.s+"の「"+c.name+"」に"+(mkp?"振替":"体験")+"の生徒が1名入ります（"+stu+"）。"+(mkp?"欠席分のプリントもあわせてお願いします。":"教材の準備をお願いします。"),tr:""};
+}
+function teacherReply(sl,k){
+ var c=sl.c;
+ if(c.tl==="th")return {txt:"รับทราบค่ะ จะเตรียมเอกสารไว้ให้นะคะ",tr:"（訳）了解です。教材を用意しておきます。"};
+ if(c.tl==="en")return {txt:"Got it! I'll have the materials ready.",tr:"（訳）了解です。教材を用意しておきます。"};
+ return {txt:"了解しました。"+(k.type==="makeup"?"欠席分のプリントも用意しておきます。":gl(k.grade,"ja")+"向けの体験用プリントを用意しておきます。"),tr:""};
+}
+function slotTab(c,st){
+ var k=c.cond,list=match(k);
+ if(!list.length)return '<div class="card"><h3>条件に合う空き枠が見つかりません</h3><p class="tiny muted">返信では、近い曜日・時間のクラスやオンライン授業をご提案します。体験の募集を「お知らせ・LINE配信」から出すこともできます。</p></div>';
+ var h='<div class="card" style="padding:12px 16px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:13px">時間割から '+list.length+' 枠が条件に合いました</b><span class="tiny muted">候補に入れた枠（最大3つ）の席を仮押さえし、担当講師にLINEで共有します</span><span style="flex:1"></span><button class="small btn-i" data-act="hold" data-case="'+c.id+'" '+(st.picked.length&&st.share==="none"?"":"disabled")+'>'+IC.chat+(st.share==="none"?"仮押さえして講師に共有":"共有済み")+'</button></div></div><div class="cands">';
+ list.forEach(function(r){
+  var sl=r.sl,full=sl.seats<=0,i=st.picked.indexOf(sl.key);
+  h+='<div class="cand '+(full?"full off":"")+'">'+dblock(sl)+'<div><div class="cand-h"><b>'+esc(sl.c.name)+'</b><span class="tiny muted">'+esc(tname(sl.c,"ja"))+' · '+esc(sl.c.campus)+'</span><span style="flex:1"></span>'+(i>=0?'<span class="rank">'+TX.ja.opt(i)+'</span>':'')+'</div>'+
+   '<div class="spec">'+mdw(sl.d)+' '+sl.s+'〜'+sl.e+' · 対象 '+esc(grng(sl.c))+' · 定員'+sl.c.cap+'名 · <span class="seat" style="color:'+(full?"var(--red)":sl.seats===1?"var(--amber)":"var(--green)")+'">'+(full?"満席":"空き "+sl.seats+" 席")+'</span> · 一致度 '+Math.max(1,Math.min(99,Math.round(r.s)))+'</div>'+
+   '<div class="chips">'+r.hit.map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join("")+r.miss.map(function(x){return '<span class="chip no">'+esc(x)+'</span>'}).join("")+'</div>'+
+   '<div class="owner"><label class="tiny" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-pick="'+esc(sl.key)+'" data-case="'+c.id+'" '+(i>=0?"checked":"")+' '+(full?"disabled":"")+'>'+(full?"満席のため選べません（キャンセル待ちに登録できます）":"候補に入れる")+'</label></div></div></div>';
+ });
+ h+='</div>';
+ if(st.share!=="none"){
+  h+='<div class="card"><h3>'+IC.chat+' 講師へのLINE共有</h3>';
+  st.picked.map(slotByKey).forEach(function(sl){var o=teacherMsg(sl,k);h+='<div class="owner" style="flex-direction:column;border-top:0;margin-top:0"><div class="tiny muted">'+esc(tname(sl.c,"ja"))+'へ</div><div class="bubble out" style="white-space:pre-wrap">'+esc(o.txt)+(o.tr?'<span class="tr">'+esc(o.tr)+'</span>':'')+'</div>';
+   if(st.share==="ok"){var rp=teacherReply(sl,k);h+='<div class="bubble in">'+esc(rp.txt)+(rp.tr?'<span class="tr">'+esc(rp.tr)+'</span>':'')+'</div>'}else h+='<div class="tiny muted">返信待ち…</div>';
+   h+='</div>'});
+  h+='</div>';
+ }
+ h+='<div class="actions"><button class="primary btn-i" data-ptab="doc" '+(st.share==="ok"?"":"disabled")+'>'+IC.doc+'ご案内を作る</button><span class="tiny muted">'+(st.share==="ok"?"仮押さえした "+st.picked.length+" 枠でご案内を作ります（"+({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+"）":"候補に入れた枠を仮押さえして、講師に共有してください")+'</span></div>';
+ return h;
+}
+function docHtml(c,st,forPrint){
+ var k=c.cond,lg=k.lang,T=TX[lg],mkp=k.type==="makeup",sls=st.picked.map(slotByKey),ad=k.grade>=13;
+ var h='<div class="doc" '+(forPrint?'id="printDoc"':'')+'><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h4>'+(mkp?T.mkT:T.trT)+'</h4><div class="tiny muted">'+esc(brandL(lg))+' · '+esc(dl(NOW,lg))+' · '+esc(T.by)+'</div></div><div class="tiny muted" style="text-align:right">No. '+c.id+'</div></div>'+
+  '<div class="to">'+esc(c.addressee)+'</div><p class="lead">'+esc(T.lead(k))+'</p>';
+ if(mkp){var b=CL(k.cls);h+='<p style="font-size:12.5px;margin:0 0 10px"><b>'+esc(T.absent)+'：</b>'+esc(dl(absD(k),lg))+' '+esc(b?cname(b,lg):"")+'</p>'}
+ h+='<div style="overflow-x:auto"><table><tr>'+T.cols.map(function(x){return '<th>'+esc(x)+'</th>'}).join("")+'</tr>'+sls.map(function(sl,i){return '<tr><td><b>'+esc(T.opt(i))+'</b></td><td>'+esc(slotLine(sl,lg))+'</td><td>'+esc(cname(sl.c,lg))+'</td><td>'+esc(tname(sl.c,lg))+'</td><td>'+esc(campusL(sl.c.campus,lg))+'</td></tr>'}).join("")+'</table></div>';
+ var s0=sls[0],m=s0?mins(s0.e)-mins(s0.s):60,cp=s0?s0.c.campus:k.campus;
+ var kv=[[T.place,addrL(cp,lg)+((CAMPUS[cp]||{park:{}}).park[lg]?"／"+CAMPUS[cp].park[lg]:"")],[T.bring,T.bringV]];
+ if(mkp)kv.push([T.note,T.mkNote]);else{kv.push([T.fee,T.feeV]);kv.push([T.flow,T.flowV(m,ad)])}
+ h+='<table class="kv" style="margin-top:12px">'+kv.map(function(r){return '<tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'}).join("")+'</table>';
+ h+='<p class="tiny muted" style="margin:10px 0 0">'+esc(T.foot)+'</p></div>';
+ return h;
+}
+function docTab(c,st){
+ if(st.share!=="ok")return '<div class="empty"><div><div class="em-i">'+IC.doc+'</div><h3>まだ仮押さえした枠がありません</h3><p class="tiny">「空き枠・仮押さえ」で枠を選び、仮押さえして講師に共有してください。</p><button data-ptab="slot">空き枠へ</button></div></div>';
+ if(st.step<3){st.step=3;setTimeout(function(){save()},0)}
+ return '<div class="card" style="background:#fdfbf9">'+docHtml(c,st)+'</div><div class="actions"><button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.sent?"disabled":"")+'>'+IC.send+'ご案内を返信メールに添付</button><span class="tiny muted">メール画面に移り、ご案内付きの返信が入ります</span></div>';
+}
+function replyMail(c,st){
+ var k=c.cond,lg=k.lang,mkp=k.type==="makeup",sls=st.picked.map(slotByKey),T=TX[lg],chk=c.checksMail||c.checks;
+ if(lg==="en"){
+  var s="Dear "+c.addressee.replace(/^Dear\s+/,"")+",\n\n"+(mkp?"Thank you for letting us know.":"Thank you for your inquiry.")+" This is "+STAFF_EN+" from "+BRAND_EN+".\n"+T.lead(k)+"\n\n";
+  sls.forEach(function(sl,i){s+="- "+T.opt(i)+": "+slotLine(sl,"en")+"  "+sl.c.en+" ("+campusL(sl.c.campus,"en")+")\n"});
+  s+="\n"+(mkp?"":"The trial lesson is free. ")+"Please see the attached information for details.\n\nIt would also help us prepare if you could let us know:\n";chk.forEach(function(x){s+="- "+x+"\n"});
+  return s+"\nBest regards,\n"+STAFF_EN+"\n"+BRAND_EN;
+ }
+ if(lg==="th"){
+  var t=c.addressee+"\n\nสวัสดีค่ะ "+STAFF_TH+" จาก "+BRAND_EN+" ค่ะ\n"+T.lead(k)+"\n\n";
+  sls.forEach(function(sl,i){t+="• "+T.opt(i)+": "+slotLine(sl,"th")+"  "+sl.c.th+" ("+campusL(sl.c.campus,"th")+")\n"});
+  t+="\n"+(mkp?"":"ทดลองเรียนฟรี 1 ครั้ง ")+"รายละเอียดอยู่ในไฟล์แนบค่ะ\n\nรบกวนแจ้งข้อมูลต่อไปนี้ด้วยนะคะ\n";chk.forEach(function(x){t+="• "+x+"\n"});
+  return t+"\nขอบคุณค่ะ\n"+STAFF_TH+"\n"+BRAND_EN;
+ }
+ var j=c.addressee+"\n\n"+(mkp?"いつもお世話になっております。":"お問い合わせいただき、ありがとうございます。")+BRAND+"の"+STAFF+"です。\n"+(mkp?k.student+"さんの"+mdw(absD(k))+"の欠席、承知しました。振替は以下の回をご用意できます（席を仮押さえしています）。":k.student+"さんの体験授業を、以下の日時で仮押さえしました。")+"\n\n";
+ sls.forEach(function(sl,i){j+="・"+T.opt(i)+"　"+mdw(sl.d)+" "+sl.s+"〜"+sl.e+"　"+sl.c.name+"（"+sl.c.campus+"）\n"});
+ j+="\n"+(mkp?"ご都合のよい回をお知らせください。欠席分のプリントは授業の後にメールでお送りします。":"体験授業は無料です。当日の流れと持ち物は、添付のご案内をご覧ください。\nご都合のよい日時をお知らせください。")+"\n\nあわせて、以下を教えていただけますと準備がしやすくなります。\n";chk.forEach(function(x){j+="・"+x+"\n"});
+ return j+"\nよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF;
+}
+function parentReply(c,st){
+ var k=c.cond,lg=k.lang,sl=slotByKey(st.picked[0]),mkp=k.type==="makeup";
+ if(lg==="en")return {body:"Thank you for the information!\nOption 1 ("+slotLine(sl,"en")+") works for us. Mint can read a little hiragana already.\nI will pick her up after class.\n\nBest,\n"+(k.student==="Mint"?"Ploy":"Parent"),tr:"（訳）ご案内ありがとうございます。第1候補（"+mdw(sl.d)+" "+sl.s+"）でお願いします。ひらがなは少し読めます。お迎えは私が行きます。"};
+ if(lg==="th")return {body:"ขอบคุณค่ะ\nขอเป็นตัวเลือกที่ 1 วัน"+mdwTh(sl.d)+" "+sl.s+" นะคะ\nบริษัทช่วยออกค่าเรียนครึ่งหนึ่งค่ะ\n\nวนิดา",tr:"（訳）ありがとうございます。第1候補の"+mdw(sl.d)+" "+sl.s+"でお願いします。会社が授業料の半分を補助してくれます。"};
+ return {body:"ご案内ありがとうございます。\n"+(mkp?mdw(sl.d)+" "+sl.s+"の回でお願いします。プリントはメールで送っていただけると助かります。":"第1候補の"+mdw(sl.d)+" "+sl.s+"でお願いします。\n当日は私が車で送ります。算数は割合の文章題が苦手です。")+"\nよろしくお願いいたします。",tr:""};
+}
+function confirmMail(c,st){
+ var k=c.cond,lg=k.lang,sl=slotByKey(st.picked[0]),mkp=k.type==="makeup";
+ if(lg==="en")return "Dear "+c.addressee.replace(/^Dear\s+/,"")+",\n\nThank you. The "+(mkp?"make-up":"trial")+" lesson is confirmed:\n\n- "+slotLine(sl,"en")+"  "+sl.c.en+"\n- "+addrL(sl.c.campus,"en")+"\n\nWe will send a reminder on LINE the day before. We look forward to meeting "+stuL(k,"en")+"!\n\n"+STAFF_EN+"\n"+BRAND_EN;
+ if(lg==="th")return c.addressee+"\n\nขอบคุณค่ะ ยืนยันการ"+(mkp?"เรียนชดเชย":"ทดลองเรียน")+"ตามนี้ค่ะ\n\n• "+slotLine(sl,"th")+"  "+sl.c.th+"\n• "+addrL(sl.c.campus,"th")+"\n\nเราจะส่งข้อความแจ้งเตือนทาง LINE ในวันก่อนเรียนค่ะ\n\n"+STAFF_TH+"\n"+BRAND_EN;
+ return c.addressee+"\n\nご連絡ありがとうございます。以下の日時で"+(mkp?"振替授業":"体験授業")+"のご予約を確定しました。\n\n・"+mdw(sl.d)+" "+sl.s+"〜"+sl.e+"　"+sl.c.name+"\n・"+addrL(sl.c.campus,"ja")+"\n\n前日にLINEで、時間と持ち物をお知らせします。\n"+(mkp?"引き続きよろしくお願いいたします。":"当日お会いできるのを楽しみにしております。")+"\n\n"+BRAND+"　"+STAFF;
+}
+
+/* ============================================================ view: sns / LINE */
+var AUD={all:"全保護者・生徒（312名）",pp:"プロンポン校（188名）",sr:"シラチャ校（97名）",on:"オンライン（27名）",one:"保護者1名（個別）"};
+var CHN={line:"LINE配信",facebook:"Facebook",blog:"ブログ"};
+function postTitle(p){
+ if(p.kind==="notice")return "休講のお知らせ（"+md(ND)+"）";
+ if(p.kind==="season")return SEASON.ja+"の募集";
+ if(p.kind==="blog")return "ブログ：今週の授業の様子";
+ if(p.kind==="trial"){var c=CL(p.cls)||CLS[0];return "体験受付："+c.name+"（"+c.campus+"）"}
+ if(p.kind==="remind"){var cc=C(p.caseId);return "前日リマインド："+(cc?cc.cond.student:"")}
+ return "お知らせ";
+}
+function postText(p,ch,lg,v){
+ v=v||0;var tags=ch==="facebook";
+ if(p.kind==="notice"){
+  if(lg==="th")return "【แจ้งงดการเรียนการสอน】\nวัน"+mdwTh(ND)+" งดเรียนทุกสาขา เนื่องจากอบรมครูผู้สอน\nขอเรียนชดเชยได้ โดยแจ้งวันเวลาที่สะดวกทางแชทนี้\n\n"+BRAND_EN;
+  if(lg==="en")return "[Notice] No classes on "+mdwEn(ND)+"\nAll campuses will be closed for teacher training.\nMake-up lessons are available — just reply with your preferred time.\n\n"+BRAND_EN;
+  return "【休講のお知らせ】\n"+mdw(ND)+"は講師研修のため、全校舎で休講です。\nこの日の授業は振替を承ります。ご希望の日時をこのトークでお知らせください。\n\n"+BRAND;
+ }
+ if(p.kind==="season"){
+  var hk=[["受付開始","残りわずか","早割あり"],["Now open","Few seats left","Early-bird"],["เปิดรับสมัคร","ที่นั่งใกล้เต็ม","สมัครก่อนลดพิเศษ"]][lg==="ja"?0:lg==="en"?1:2][v%3];
+  if(lg==="th")return "【"+SEASON.th+" "+hk+"】\nสำหรับนักเรียนประถม-มัธยมต้น (6 ครั้ง)\n• คณิตศาสตร์ / ภาษาญี่ปุ่น\n• คณิต-อังกฤษ ม.ต้น\n• ภาษาอังกฤษสำหรับเด็ก\nเรียนได้ที่สาขาพร้อมพงษ์ ศรีราชา และออนไลน์\n\nสมัครทาง LINE หรืออีเมลได้เลย"+(tags?"\n\n#เรียนพิเศษ #กรุงเทพ #ศรีราชา":"");
+  if(lg==="en")return "["+SEASON.en+" — "+hk+"]\nFor elementary and junior high students (6 lessons)\n- Math / Japanese (entrance exam prep)\n- Junior high Math & English\n- Kids English\nAt Phrom Phong, Sriracha and online.\n\nApply via LINE or email."+(tags?"\n\n#Bangkok #Sriracha #TutoringBangkok":"");
+  return "【"+SEASON.ja+" "+hk+"】\n小学生・中学生向けの"+SEASON.ja+"（全6回）の申込みを受け付けています。\n・中学受験 算数／国語\n・中学 数学・英語\n・キッズ英会話\nプロンポン校・シラチャ校・オンラインで開講します。\n\nお申込みはLINE・メールでお気軽にどうぞ。"+(tags?"\n\n#バンコク #シラチャ #タイ駐在 #学習塾 #"+SEASON.ja:"");
+ }
+ if(p.kind==="trial"){
+  var c=CL(p.cls)||CLS[0],dw=c.sl.map(function(x){return "日月火水木金土"[x[0]]}).filter(function(x,i,a){return a.indexOf(x)===i}).join("・");
+  if(lg==="th")return "【เปิดรับทดลองเรียนฟรี】"+c.th+"\n📍 "+campusL(c.campus,"th")+"\n🕔 "+c.sl.map(function(x){return TH_D[x[0]]+" "+x[1]}).join(" / ")+"\nห้องเรียนขนาดเล็ก (ไม่เกิน "+c.cap+" คน)\n\nสนใจพิมพ์ \"ทดลองเรียน\" ในแชทนี้ได้เลย"+(tags?"\n\n#เรียนภาษาญี่ปุ่น #เรียนพิเศษ":"");
+  if(lg==="en")return "[Free trial lesson] "+c.en+"\n"+campusL(c.campus,"en")+" · "+c.sl.map(function(x){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][x[0]]+" "+x[1]}).join(" / ")+"\nSmall class (max "+c.cap+" students).\n\nSend \"trial\" in this chat to book."+(tags?"\n\n#Bangkok #KidsClass":"");
+  return "【体験授業 受付中】"+c.campus+"｜"+c.name+"\n"+dw+"曜 "+c.sl[0][1]+"〜／対象 "+grng(c)+"\n少人数（定員"+c.cap+"名）で、一人ひとりに合わせて進めます。体験授業は無料です。\n\nお申込み：このトークに「体験」と送ってください"+(tags?"\n\n#バンコク #学習塾 #タイ駐在":"");
+ }
+ if(p.kind==="remind"){
+  var cc=C(p.caseId),k=cc?cc.cond:{type:"trial",student:"",lang:"ja"},st=cc?cs(cc.id):null,sl=st&&st.picked[0]?slotByKey(st.picked[0]):allSlots(7)[0],mkp=k.type==="makeup";
+  if(lg==="th")return "【แจ้งเตือนพรุ่งนี้】\nคุณ"+stuL(k,"th")+"\n"+slotLine(sl,"th")+"\n"+sl.c.th+"\n📍 "+addrL(sl.c.campus,"th")+"\nสิ่งที่ต้องนำมา: เครื่องเขียน สมุดโน้ต\nแล้วพบกันค่ะ";
+  if(lg==="en")return "[Reminder for tomorrow]\n"+stuL(k,"en")+"\n"+slotLine(sl,"en")+"\n"+sl.c.en+"\nPlace: "+addrL(sl.c.campus,"en")+"\nPlease bring a pencil case and a notebook. See you!";
+  return "【明日の"+(mkp?"振替授業":"体験授業")+"のご案内】\n"+k.student+"さん\n"+mdw(sl.d)+" "+sl.s+"〜"+sl.e+"　"+sl.c.name+"\n場所："+addrL(sl.c.campus,"ja")+"\n持ち物：筆記用具・ノート\nお気をつけてお越しください。";
+ }
+ /* blog */
+ if(lg==="th")return "บรรยากาศการเรียนสัปดาห์นี้\n\nคลาสคณิตศาสตร์เตรียมสอบ ฝึกโจทย์ร้อยละด้วยการวาดแผนภาพ\nคลาสภาษาอังกฤษสำหรับเด็ก เล่นเกมคำศัพท์สีและรูปทรง\nคลาสภาษาญี่ปุ่นสำหรับคนทำงาน ฝึกฟังโจทย์ N3\n\nเปิดรับทดลองเรียนฟรีทุกคลาส";
+ if(lg==="en")return "This week in class\n\nEntrance-exam Math: word problems on ratios, drawing diagrams to think them through.\nKids English: a word game with colors and shapes.\nJapanese for adults: N3 listening practice.\n\nFree trial lessons are available for every class.";
+ return ["今週の授業の様子","授業レポート","教室だより"][v%3]+"\n\n中学受験 算数クラスでは、割合の文章題に取り組みました。図をかいて考える練習を続けています。\nキッズ英会話では、色と形の単語でゲームをしました。\nシラチャ校の社会人日本語クラスは、N3の聴解の練習です。\n\nどのクラスも体験授業（無料）を受け付けています。";
+}
+function slots(){var out=[];for(var i=0;i<14&&out.length<4;i++){var d=addD(NOW,i+1);if(d.getDay()===2||d.getDay()===5)out.push(d)}return out}
+function viewSns(){
+ var posts=state.posts;
+ var rows=posts.map(function(s){var b=s.status==="posted"?["配信済み","gray"]:s.status==="scheduled"?["予約済み","green"]:["下書き","amber"];
+  return '<button class="row '+(s.id===state.selPost?"active":"")+'" data-post="'+s.id+'"><div class="row-top"><b>'+esc(postTitle(s))+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div class="snip">'+esc(s.ch==="line"?"配信先："+AUD[s.aud||"all"]:CHN[s.ch]+"に投稿")+'</div><div class="row-foot"><span class="badge blue">'+CHN[s.ch]+'</span>'+(s.auto?'<span class="badge gray">自動作成：'+esc(s.why||"")+'</span>':'')+(s.when?'<span class="badge gray">'+esc(s.when)+'</span>':'')+'</div></button>'}).join("");
+ var s=posts.filter(function(x){return x.id===state.selPost})[0]||posts[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">お知らせ・配信</b> <span class="badge gray">'+posts.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">受付や時間割から、配信の下書きが自動でできます</div></section>'+
+  '<section class="detail">'+(s?postDetail(s):"")+'</section></div>';
+}
+function postDetail(s){
+ var lg=state.lang,txt=s.text||postText(s,s.ch,lg,s.v),ed=s.status==="draft",rem=s.kind==="remind";
+ var ch=[["line","LINE配信"],["facebook","Facebook"],["blog","ブログ"]].map(function(x){return '<button data-ch="'+x[0]+'" class="'+(s.ch===x[0]?"on":"")+'" '+(!ed||rem?"disabled":"")+'>'+x[1]+'</button>'}).join("");
+ var lgs=[["ja","日本語"],["th","ไทย"],["en","English"]].map(function(x){return '<button data-lang="'+x[0]+'" class="'+(lg===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+ var aud=s.ch==="line"&&!rem?'<div class="seg" aria-label="配信先">'+[["all","全体"],["pp","プロンポン"],["sr","シラチャ"],["on","オンライン"]].map(function(x){return '<button data-aud="'+x[0]+'" class="'+((s.aud||"all")===x[0]?"on":"")+'" '+(ed?"":"disabled")+'>'+x[1]+'</button>'}).join("")+'</div>':'';
+ var hue={notice:0,season:200,trial:20,remind:140,blog:280}[s.kind]||20;
+ var cap={notice:"休講のお知らせ",season:SEASON.ja,trial:"体験授業 受付中",remind:"明日のご案内",blog:"教室だより"}[s.kind];
+ var ph='<div class="photo" style="background:linear-gradient(135deg,hsl('+hue+',40%,55%),hsl('+((hue+40)%360)+',42%,36%))">'+IC.bigbook+'<span>'+esc(cap+" · "+brandL(lg))+'</span></div>';
+ var prev=s.ch==="line"?'<div class="line-prev">'+(rem?"":ph)+'<div class="lb">'+esc(txt)+'</div></div>':s.ch==="blog"?'<div class="blog-prev">'+ph+'<div class="tx">'+esc(txt)+'</div></div>':'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><b>'+esc(BRAND)+'</b></div>'+ph+'<div class="tx">'+esc(txt)+'</div></div>';
+ var sl=slots().map(function(d){return '<option value="'+stamp(d,"12:00")+'">'+mdw(d)+' 12:00</option>'}).join("");
+ return '<div class="detail-inner"><div class="sns-grid"><div><div class="p-head"><div><h2>'+esc(postTitle(s))+'</h2><div class="meta">'+esc(s.ch==="line"?"配信先："+AUD[s.aud||"all"]:CHN[s.ch])+'</div></div></div>'+
+  '<div class="actions"><div class="seg">'+ch+'</div><div class="seg">'+lgs+'</div>'+aud+'<button class="small btn-i" data-act="regen" '+(ed?"":"disabled")+'>'+IC.spark+'文面を作り直す</button></div>'+prev+
+  '<div class="actions">'+(ed?'<select id="slot" aria-label="配信日時">'+sl+'</select><button class="primary btn-i" data-act="schedule">'+IC.cal+'この日時に予約</button><button data-act="postnow">今すぐ配信（デモ）</button>':s.status==="scheduled"?'<span class="badge green">'+esc(s.when)+' に配信予定</span><button class="small" data-act="unschedule">予約を取り消す</button>':'<span class="badge gray">'+esc(s.when)+' に配信済み</span>')+'</div></div>'+
+  '<div><div class="card" style="margin-top:0"><h3>'+IC.cal+' 配信カレンダー</h3>'+calendar()+'</div>'+
+  '<div class="card"><h3>自動運用のルール</h3>'+
+  '<label class="toggle"><input type="checkbox" data-auto="draft" '+(state.auto.draft?"checked":"")+'><span>体験の申込みを受けたら、空きのあるクラスの体験募集を下書きする</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="weekly" '+(state.auto.weekly?"checked":"")+'><span>毎週 火・金 12:00 に、予約したお知らせを自動で配信する</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="remind" '+(state.auto.remind?"checked":"")+'><span>前日 15:00 に、翌日の体験・振替の生徒へLINEでリマインドする</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="approve" '+(state.auto.approve?"checked":"")+'><span>配信の前に教室長の確認を入れる</span></label>'+
+  '<p class="tiny muted" style="margin:6px 0 0">本番では、メール・LINEの受付や時間割の更新をもとに、この画面の操作なしで動きます。保護者の言葉（日本語・タイ語・英語）に合わせて送り分けます。</p></div></div></div></div>';
+}
+function calendar(){
+ var out="";
+ for(var i=-2;i<7;i++){var d=addD(NOW,i),key=md(d);
+  var its=state.posts.filter(function(s){return s.when&&s.when.split(" ")[0]===key});
+  out+='<div class="cal-day"><b>'+mdw(d)+(i===0?"　今日":"")+'</b>'+(its.length?its.map(function(s){return '<div class="it"><span class="badge '+(s.status==="posted"?"gray":"green")+'">'+esc(s.when.split(" ")[1])+'</span>'+esc(postTitle(s))+'</div>'}).join(""):'<div class="it muted">—</div>')+'</div>'}
+ return '<div class="cal">'+out+'</div>';
+}
+
+/* ============================================================ actions */
+function go(view){state.view=view;render();try{window.scrollTo(0,0)}catch(e){}}
+function openCase(id){state.selCase=id;var s=cs(id);state.ptab=s.extracted?(s.step>=3?"doc":s.step>=2?"slot":"cond"):"cond";go("desk")}
+function captureCompose(mailId){var to=$("#rTo"),sj=$("#rSubj"),b=$("#rBody");if(!to)return null;return {mail:mailId,to:to.value,subject:sj.value,body:b.value,attach:$("#replyBox").dataset.attach||null}}
+function addTrialPost(caseId){
+ if(!state.auto.draft)return;var c=C(caseId);if(!c||c.cond.type==="makeup")return;
+ var best=match(c.cond).filter(function(r){return r.sl.seats>0})[0];if(!best)return;
+ if(state.posts.some(function(s){return s.kind==="trial"&&s.cls===best.sl.c.id}))return;
+ state.posts.unshift({id:"S"+(++state.seq)+"t",kind:"trial",cls:best.sl.c.id,status:"draft",ch:"line",aud:(CAMPUS[best.sl.c.campus]||{aud:"all"}).aud,when:"",auto:true,why:"体験の申込みから"});
+}
+function autoPick(c,st){if(st.picked.length)return;st.picked=match(c.cond).filter(function(r){return r.sl.seats>0}).slice(0,2).map(function(r){return r.sl.key})}
+function hold(caseId){
+ var st=cs(caseId);if(!st.picked.length){toast("候補に入れる枠を選んでください");return}
+ st.share="asking";if(st.step<2)st.step=2;render();
+ setTimeout(function(){st.share="ok";render();toast("席を仮押さえし、講師から返信がありました。ご案内を作れます")},1300);
+}
+function attachDoc(caseId){
+ var st=cs(caseId),c=C(caseId);if(st.share!=="ok"){toast("先に空き枠を仮押さえしてください");return}
+ st.attached=true;st.step=3;
+ var mid=state.mails.filter(function(m){return m.caseId===caseId&&m.folder==="inbox"&&m.kind!=="confirm"})[0];
+ if(!mid){toast("元のメールが見つかりません");return}
+ state.compose={mail:mid.id,to:mid.addr,subject:"Re: "+mid.subject,body:replyMail(c,st),attach:docName(c)};
+ state.folder="inbox";state.selMail=mid.id;go("mail");
+ setTimeout(function(){var r=$("#replyBox");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("ご案内を添付し、返信の本文を作りました。内容を確認して送信してください");
+}
+function genericReply(c,st){var k=c.cond,sl=slotByKey(st.picked[0]);
+ if(k.lang==="en")return {body:"Thank you! Option 1 ("+slotLine(sl,"en")+") works for us.\n\nBest regards",tr:"（訳）ありがとうございます。第1候補（"+mdw(sl.d)+" "+sl.s+"）でお願いします。"};
+ if(k.lang==="th")return {body:"ขอบคุณค่ะ ขอเป็นตัวเลือกที่ 1 วัน"+mdwTh(sl.d)+" "+sl.s+" นะคะ",tr:"（訳）ありがとうございます。第1候補の"+mdw(sl.d)+" "+sl.s+"でお願いします。"};
+ return {body:"ご案内ありがとうございます。\n第1候補の"+mdw(sl.d)+" "+sl.s+"でお願いします。\nよろしくお願いいたします。",tr:""};
+}
+function sendMail(mailId){
+ var m=state.mails.filter(function(x){return x.id===mailId})[0],d=captureCompose(mailId);if(!d||!m)return;
+ if(!d.to.trim()||!d.body.trim()){toast("宛先と本文を入れてください");return}
+ var sent={id:"M"+(++state.seq)+"s",folder:"sent",from:BRAND,addr:d.to,toName:m.folder==="inbox"?m.from:m.toName,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:m.caseId,tags:[{t:"送信済み",k:"gray"}]};
+ state.mails.unshift(sent);state.compose=null;
+ if(m.folder==="draft")state.mails=state.mails.filter(function(x){return x.id!==m.id});
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ if(st&&c&&d.attach&&m.kind!=="confirm"&&!st.sent){st.sent=true;
+  setTimeout(function(){
+   var r=c.custom?genericReply(c,st):parentReply(c,st);
+   state.mails.unshift({id:"M"+(++state.seq)+"r",folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:stamp(NOW,nowHM()),subject:"Re: "+d.subject.replace(/^Re:\s*/,""),body:r.body,tr:r.tr,caseId:c.id,kind:"confirm",tags:[{t:"日時の返信",k:"green"}],unread:true});
+   render();toast(c.from+" から返信が届きました（日時の希望）");
+  },3500);
+ }
+ if(st&&m.kind==="confirm"&&st.booking){st.booking.confirmed=true}
+ state.folder="sent";state.selMail=sent.id;render();toast("送信しました（デモのため、実際には送信していません）");
+}
+function confirmBooking(caseId,mailId){
+ var st=cs(caseId),c=C(caseId),m=state.mails.filter(function(x){return x.id===mailId})[0];if(!c||!m)return;
+ var sl=slotByKey(st.picked[0]);
+ st.booking={key:sl.key,made:true,confirmed:false};
+ if(state.auto.remind&&!state.posts.some(function(p){return p.kind==="remind"&&p.caseId===caseId}))
+  state.posts.unshift({id:"S"+(++state.seq)+"r",kind:"remind",caseId:caseId,status:"scheduled",ch:"line",aud:"one",when:stamp(addD(sl.d,-1),"15:00"),auto:true,why:"予約の確定から"});
+ state.compose={mail:mailId,to:m.addr,subject:"Re: "+m.subject.replace(/^Re:\s*/,""),body:confirmMail(c,st),attach:null};
+ render();setTimeout(function(){var r2=$("#replyBox");if(r2&&r2.scrollIntoView)r2.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("予約を確定し、確認メールと前日のLINEリマインドを作りました");
+}
+function help(){
+ modal('<h3>このワークスペースの使い方</h3><p class="tiny muted">'+esc(BRAND)+'様の業務に近い形で動かせるデモです。生徒・保護者・講師・クラスはすべて架空のサンプルで、メールやLINEも実際には送信しません。</p>'+
+ '<ol><li><b>メール</b>：保護者からの体験の申込みや欠席の連絡を開き、「このメールから○○の受付を作る」を押します（タイ語・英語のメールも試せます）。</li><li><b>体験・振替</b>：①内容を読み取る → ②時間割の空き枠と照合し、席を仮押さえして講師にLINEで共有 → ③ご案内を作る → 「返信へ添付」。</li><li><b>メール</b>：ご案内付きの返信を送ると、保護者から日時の返信が届きます。「予約を確定して返信を作る」で確認メールと前日のLINEリマインドまで作ります。</li><li><b>お知らせ・LINE配信</b>：休講・講習・体験募集のお知らせを、日本語・タイ語・英語で作り、校舎ごとに配信を予約できます。</li></ol>'+
+ (SERVICES.length?'<p class="tiny">想定した業務：'+SERVICES.map(esc).join("・")+'</p>':'')+
+ '<div class="cta-box"><b>このデモを、'+esc(BRAND)+'様の実際の時間割・生徒名簿・メールで動かします。</b><br>Excel・Googleスプレッドシートの時間割、Gmail・Outlook、LINE公式アカウントと連携できます。まずは30分、お困りの業務をお聞かせください。<br><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</div>'+
+ '<div class="actions" style="justify-content:flex-end"><button class="primary" data-close>はじめる</button></div>');
+}
+function timetableModal(){
+ var bk=allCases().map(function(c){var st=cs(c.id);if(!st.booking)return "";var sl=slotByKey(st.booking.key);return '<tr><td>'+esc(c.cond.student)+'</td><td>'+(c.cond.type==="makeup"?"振替":"体験")+'</td><td>'+mdw(sl.d)+' '+sl.s+'</td><td class="tiny">'+esc(sl.c.name)+'</td><td>'+(st.booking.confirmed?'<span class="badge green">確定・連絡済み</span>':'<span class="badge amber">確認メール未送信</span>')+'</td></tr>'}).join("");
+ modal('<h3>時間割・空き状況（サンプル '+CLS.length+'クラス）</h3><p class="tiny muted">本番では、貴校のExcel・スプレッドシートの時間割と生徒名簿をそのまま使います。</p><div style="overflow-x:auto"><table><tr><th>校舎</th><th>クラス</th><th>対象</th><th>曜日・時間</th><th>講師</th><th class="num">在籍/定員</th></tr>'+CLS.map(function(c){return '<tr><td class="tiny">'+esc(c.campus)+'</td><td>'+esc(c.name)+'</td><td class="tiny">'+esc(grng(c))+'</td><td class="tiny">'+c.sl.map(function(x){return "日月火水木金土"[x[0]]+" "+x[1]}).join("<br>")+'</td><td class="tiny">'+esc(tname(c,"ja"))+'</td><td class="num">'+c.enr+'/'+c.cap+'</td></tr>'}).join("")+'</table></div>'+
+  '<h3 style="margin-top:18px;font-size:14px">体験・振替の予約</h3>'+(bk?'<div style="overflow-x:auto"><table><tr><th>生徒</th><th>種別</th><th>日時</th><th>クラス</th><th>状態</th></tr>'+bk+'</table></div>':'<p class="tiny muted">まだ確定した予約はありません。</p>')+
+  '<div class="actions" style="justify-content:flex-end"><button data-close>閉じる</button></div>');
+}
+function pasteModal(){
+ var bg=modal('<h3>問い合わせを貼り付けて試す</h3><p class="tiny muted">実際に届くメール・LINEに近い文面を貼り付けると、受信箱に追加して受付からご案内まで試せます（簡易読み取り・日本語／タイ語／英語）。</p><div class="paste"><textarea id="pasteText" aria-label="問い合わせの文面" placeholder="例）小3の息子の英会話の体験をお願いしたいです。シラチャ校で、土曜の午前が希望です。"></textarea></div><div class="actions" style="justify-content:flex-end"><button data-close>キャンセル</button><button class="primary" id="pasteGo">受信箱に追加</button></div>');
+ $("#pasteGo",bg).onclick=function(){var t=$("#pasteText",bg).value.trim();if(!t)return;
+  var r=parse(t),id="X"+(++state.seq),from=r.cond.lang==="ja"?"お問い合わせ（貼り付け）":"Inquiry (pasted)";
+  state.custom[id]={id:id,custom:true,from:from,addr:"parent@example.com",init:"問",date:stamp(NOW,nowHM()),subject:t.split("\n")[0].slice(0,40),tag:"貼り付け",body:t,cond:r.cond,checks:r.checks,addressee:r.addressee};
+  state.mails.unshift({id:"M"+id,folder:"inbox",from:from,addr:"parent@example.com",init:"問",date:state.custom[id].date,subject:state.custom[id].subject,body:t,tags:[{t:r.cond.type==="makeup"?"欠席・振替":"体験の申込み",k:r.cond.type==="makeup"?"amber":"green"},{t:"貼り付け",k:"gray"}],caseId:id,unread:true});
+  state.folder="inbox";state.selMail="M"+id;bg.remove();render();toast("受信箱に追加しました");
+ };
+}
+
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t)return;
+ var ds=t.dataset;
+ if(t.hasAttribute("data-close")||t.disabled)return;
+ if(ds.view){go(ds.view);return}
+ if(ds.folder){state.folder=ds.folder;var f=state.mails.filter(function(m){return m.folder===ds.folder})[0];state.selMail=f?f.id:null;state.compose=null;render();return}
+ if(ds.mail&&!ds.act){state.selMail=ds.mail;state.compose=null;state.mails.forEach(function(m){if(m.id===ds.mail)m.unread=false});render();return}
+ if(ds.case&&!ds.act){state.selCase=ds.case;var st0=cs(ds.case);state.ptab=st0.extracted?(st0.step>=3?"doc":st0.step>=2?"slot":"cond"):"cond";render();return}
+ if(ds.ptab){var sc=cs(state.selCase);if(ds.ptab!=="mail"&&ds.ptab!=="cond"&&!sc.extracted){toast("先に内容を読み取ってください");return}state.ptab=ds.ptab;if(ds.ptab==="slot"){if(sc.step<2)sc.step=2;autoPick(C(state.selCase),sc)}if(ds.ptab==="doc"&&sc.share==="ok"&&sc.step<3)sc.step=3;render();return}
+ if(ds.post){state.selPost=ds.post;render();return}
+ var sp=state.posts.filter(function(x){return x.id===state.selPost})[0];
+ if(ds.ch&&sp){sp.ch=ds.ch;sp.text=null;render();return}
+ if(ds.aud&&sp){sp.aud=ds.aud;render();return}
+ if(ds.lang){state.lang=ds.lang;state.posts.forEach(function(x){if(x.status==="draft")x.text=null});render();return}
+ switch(ds.act){
+  case "help":help();break;
+  case "timetable":timetableModal();break;
+  case "reset":var ok=true;try{ok=window.confirm("デモを最初の状態に戻しますか？")}catch(err){ok=true}if(ok){try{localStorage.removeItem(KEY)}catch(err){}state=fresh();state.seen=true;render();toast("最初の状態に戻しました")}break;
+  case "paste":pasteModal();break;
+  case "gomail":var mm=state.mails.filter(function(m){return m.caseId===state.selCase&&m.folder==="inbox"})[0];if(mm){state.folder="inbox";state.selMail=mm.id}go("mail");break;
+  case "todesk":openCase(ds.case);break;
+  case "extract":var st=cs(ds.case);t.disabled=true;t.innerHTML=IC.spark+"読み取っています…";setTimeout(function(){st.extracted=true;st.step=1;state.ptab="cond";addTrialPost(ds.case);render()},900);break;
+  case "hold":hold(ds.case);break;
+  case "viewdoc":var c2=C(ds.case),st3=cs(ds.case);if(!c2||st3.share!=="ok"){toast("先に空き枠を仮押さえしてください");break}modal(docHtml(c2,st3,true)+'<div class="actions" style="justify-content:flex-end"><button data-act="print">印刷・PDFで保存</button><button class="primary" data-close>閉じる</button></div>');break;
+  case "print":try{window.print()}catch(err){}break;
+  case "attach":attachDoc(ds.case);break;
+  case "insertdoc":var mi=state.mails.filter(function(x){return x.id===ds.mail})[0];if(mi)attachDoc(mi.caseId);break;
+  case "savedraft":var d=captureCompose(ds.mail);if(!d)break;var src=state.mails.filter(function(x){return x.id===ds.mail})[0];
+   if(src.folder==="draft"){src.body=d.body;src.subject=d.subject;src.addr=d.to;src.attach=d.attach}else{state.mails.unshift({id:"M"+(++state.seq)+"d",folder:"draft",from:BRAND,addr:d.to,toName:src.from,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:src.caseId,kind:src.kind,tags:[{t:"下書き",k:"amber"}]})}
+   state.compose=null;render();toast("下書きに保存しました");break;
+  case "send":sendMail(ds.mail);break;
+  case "confirm":confirmBooking(ds.case,state.selMail);break;
+  case "regen":if(sp){sp.v=(sp.v||0)+1;sp.text=null;render()}break;
+  case "schedule":if(sp){sp.when=$("#slot").value;sp.status="scheduled";sp.text=postText(sp,sp.ch,state.lang,sp.v);render();toast("予約しました："+sp.when+"（"+CHN[sp.ch]+"）")}break;
+  case "unschedule":if(sp){sp.status="draft";sp.when="";sp.text=null;render()}break;
+  case "postnow":if(sp){sp.status="posted";sp.when=stamp(NOW,nowHM());sp.text=postText(sp,sp.ch,state.lang,sp.v);render();toast("配信しました（デモのため、実際には配信していません）")}break;
+  case "newpost":var kinds=["notice","season","blog"],used=state.posts.filter(function(p){return p.status==="draft"}).map(function(p){return p.kind});var kk=kinds.filter(function(x){return used.indexOf(x)<0})[0]||"notice";var nid="S"+(++state.seq)+"n";state.posts.unshift({id:nid,kind:kk,status:"draft",ch:"line",aud:"all",when:"",auto:false});state.selPost=nid;render();toast("お知らせの下書きを作りました");break;
+ }
+});
+document.addEventListener("change",function(e){
+ var t=e.target;
+ if(t.dataset&&t.dataset.pick){var st=cs(t.dataset.case),id=t.dataset.pick;
+  if(t.checked){if(st.picked.length>=3){t.checked=false;toast("候補は3つまでです");return}if(st.picked.indexOf(id)<0)st.picked.push(id)}else st.picked=st.picked.filter(function(x){return x!==id});
+  if(st.share!=="none"&&!st.sent){st.share="none";st.attached=false;toast("候補を変えたので、もう一度仮押さえしてください")}
+  render();return}
+ if(t.dataset&&t.dataset.auto){state.auto[t.dataset.auto]=t.checked;save();return}
+});
+document.addEventListener("input",function(e){
+ var t=e.target;if(t.id==="rBody"||t.id==="rTo"||t.id==="rSubj"){state.compose={mail:state.selMail,to:$("#rTo").value,subject:$("#rSubj").value,body:$("#rBody").value,attach:$("#replyBox").dataset.attach||null};save()}
+});
+
+render();
+if(!state.seen){state.seen=true;save();help()}
+})();
+</script>
+</body>
+</html>
