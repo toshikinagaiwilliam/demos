@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>サロン予約ワークスペース｜Nova Strategy</title>
+<meta name="description" content="LINE・メールで届くご予約・変更の受付から、予約表の空き枠の仮押さえ・スタッフへの共有・料金の目安付きのご案内、前日リマインド、キャンペーンのLINE配信、口コミ返信までをひとつの画面で。美容室・ネイル・まつげサロン・スパ向けの業務デモ。">
+<style>
+:root{--bg:#f6f8fa;--paper:#fff;--ink:#223731;--muted:#788680;--line:#e4eae7;--green:#16654e;--green-2:#104c3a;--green-light:#eaf5ee;--amber:#926417;--amber-light:#fff5df;--red:#b04438;--red-light:#fbeae6;--blue:#476c9f;--blue-light:#e9f0fb;--nav:176px;
+--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:13px/1.65 var(--font);color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;white-space:nowrap;transition:background .15s}
+button:hover:not(:disabled){background:#f0f6f2}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #75baa2;outline-offset:2px}
+.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--green-2)}
+.small{font-size:11px;padding:5px 9px}
+.subtle{border:0;background:transparent}
+.muted{color:var(--muted)}.tiny{font-size:11px}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.btn-i{display:inline-flex;align-items:center;gap:7px}
+/* top */
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-symbol{width:31px;height:31px;background:var(--green);border-radius:9px;color:#fff;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.brand b{font-size:15px;letter-spacing:.02em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.brand small{display:block;font-size:9px;line-height:1.2;letter-spacing:.16em;color:#6b7c73}
+.crumb{font-size:12px;color:#7b8b83;flex:1}
+.demo-pill{background:#f8f2df;color:#856e30;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.help{border:0;background:none;display:flex;gap:6px;align-items:center;font-size:12px}
+/* layout */
+.layout{height:calc(100vh - 60px);display:grid;grid-template-columns:var(--nav) minmax(0,1fr)}
+.nav{border-right:1px solid var(--line);padding:22px 12px;background:#f3f6f3;display:flex;flex-direction:column;gap:6px}
+.nav-label{font-size:10px;letter-spacing:.12em;color:#859389;padding:0 12px 10px}
+.nav button{display:flex;align-items:center;gap:10px;text-align:left;border:0;padding:11px 12px;background:none;border-radius:8px;font-weight:500;font-size:12.5px;width:100%}
+.nav button.active{background:#dcebe1;color:#145c44}
+.nav button:hover{background:#e5eee7}
+.nav .count:empty{display:none}.nav .count{margin-left:auto;background:#fff9;border-radius:6px;padding:0 6px;font-size:10px}
+.nav .count.hot{background:var(--green);color:#fff}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.nav .note{font-size:9.5px;color:#829083;padding:12px 12px 0;line-height:1.6}
+.workspace{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{min-height:72px;flex-shrink:0;display:flex;align-items:center;padding:10px 26px;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);gap:16px}
+.ws-head h1{font-size:19px;line-height:1.5;margin:0;font-weight:600}
+.ws-head p{font-size:11px;color:#7b8981;margin:2px 0 0}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr)}
+.list-pane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.list-tools{padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:16px;padding-top:4px}
+.tabs button{border:0;background:none;padding:6px 0;border-bottom:2px solid transparent;border-radius:0;color:#829087;font-size:11.5px}
+.tabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+.row{width:100%;display:block;border:0;border-bottom:1px solid #edf0ee;border-radius:0;text-align:left;padding:15px 17px;white-space:normal;background:#fff}
+.row.active{background:#eef6f0;box-shadow:3px 0 0 var(--green) inset}
+.row:hover{background:#f5f8f5}
+.row-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.row-top b{font-size:11.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-top time{font-size:10px;color:#8a968f}
+.dot{width:7px;height:7px;border-radius:50%;background:#267658;flex-shrink:0}
+.row .subj{font-size:12.5px;font-weight:500;line-height:1.6;margin:2px 0}
+.row .snip{font-size:11px;color:#8c968f;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row-foot{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap;line-height:1.7}
+.badge.green{background:#e5f2e9;color:#377355}.badge.amber{background:var(--amber-light);color:var(--amber)}.badge.blue{background:var(--blue-light);color:var(--blue)}.badge.gray{background:#f0f2f1;color:#7e8982}.badge.red{background:var(--red-light);color:#a65a4b}
+.list-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.detail{min-width:0;overflow:auto;background:#fff}
+.detail-inner{padding:24px 30px 40px;max-width:980px}
+.mail-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mail-h h2{font-size:19px;margin:0 0 14px;font-weight:600;line-height:1.5}
+.sender{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#efe9da;color:#7a6331;display:grid;place-items:center;font-size:13px;font-weight:600;flex-shrink:0}
+.sender b{font-size:12.5px;display:block}.sender span{font-size:11px;color:var(--muted)}
+.sender time{margin-left:auto;font-size:11px;color:var(--muted)}
+.mail-body{white-space:pre-wrap;font-size:13px;line-height:1.95;border-bottom:1px solid var(--line);padding-bottom:20px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.reply{border:1px solid var(--line);border-radius:12px;margin-top:18px;overflow:hidden}
+.reply-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;background:#fafbfa;flex-wrap:wrap}
+.reply-h input{border:0;background:transparent;flex:1;min-width:160px;padding:2px}
+.reply textarea{width:100%;border:0;min-height:220px;padding:14px;resize:vertical;line-height:1.8;font-size:12.5px;background:#fff}
+.reply-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfa;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green);border-radius:6px;padding:3px 9px;font-size:11px}
+.empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .em-i{width:58px;height:58px;border:1px solid var(--line);border-radius:14px;display:grid;place-items:center;margin:0 auto 14px;color:var(--green);background:#fff}
+.empty h3{color:var(--ink);font-size:16px;font-weight:500;margin:0 0 6px}
+/* proposal */
+.p-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.p-head h2{margin:0;font-size:18px;font-weight:600}
+.p-head .meta{font-size:11px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px}
+.step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#8a978f;border:0;background:none;padding:6px 0;text-align:left;border-radius:0;border-top:3px solid #e5ebe7}
+.step i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid #cfd8d3;display:grid;place-items:center;font-size:10px;flex-shrink:0}
+.step.done{border-color:#9cc9b2;color:#3d6d57}.step.done i{background:#9cc9b2;color:#fff;border-color:#9cc9b2}
+.step.cur{border-color:var(--green);color:var(--green);font-weight:600}.step.cur i{background:var(--green);color:#fff;border-color:var(--green)}
+.ptabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:10px}
+.ptabs button{border:0;background:none;border-radius:0;padding:9px 0;border-bottom:2px solid transparent;color:#7d8a83;font-size:12px}
+.ptabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;margin-top:14px}
+.card h3{font-size:13.5px;margin:0 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv th{width:28%}
+.miss{color:var(--amber)}
+.checklist{background:var(--amber-light);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px}
+.checklist b{color:var(--amber)}
+.checklist ul{margin:4px 0 0;padding-left:20px}
+.cands{display:grid;gap:12px;margin-top:12px}
+.cand{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.cand.off{opacity:.55}
+.photo{border-radius:9px;min-height:96px;position:relative;overflow:hidden;display:grid;place-items:end start;padding:8px;color:#fff;font-size:10px;font-weight:600;text-shadow:0 1px 2px #0005}
+.photo svg{position:absolute;right:8px;top:8px;width:44px;height:44px;opacity:.85}
+.cand-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cand-h b{font-size:13.5px}
+.cand .spec{font-size:11.5px;color:#5f6d66;margin:2px 0 6px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:999px;padding:1px 8px;background:var(--green-light);color:var(--green)}
+.chip.no{background:#f3f3f1;color:#9a8f7a;text-decoration:line-through}
+.owner{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bubble{border-radius:10px;padding:8px 11px;font-size:12px;max-width:520px;line-height:1.7}
+.bubble.out{background:#e9f6ee}
+.bubble.in{background:#f2f3f5}
+.bubble .tr{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.vac{font-size:11px;font-weight:600}
+.doc{border:1px solid var(--line);border-radius:6px;padding:28px 30px;background:#fff;box-shadow:0 6px 20px #2237310d;max-width:760px}
+.doc h4{margin:0;font-size:18px}
+.doc .to{font-size:13px;margin:14px 0 4px}
+.doc .lead{font-size:12px;color:#5d6b64;margin:0 0 14px}
+.doc-prop{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding:14px 0}
+.doc-prop .photo{min-height:104px}
+.route{display:grid;gap:0;margin-top:6px}
+.route div{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;font-size:12px;align-items:start}
+.route .ln{width:2px;background:#cfe3d7;justify-self:center;height:100%}
+.route .pt{width:10px;height:10px;border-radius:50%;background:var(--green);margin:5px auto 0}
+.foot-bar{position:sticky;bottom:0;background:#fffffff2;border-top:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.foot-bar .sum{margin-right:auto;font-size:11.5px;color:var(--muted)}
+/* sns */
+.sns-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.post-prev{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:420px}
+.post-prev .ph{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:12px}
+.post-prev .ph .avatar{width:28px;height:28px;font-size:11px;background:var(--green);color:#fff}
+.post-prev .photo{border-radius:0;min-height:200px}
+.post-prev .tx{white-space:pre-wrap;padding:12px;font-size:12.5px;line-height:1.75}
+.line-prev{background:#8cabd9;border-radius:12px;padding:14px;max-width:420px}
+.line-prev .lb{background:#fff;border-radius:14px;padding:12px;white-space:pre-wrap;font-size:12.5px;line-height:1.75}
+.line-prev .photo{border-radius:12px;margin-bottom:8px;min-height:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;font-size:11.5px}
+.seg button.on{background:var(--green);color:#fff}
+.cal{display:grid;gap:6px}
+.cal-day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.cal-day b{font-size:11.5px}
+.cal-day .it{font-size:11px;margin-top:4px;display:flex;gap:6px;align-items:center}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:6px 0}
+.toggle input{margin-top:3px;accent-color:var(--green)}
+/* misc */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#21352f;color:#fff;border-radius:10px;padding:10px 16px;font-size:12.5px;box-shadow:0 8px 24px #0003;z-index:50;max-width:92vw}
+.modal-bg{position:fixed;inset:0;background:#1d2b2680;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px 24px}
+.modal h3{margin:0 0 8px;font-size:17px}
+.modal ol{padding-left:20px;margin:8px 0}
+.modal li{margin:6px 0}
+.cta-box{background:var(--green-light);border:1px solid #bfdccb;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:12.5px}
+.cta-box b{color:var(--green)}
+.paste textarea{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px}
+.mobile-tabs{display:none}
+@media (max-width:900px){
+  .topbar{padding:0 12px;gap:10px;height:56px}
+  .crumb,.help span{display:none}
+  .brand{flex:1}
+  .demo-pill{font-size:10px;padding:3px 6px}
+  .demo-pill .long{display:none}
+  .ws-head{flex-wrap:wrap}
+  .brand b{max-width:52vw;font-size:14px}
+  .layout{display:block;height:auto}
+  .nav{display:none}
+  .mobile-tabs{display:flex;gap:4px;background:#f3f6f3;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5;overflow-x:auto}
+  .mobile-tabs button{border:0;background:none;padding:8px 10px;font-size:12px;border-radius:8px}
+  .mobile-tabs button.active{background:#dcebe1;color:#145c44;font-weight:600}
+  .workspace{overflow:visible}
+  .ws-head{padding:10px 14px;min-height:0}
+  .ws-head h1{font-size:16px}
+  .body{display:block}
+  .list-pane{border-right:0;border-bottom:1px solid var(--line);max-height:300px}
+  .detail{overflow:visible}
+  .detail-inner{padding:16px 14px 30px}
+  .foot-bar{padding:10px 14px}
+  .steps{grid-template-columns:1fr}
+  .cand{grid-template-columns:1fr}
+  .cand .photo{min-height:120px}
+  .doc{padding:18px 16px}
+  .doc-prop{grid-template-columns:1fr}
+  .sns-grid{grid-template-columns:1fr}
+}
+@media print{
+  body *{visibility:hidden}
+  #printDoc,#printDoc *{visibility:visible}
+  #printDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  .modal-bg{position:static;background:none}
+}
+
+</style>
+<style>
+:root{--green:#a8456a;--green-2:#863553;--green-light:#fbeef3}
+.nav{background:#faf5f7}.nav button:hover{background:#f3e6ec}
+.nav button.active,.mobile-tabs button.active{background:#f4dfe7;color:#863553}
+.mobile-tabs{background:#faf5f7}
+.row.active{background:#fdf2f6}
+.badge.green{background:#f7e3eb;color:#8f3a5a}
+.bubble.out{background:#fbe9f0}
+button:hover:not(:disabled){background:#fcf4f7}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline-color:#dc9bb4}
+.step.done{border-color:#e0b3c4;color:#8a4d64}.step.done i{background:#e0b3c4;border-color:#e0b3c4}
+.cta-box{border-color:#ecc9d6}
+.cand{grid-template-columns:104px minmax(0,1fr)}
+.dblock{border-radius:10px;min-height:96px;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;text-align:center;padding:8px 4px;line-height:1.25}
+.dblock .dd{font-size:21px;font-weight:700;letter-spacing:.02em}
+.dblock .dw{font-size:11px;opacity:.95}
+.dblock .dt{font-size:11px;margin-top:4px;background:#ffffff2b;border-radius:5px;padding:1px 6px}
+.cand.full .dblock{filter:grayscale(.85)}
+.rank{font-size:10.5px;font-weight:600;color:#fff;background:var(--green);border-radius:5px;padding:1px 7px}
+.trn{display:block;margin-top:10px;padding:10px 12px;background:#f6f7f8;border-radius:8px;font-size:12px;color:#5d6a64;white-space:pre-wrap}
+.doc table td,.doc table th{font-size:12px}
+.seat{font-size:11px;font-weight:600}
+.post-prev .photo,.line-prev .photo{display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;padding:12px;font-size:12px;font-weight:600}
+.post-prev .photo svg,.line-prev .photo svg{position:absolute;right:12px;top:12px;width:46px;height:46px;opacity:.9}
+.stars{color:#d49a1f;letter-spacing:1px;font-size:13px}
+.rv-text{white-space:pre-wrap;font-size:13px;line-height:1.9;border-bottom:1px solid var(--line);padding-bottom:16px}
+.rv-reply textarea{width:100%;min-height:170px;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.8}
+.rv-posted{background:#f7f8f8;border-left:3px solid var(--green);border-radius:6px;padding:10px 12px;white-space:pre-wrap;font-size:12.5px;line-height:1.8;margin-top:12px}
+.total td{font-weight:600;border-top:2px solid var(--line)}
+@media (max-width:900px){.cand{grid-template-columns:1fr}.dblock{min-height:64px;flex-direction:row;gap:10px}.dblock .dt{margin-top:0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+/* ============================================================ helpers */
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return Number(n).toLocaleString("en-US")}
+var IC={
+ mail:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ book:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6"/></svg>',
+ share:'<svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+ star:'<svg class="icon" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/></svg>',
+ list:'<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+ reset:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ help:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>',
+ spark:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+ send:'<svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>',
+ clip:'<svg class="icon" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>',
+ doc:'<svg class="icon" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+ plus:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cal:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+ chat:'<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+ bigsc:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.3"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></svg>'
+};
+
+/* ============================================================ personalization (?c=&s= or #c-<hex>) */
+var q;try{q=new URLSearchParams(location.search)}catch(e){q={get:function(){return null}}}
+function fromHex(h){try{h=String(h).replace(/[^0-9a-f]/gi,"");if(h.length%2)h=h.slice(0,-1);var b=new Uint8Array(h.length/2);for(var i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);return new TextDecoder("utf-8").decode(b)}catch(e){return ""}}
+var HASH=location.hash||"";
+var hc=HASH.match(/^#c-([0-9a-f]+)/i),hs=HASH.match(/[#&\-]s-([0-9a-f]+)/i);
+var COMPANY=(q.get("c")||(hc?fromHex(hc[1]):"")||"").replace(/[\u0000-\u001f]/g,"").slice(0,60).trim();
+var SERVICES=(q.get("s")||(hs?fromHex(hs[1]):"")||"").split(/[,、|｜]/).map(function(x){return x.trim().slice(0,20)}).filter(Boolean).slice(0,4);
+var BRAND=COMPANY||"サンプルサロン";
+var BRAND_EN=COMPANY||"Sample Salon";
+function brandL(lg){return lg==="ja"?BRAND:BRAND_EN}
+var STAFF="森",STAFF_EN="Mori",STAFF_TH="โมริ";
+window.addEventListener("hashchange",function(){location.reload()});
+
+/* ============================================================ dates */
+var NOW=(function(){var t=q.get("today");if(t&&/^\d{4}-\d{2}-\d{2}$/.test(t)){var a=t.split("-");return new Date(+a[0],a[1]-1,+a[2],9,0)}return new Date()})();
+function addD(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+function md(d){return (d.getMonth()+1)+"/"+d.getDate()}
+function ymd(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+function wdJ(d){return "日月火水木金土"[d.getDay()]}
+function mdw(d){return md(d)+"（"+wdJ(d)+"）"}
+var EN_D=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function mdwEn(d){return EN_D[d.getDay()]+", "+["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]+" "+d.getDate()}
+var TH_D=["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"],TH_M=["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function mdwTh(d){return TH_D[d.getDay()]+"ที่ "+d.getDate()+" "+TH_M[d.getMonth()]}
+function dl(d,lg){return lg==="en"?mdwEn(d):lg==="th"?mdwTh(d):mdw(d)}
+function nextDow(dow,from){var d=addD(from||NOW,1);while(d.getDay()!==dow)d=addD(d,1);return d}
+function nowHM(){var n=new Date();return ("0"+n.getHours()).slice(-2)+":"+("0"+n.getMinutes()).slice(-2)}
+function stamp(d,h){return md(d)+" "+h}
+function mins(s){var a=s.split(":");return +a[0]*60+ +a[1]}
+function hm(m){return ("0"+Math.floor(m/60)).slice(-2)+":"+("0"+(m%60)).slice(-2)}
+var Y=addD(NOW,-1);
+var ORIG=nextDow(3,addD(NOW,1));        // 変更前の予約日（次の水曜）
+var ND=nextDow(1,addD(NOW,6));          // 臨時休業日（翌週以降の月曜）
+var SEASON=(function(){var m=NOW.getMonth()+1;
+ if(m>=11||m===1)return {ja:"年末のヘッドスパ・カラー",en:"Year-end Head Spa & Color",th:"โปรสปาหนังศีรษะ & ทำสีส่งท้ายปี",menu:"headspa"};
+ if(m<=4)return {ja:"ソンクラーン前の縮毛矯正",en:"Pre-Songkran Straightening",th:"โปรยืดผมก่อนสงกรานต์",menu:"straight"};
+ if(m<=8)return {ja:"雨季のうねり対策（縮毛矯正）",en:"Rainy-season Frizz Care",th:"โปรแก้ผมชี้ฟูหน้าฝน",menu:"straight"};
+ return {ja:"秋の新色カラー",en:"Autumn Color",th:"โปรทำสีผมรับฤดูใบไม้ร่วง",menu:"color"}})();
+
+/* ============================================================ master data (all fictional) */
+var STORE={
+ "プロンポン店":{en:"Phrom Phong",th:"สาขาพร้อมพงษ์",ja2:"スクンビット ソイ33/1 サンプルビル2F（架空）",en2:"Sample Bldg. 2F, Sukhumvit Soi 33/1 (fictional)",park:{ja:"ビル前に駐車スペース2台",en:"2 parking spaces in front of the building",th:"มีที่จอดรถหน้าอาคาร 2 คัน"},hue:335,aud:"pp"},
+ "トンロー店":{en:"Thonglor",th:"สาขาทองหล่อ",ja2:"トンロー ソイ13 サンプルコート1F（架空）",en2:"Sample Court 1F, Thonglor Soi 13 (fictional)",park:{ja:"サンプルコートの駐車場（1時間無料）",en:"Sample Court car park (1 hour free)",th:"ที่จอดรถของอาคาร (ฟรี 1 ชั่วโมง)"},hue:285,aud:"tl"},
+ "シラチャ店":{en:"Sriracha",th:"สาขาศรีราชา",ja2:"シラチャ スクンビット通り サンプルプラザ1F（架空）",en2:"Sample Plaza 1F, Sukhumvit Rd., Sriracha (fictional)",park:{ja:"プラザの駐車場をご利用ください",en:"Please use the plaza car park",th:"จอดรถได้ที่ลานจอดของพลาซ่า"},hue:195,aud:"sr"}
+};
+function storeL(k,lg){var x=STORE[k]||STORE["プロンポン店"];return lg==="en"?x.en:lg==="th"?x.th:k}
+function addrL(k,lg){var x=STORE[k]||STORE["プロンポン店"];return lg==="ja"?x.ja2:x.en2}
+var MENU={
+ cut:{ja:"カット",en:"Haircut",th:"ตัดผม",p:1200,m:60},
+ color:{ja:"カラー",en:"Hair color",th:"ทำสีผม",p:2400,m:90},
+ straight:{ja:"縮毛矯正",en:"Hair straightening",th:"ยืดผม",p:3800,m:150},
+ headspa:{ja:"ヘッドスパ",en:"Head spa",th:"สปาหนังศีรษะ",p:1500,m:60},
+ nail:{ja:"ジェルネイル",en:"Gel nails",th:"ทำเล็บเจล",p:1400,m:90},
+ lash:{ja:"まつげエクステ",en:"Eyelash extensions",th:"ต่อขนตา",p:1600,m:75}
+};
+function menuL(ids,lg){return ids.map(function(i){return MENU[i]?MENU[i][lg]:i}).join(lg==="ja"?"＋":" + ")}
+function menuMin(ids){return ids.reduce(function(a,i){return a+(MENU[i]?MENU[i].m:60)},0)}
+function menuPrice(ids){return ids.reduce(function(a,i){return a+(MENU[i]?MENU[i].p:0)},0)}
+var STAFFS=[
+ {id:"P1",store:"プロンポン店",name:"高橋",en:"Takahashi",tl:"ja",f:true,role:"トップスタイリスト",tags:["cut","color","straight","headspa"],days:[2,3,4,5,6],times:["10:00","13:00","16:00"]},
+ {id:"P2",store:"プロンポン店",name:"小林",en:"Kobayashi",tl:"ja",f:false,role:"スタイリスト",tags:["cut","color","headspa"],days:[1,2,4,5,6,0],times:["10:30","13:30","16:30"]},
+ {id:"P3",store:"プロンポン店",name:"ジョイ",en:"Joy",tl:"th",f:true,role:"スパ・ネイリスト",tags:["headspa","nail"],days:[1,3,5,6,0],times:["11:00","14:00","17:00"]},
+ {id:"T1",store:"トンロー店",name:"佐藤",en:"Sato",tl:"ja",f:true,role:"ネイリスト",tags:["nail"],days:[2,3,4,6,0],times:["10:00","12:30","15:00","17:30"]},
+ {id:"T2",store:"トンロー店",name:"ナム",en:"Nam",tl:"th",f:true,role:"アイリスト・ネイリスト",tags:["lash","nail"],days:[1,2,5,6,0],times:["10:00","13:00","16:00"]},
+ {id:"S1",store:"シラチャ店",name:"山口",en:"Yamaguchi",tl:"ja",f:false,role:"店長・スタイリスト",tags:["cut","color","straight"],days:[1,3,4,6,0],times:["10:00","13:00","16:00"]},
+ {id:"S2",store:"シラチャ店",name:"ポーン",en:"Porn",tl:"th",f:true,role:"スタイリスト",tags:["cut","color","straight","headspa"],days:[2,4,5,6,0],times:["10:30","13:30","16:30"]}
+];
+function SF(id){for(var i=0;i<STAFFS.length;i++)if(STAFFS[i].id===id)return STAFFS[i];return null}
+function sname(s,lg){if(lg==="ja")return s.name+(s.tl==="th"?"（タイ人・日本語少し）":"");if(lg==="th")return "ช่าง"+s.en;return s.en}
+function booked(s,d,t){var h=(d.getDate()*31+d.getMonth()*7+s.id.charCodeAt(0)*3+s.id.charCodeAt(1)+mins(t))%5;return h===0}
+function mk(s,d,t,menus){var e=hm(Math.min(mins(t)+menuMin(menus),20*60));return {s:s,d:d,t:t,e:e,menus:menus,busy:booked(s,d,t),key:s.id+"|"+ymd(d)+"|"+t+"|"+menus.join(".")}}
+function slotByKey(k){var p=String(k).split("|"),s=SF(p[0])||STAFFS[0],a=(p[1]||ymd(NOW)).split("-"),d=new Date(+a[0],a[1]-1,+a[2]);return mk(s,d,p[2]||s.times[0],(p[3]||"cut").split("."))}
+function allSlots(n,menus){var out=[];for(var i=1;i<=n;i++){var d=addD(NOW,i);STAFFS.forEach(function(s){if(s.days.indexOf(d.getDay())<0)return;s.times.forEach(function(t){out.push(mk(s,d,t,menus||[s.tags[0]]))})})}return out}
+
+/* ============================================================ sample inquiries (4 cases) */
+var CASES=[
+ {id:"C1",from:"佐々木 由香",addr:"sasaki.yuka@example.com",init:"佐",date:stamp(Y,"20:40"),
+  subject:"カットとカラーの予約をお願いします（初めてです）",tag:"新規・日本語",
+  body:"はじめまして。佐々木と申します。\n先月、夫の転勤でバンコクに来ました。日本語で相談できる美容室を探していて、こちらを知りました。\n\nカットとカラーをお願いしたいです。\n・プロンポン店を希望します\n・子どもを学校に送ったあとなので、火曜か木曜の10時以降\n・15時には終わりたいです（お迎えがあるため）\n・できれば女性のスタイリストさんだとうれしいです\n\n料金の目安と、駐車場があるかも教えていただけますか。\nよろしくお願いいたします。",
+  cond:{type:"new",customer:"佐々木 由香",customerEn:"Ms. Sasaki",store:"プロンポン店",menus:["cut","color"],days:[2,4],after:"10:00",before:"15:00",female:true,lang:"ja",first:true},
+  checks:["ご希望の色味（写真があればお送りください）","前回カラーをした時期","髪の長さ（肩より上／下）"],
+  addressee:"佐々木 由香 様"},
+ {id:"C2",from:"井上 さやか",addr:"inoue.sayaka@example.com",init:"井",date:stamp(NOW,"08:15"),
+  subject:"【予約変更】水曜のネイルの日時を変更したいです",tag:"変更・日本語",
+  body:"いつもお世話になっております。井上です。\n\n"+mdw(ORIG)+" 15:00 に佐藤さんでジェルネイルを予約していますが、急な来客が入ってしまいました。\n申し訳ないのですが、週末の午前中（13時まで）に変更できますか。土曜でも日曜でも大丈夫です。\nできればまた佐藤さんにお願いしたいです。\n\nよろしくお願いいたします。",
+  cond:{type:"change",customer:"井上 さやか",customerEn:"Ms. Inoue",store:"トンロー店",menus:["nail"],days:[6,0],after:"",before:"13:00",female:false,lang:"ja",staff:"T1",orig:ymd(ORIG),origT:"15:00"},
+  checks:["今回のデザインの希望（前回と同じ／変更）","オフ（付け替え）の有無"],
+  addressee:"井上 さやか 様"},
+ {id:"C3",from:"Khun Pim（Instagram DMから転送）",addr:"pim.sample@example.com",init:"P",date:stamp(NOW,"09:30"),
+  subject:"Eyelash extensions + gel nails on the same day?",tag:"英語・まつげ＋ネイル",
+  body:"Hi!\n\nI'd like to book eyelash extensions and gel nails on the same day if possible. This weekend or next weekend is best for me.\nI live near Thonglor. It's my first time at your salon.\n\nHow much would both cost? Do you have a first-visit discount?\n\nThanks,\nPim",
+  tr:"（訳）まつげエクステとジェルネイルを同じ日にお願いしたいです。今週末か来週末が希望です。トンローの近くに住んでいます。初めての来店です。両方でいくらになりますか。初回の割引はありますか。",
+  cond:{type:"new",customer:"Pim",customerEn:"Khun Pim",customerTh:"คุณพิม",store:"トンロー店",menus:["lash","nail"],days:[6,0],after:"",before:"",female:false,lang:"en",first:true},
+  checks:["Lash style you prefer (natural / volume)","Nail design (one color / with art)","Whether you wear contact lenses"],
+  addressee:"Khun Pim"},
+ {id:"C4",from:"Khun Siriporn（LINE公式アカウントから転送）",addr:"siriporn.line@example.com",init:"S",date:stamp(NOW,"11:05"),
+  subject:"สอบถามยืดผม + ตัดผม วันอาทิตย์ค่ะ",tag:"タイ語・縮毛矯正",
+  body:"สวัสดีค่ะ\nทำงานที่บริษัทญี่ปุ่นในศรีราชาค่ะ อยากยืดผมและตัดผมวันอาทิตย์ค่ะ\nขอเป็นช่างผู้หญิงนะคะ ผมยาวประมาณกลางหลังค่ะ\nราคาประมาณเท่าไหร่คะ\n\nขอบคุณค่ะ\nศิริพร",
+  tr:"（訳）シラチャの日系企業で働いています。日曜日に縮毛矯正とカットをお願いしたいです。女性のスタイリストを希望します。髪の長さは背中の真ん中くらいです。料金はいくらくらいですか。シリポーン",
+  cond:{type:"new",customer:"Siriporn",customerEn:"Khun Siriporn",customerTh:"คุณศิริพร",store:"シラチャ店",menus:["cut","straight"],days:[0],after:"",before:"",female:true,lang:"th",first:true},
+  checks:["前回の縮毛矯正・パーマの時期","ご希望の仕上がり（自然に／しっかり）"],
+  checksMail:["ยืดผมหรือดัดผมครั้งล่าสุดเมื่อไหร่","อยากได้ทรงแบบไหน (ธรรมชาติ / ตรงมาก)"],
+  addressee:"คุณศิริพร"}
+];
+function C(id){for(var i=0;i<CASES.length;i++)if(CASES[i].id===id)return CASES[i];return state.custom[id]||null}
+function cuL(k,lg){return lg==="th"?(k.customerTh||k.customer):lg==="en"?(k.customerEn||k.customer):k.customer}
+function origD(k){var a=String(k.orig||ymd(ORIG)).split("-");return new Date(+a[0],a[1]-1,+a[2])}
+
+/* ============================================================ matching */
+function match(k){
+ var res=[];
+ allSlots(14,k.menus).forEach(function(sl){
+  var s=sl.s,hit=[],miss=[],sc=0,st=mins(sl.t),en=st+menuMin(k.menus);
+  if(s.store!==k.store)return;
+  if(!k.menus.every(function(m){return s.tags.indexOf(m)>=0}))return;
+  if(k.female&&!s.f)return;
+  if(k.type==="change"){if(s.id===k.staff&&ymd(sl.d)===k.orig&&sl.t===k.origT)return;if(s.id===k.staff){sc+=20;hit.push("いつもの担当")}}
+  hit.push(menuL(k.menus,"ja")+"に対応");
+  if(k.female)hit.push("女性スタッフ");
+  if(s.tl==="ja"&&k.lang==="ja")hit.push("日本語で接客");
+  if(s.tl==="th"&&k.lang==="th"){sc+=5;hit.push("タイ語で接客")}
+  if(k.days&&k.days.length){if(k.days.indexOf(sl.d.getDay())>=0){sc+=25;hit.push("希望の"+wdJ(sl.d)+"曜")}else miss.push("希望の曜日以外")}
+  if(k.after){if(st>=mins(k.after))sc+=5;else{miss.push(k.after+"より前");sc-=15}}
+  if(k.before){if(en<=mins(k.before)){sc+=5;hit.push(k.before+"までに終了")}else{miss.push(k.before+"を過ぎる");sc-=20}}
+  if(en>20*60){miss.push("閉店時間を過ぎる");sc-=40}
+  if(sl.busy){miss.push("予約あり");sc-=60}else hit.push("空きあり");
+  sc-=Math.round((sl.d-NOW)/864e5)*0.6;
+  res.push({sl:sl,s:sc,hit:hit,miss:miss});
+ });
+ return res.sort(function(a,b){return b.s-a.s||a.sl.d-b.sl.d}).slice(0,6);
+}
+
+/* ============================================================ free-text parser (pasted inquiries) */
+var DAYS_RE=[[1,/月曜|monday|mon\b|จันทร์/i],[2,/火曜|tuesday|tue\b|อังคาร/i],[3,/水曜|wednesday|wed\b|พุธ/i],[4,/木曜|thursday|thu\b|พฤหัส/i],[5,/金曜|friday|fri\b|ศุกร์/i],[6,/土曜|saturday|sat\b|เสาร์/i],[0,/日曜|sunday|sun\b|อาทิตย์/i]];
+function parse(t){
+ var th=/[฀-๿]/.test(t),ja=/[぀-ヿ一-鿿]/.test(t),lg=th?"th":ja?"ja":"en";
+ var k={type:/変更|ずらし|リスケ|reschedule|change my|เลื่อน/i.test(t)?"change":"new",customer:lg==="ja"?"お客様":lg==="th"?"ลูกค้า":"Guest",customerEn:"Guest",customerTh:"ลูกค้า",store:"",menus:[],days:[],after:"",before:"",female:/女性|female|woman|lady|ผู้หญิง/i.test(t),lang:lg,first:/初めて|はじめて|first time|ครั้งแรก/i.test(t)};
+ if(/カット|切り|haircut|\bcut\b|ตัด/i.test(t))k.menus.push("cut");
+ if(/カラー|白髪|染め|colou?r|ทำสี/i.test(t))k.menus.push("color");
+ if(/縮毛|矯正|ストレート|straighten|ยืด/i.test(t))k.menus.push("straight");
+ if(/スパ|head ?spa|สปา/i.test(t))k.menus.push("headspa");
+ if(/ネイル|nail|เล็บ/i.test(t))k.menus.push("nail");
+ if(/まつ|マツエク|lash|ขนตา/i.test(t))k.menus.push("lash");
+ if(!k.menus.length)k.menus=["cut"];
+ var st=/シラチャ|sriracha|ศรีราชา/i.test(t)?"シラチャ店":/トンロー|thong ?lo|ทองหล่อ/i.test(t)?"トンロー店":/プロンポン|phrom ?phong|พร้อมพงษ์/i.test(t)?"プロンポン店":"";
+ function can(storeK){return STAFFS.some(function(s){return s.store===storeK&&(!k.female||s.f)&&k.menus.every(function(m){return s.tags.indexOf(m)>=0})})}
+ if(!st||!can(st)){var ok=Object.keys(STORE).filter(can);if(!ok.length){k.menus=k.menus.slice(0,1);ok=Object.keys(STORE).filter(can)}st=(st&&ok.indexOf(st)>=0)?st:(ok[0]||"プロンポン店")}
+ k.store=st;
+ DAYS_RE.forEach(function(d){if(d[1].test(t))k.days.push(d[0])});
+ if(!k.days.length){if(/土日|週末|weekend|เสาร์-อาทิตย์|สุดสัปดาห์/i.test(t))k.days=[6,0];else if(/平日|weekday|วันธรรมดา/i.test(t))k.days=[1,2,3,4,5]}
+ var m;
+ if((m=t.match(/(\d{1,2})\s*(?:[:：]\s*(\d{2}))?\s*時?\s*(?:以降|から|過ぎ)|after\s*(\d{1,2})(?:[:.](\d{2}))?|หลัง\s*(\d{1,2})[:.]?(\d{2})?/i))){var hh=+(m[1]||m[3]||m[5]);if(hh&&hh<9&&!/am|午前/i.test(t))hh+=12;var mm=m[2]||m[4]||m[6]||"00";k.after=("0"+hh).slice(-2)+":"+mm}
+ if((m=t.match(/(\d{1,2})\s*時?\s*(?:まで|までに)|before\s*(\d{1,2})|ก่อน\s*(\d{1,2})/i))){var h2=+(m[1]||m[2]||m[3]);if(h2&&h2<9)h2+=12;k.before=("0"+h2).slice(-2)+":00"}
+ else if(/午前|morning|ตอนเช้า/i.test(t))k.before="13:00";
+ if(k.type==="change"){
+  var cand=STAFFS.filter(function(s){return s.store===k.store&&k.menus.every(function(x){return s.tags.indexOf(x)>=0})})[0]||STAFFS[0];
+  k.staff=cand.id;var sl=allSlots(10,k.menus).filter(function(s){return s.s.id===cand.id})[0];k.orig=ymd(sl?sl.d:ORIG);k.origT=sl?sl.t:cand.times[0];
+ }
+ var checks=[];
+ if(!k.days.length)checks.push(lg==="en"?"Preferred days and times":lg==="th"?"วันและเวลาที่สะดวก":"ご都合のよい曜日・時間帯");
+ checks.push(lg==="en"?"Your name and phone number":lg==="th"?"ชื่อและเบอร์โทรศัพท์":"お名前と電話番号");
+ if(k.menus.indexOf("color")>=0||k.menus.indexOf("straight")>=0)checks.push(lg==="en"?"When you last colored / straightened your hair":lg==="th"?"ทำสี/ยืดผมครั้งล่าสุดเมื่อไหร่":"前回のカラー・縮毛矯正の時期");
+ return {cond:k,checks:checks,addressee:lg==="en"?"Dear Guest":lg==="th"?"เรียนลูกค้า":"お客様"};
+}
+
+/* ============================================================ wording (ja / en / th) */
+var TX={
+ ja:{nwT:"ご予約のご案内（仮押さえ）",chT:"ご予約変更のご案内",by:"受付 "+STAFF,opt:function(i){return "第"+(i+1)+"候補"},cols:["","日時","メニュー","担当","店舗"],
+  lead:function(k){return k.type==="change"?cuL(k,"ja")+"様、"+mdw(origD(k))+" "+k.origT+"のご予約の変更、承知しました。以下の日時をご用意できます（仮押さえ済み）。":cuL(k,"ja")+"様のご予約を、以下の日時で仮押さえしました。ご都合のよい日時をお知らせください。"},
+  orig:"変更前のご予約",place:"店舗",time:"所要時間",timeV:function(m){return "約"+m+"分"},price:"料金の目安",first:"初回10%OFF",total:"合計（税・サービス料込み）",
+  cancel:"キャンセル・変更",cancelV:"前日20時までにLINE・メールでご連絡ください。当日のキャンセルは料金の50%を頂戴します。",note:"当日について",noteV:"ご予約の5分前にお越しください。カラーの方は、汚れてもよい服がおすすめです。",
+  foot:"ご都合が合わない場合は、ほかの日時もご用意します。仮押さえは"+mdw(addD(NOW,2))+"まで有効です。"},
+ en:{nwT:"Booking Options (on hold)",chT:"Rescheduling Options",by:"Front desk: "+STAFF_EN,opt:function(i){return "Option "+(i+1)},cols:["","Date & time","Menu","Stylist","Salon"],
+  lead:function(k){return k.type==="change"?"We have noted your request to change the booking on "+mdwEn(origD(k))+" at "+k.origT+". The times below are available (on hold).":"Thank you for contacting us. We have put the times below on hold for "+cuL(k,"en")+". Please let us know which one suits you."},
+  orig:"Current booking",place:"Salon",time:"Duration",timeV:function(m){return "About "+m+" min"},price:"Estimated price",first:"First visit 10% off",total:"Total (incl. tax & service)",
+  cancel:"Cancellation",cancelV:"Please contact us by 8 pm the day before. Same-day cancellations are charged 50%.",note:"On the day",noteV:"Please arrive 5 minutes early.",
+  foot:"If none of these times work, we will be happy to find another. Slots are held until "+mdwEn(addD(NOW,2))+"."},
+ th:{nwT:"ตัวเลือกวันเวลานัดหมาย (จองไว้ชั่วคราว)",chT:"ตัวเลือกการเลื่อนนัด",by:"ผู้รับจอง: "+STAFF_TH,opt:function(i){return "ตัวเลือกที่ "+(i+1)},cols:["","วันเวลา","เมนู","ช่าง","สาขา"],
+  lead:function(k){return k.type==="change"?"รับทราบการขอเลื่อนนัดวัน"+mdwTh(origD(k))+" เวลา "+k.origT+" ค่ะ เราได้จองเวลาด้านล่างไว้ให้ชั่วคราวค่ะ":"ขอบคุณที่ติดต่อเราค่ะ เราได้จองเวลาด้านล่างไว้ชั่วคราวสำหรับ"+cuL(k,"th")+" กรุณาแจ้งวันเวลาที่สะดวกค่ะ"},
+  orig:"นัดเดิม",place:"สาขา",time:"ระยะเวลา",timeV:function(m){return "ประมาณ "+m+" นาที"},price:"ราคาโดยประมาณ",first:"ลูกค้าใหม่ลด 10%",total:"รวม (รวมภาษีและค่าบริการ)",
+  cancel:"การยกเลิก",cancelV:"กรุณาแจ้งภายใน 20:00 ของวันก่อนนัด หากยกเลิกในวันนัดจะมีค่าบริการ 50%",note:"ในวันนัด",noteV:"กรุณามาก่อนเวลานัด 5 นาทีค่ะ",
+  foot:"หากวันเวลาไม่สะดวก ยินดีจัดเวลาอื่นให้ค่ะ จองไว้ชั่วคราวถึงวัน"+mdwTh(addD(NOW,2))}
+};
+function slotLine(sl,lg){return dl(sl.d,lg)+" "+sl.t+"–"+sl.e}
+
+/* ============================================================ reviews (all fictional) */
+var REVIEWS=[
+ {id:"R1",site:"Google",stars:5,who:"Y. K.（サンプル）",when:stamp(addD(NOW,-1),"19:12"),lang:"ja",store:"プロンポン店",
+  text:"バンコクに来て初めてカラーをお願いしました。日本語で細かく相談できて安心でした。高橋さんの仕上がりも日本と変わらずきれいで、また来ます。",
+  reply:{ja:"Y. K.様\nこのたびはご来店、そして口コミをありがとうございます。初めてのカラーをお任せいただき、スタッフ一同とてもうれしく思っております。高橋にも伝えました。\n色の持ちや次回の時期など、気になることがあればLINEでお気軽にご相談ください。またのご来店をお待ちしております。\n\n"+"{B}"}},
+ {id:"R2",site:"Google",stars:3,who:"Daniel R. (sample)",when:stamp(addD(NOW,-2),"14:40"),lang:"en",store:"トンロー店",
+  text:"The nails look great, but I had to wait about 20 minutes after my booking time. A message would have been nice.",
+  tr:"（訳）ネイルの仕上がりはよかったが、予約時間から20分ほど待たされた。連絡がほしかった。",
+  reply:{en:"Dear Daniel,\nThank you for your visit and for your honest feedback. We are very sorry that you had to wait about 20 minutes without any notice. The previous appointment ran over, and we should have messaged you.\nFrom now on, we will send a LINE/SMS message whenever we are running more than 10 minutes late. We hope to welcome you again.\n\n{B}",ja:"（日本語訳）\nDaniel様\nご来店とご意見をありがとうございます。ご連絡なしに約20分お待たせしてしまい、申し訳ございませんでした。前のご予約が延びてしまったことが原因で、ご連絡を差し上げるべきでした。\n今後は10分以上遅れる場合に、LINE・SMSでお知らせいたします。またのご来店をお待ちしております。"}},
+ {id:"R3",site:"Facebook",stars:5,who:"Khun Fon (sample)",when:stamp(addD(NOW,-3),"21:05"),lang:"th",store:"トンロー店",
+  text:"ช่างนัมต่อขนตาสวยมาก ธรรมชาติ ไม่เจ็บเลยค่ะ ร้านสะอาด จะกลับมาอีกแน่นอน",
+  tr:"（訳）ナムさんのまつげエクステがとてもきれいで自然。まったく痛くなかった。お店も清潔。また必ず来ます。",
+  reply:{th:"ขอบคุณคุณฝนมากค่ะ ดีใจที่ชอบขนตาที่ช่างนัมต่อให้นะคะ ทางร้านได้แจ้งช่างนัมแล้วค่ะ\nแนะนำให้มาเติมขนตาประมาณ 3-4 สัปดาห์ จองผ่าน LINE ได้เลยค่ะ แล้วพบกันใหม่นะคะ\n\n{B}",ja:"（日本語訳）\nフォン様、ありがとうございます。ナムのまつげエクステを気に入っていただけてうれしいです。ナムにも伝えました。\nリペアは3〜4週間後がおすすめです。LINEからご予約いただけます。またお会いできるのを楽しみにしております。"}},
+ {id:"R4",site:"Google",stars:4,who:"M. T.（サンプル）",when:stamp(addD(NOW,-4),"12:30"),lang:"ja",store:"シラチャ店",
+  text:"カットはとても満足です。ただ、駐車場の場所が分かりにくく少し迷いました。",
+  reply:{ja:"M. T.様\nご来店と口コミをありがとうございます。カットにご満足いただけてうれしいです。\n駐車場が分かりにくく、ご不便をおかけしました。次回からは、ご予約の確認メッセージに駐車場の地図をお付けします。\nまたのご来店をお待ちしております。\n\n{B}"}}
+];
+function RV(id){for(var i=0;i<REVIEWS.length;i++)if(REVIEWS[i].id===id)return REVIEWS[i];return null}
+function rvReply(r){return String(r.reply[r.lang]||"").replace("{B}",(r.lang==="ja"?BRAND+"　スタッフ一同":BRAND_EN))}
+
+/* ============================================================ state */
+var KEY="nova-beauty-ws-v1:"+BRAND;
+function fresh(){
+ var mails=CASES.map(function(c){var ch=c.cond.type==="change";return {id:"M"+c.id,folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:c.date,subject:c.subject,body:c.body,tr:c.tr||"",tags:[{t:ch?"予約の変更":"予約の依頼",k:ch?"amber":"green"},{t:c.tag,k:c.cond.lang==="ja"?"gray":"blue"}],caseId:c.id,unread:true}});
+ mails.reverse();
+ var posts=[
+  {id:"S1",kind:"notice",status:"posted",ch:"line",aud:"all",when:stamp(addD(NOW,-2),"18:00"),auto:false},
+  {id:"S2",kind:"campaign",status:"draft",ch:"instagram",aud:"all",when:"",auto:true,why:"季節から"},
+  {id:"S3",kind:"vacancy",status:"draft",ch:"line",aud:"pp",when:"",auto:true,why:"予約表の空きから"}
+ ];
+ var rv={};REVIEWS.forEach(function(r){rv[r.id]={status:"new",text:""}});
+ return {view:"mail",folder:"inbox",selMail:mails[0].id,selCase:"C1",ptab:"cond",cases:{},custom:{},mails:mails,posts:posts,selPost:"S2",lang:"ja",rv:rv,selRv:"R2",auto:{draft:true,weekly:true,remind:true,approve:true,review:true},seq:1,seen:false,compose:null};
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+if(!state||!state.mails||!state.posts||!state.rv)state=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cs(id){if(!state.cases[id])state.cases[id]={step:0,extracted:false,picked:[],share:"none",attached:false,sent:false,booking:null};return state.cases[id]}
+
+/* ============================================================ toast / modal */
+var toastT;
+function toast(msg){var el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},3400)}
+function modal(html){var bg=document.createElement("div");bg.className="modal-bg";bg.innerHTML='<div class="modal" role="dialog" aria-modal="true">'+html+'</div>';bg.addEventListener("click",function(e){if(e.target===bg||e.target.closest("[data-close]"))bg.remove()});document.body.appendChild(bg);return bg}
+
+/* ============================================================ render: shell */
+function allCases(){return CASES.concat(Object.keys(state.custom).map(function(k){return state.custom[k]}))}
+function counts(){
+ return {inbox:state.mails.filter(function(m){return m.folder==="inbox"&&m.unread}).length,
+  open:allCases().filter(function(c){var s=cs(c.id);return !(s.booking&&s.booking.confirmed)}).length,
+  drafts:state.posts.filter(function(p){return p.status==="draft"}).length,
+  rv:REVIEWS.filter(function(r){return state.rv[r.id]&&state.rv[r.id].status!=="posted"}).length};
+}
+var VIEWS={
+ mail:{t:"メール",d:"お客様からのご予約・変更のご連絡を受けて、空き枠のご案内を添えて返信するまで。"},
+ desk:{t:"予約の受付",d:"依頼の読み取り、予約表の空き枠との照合と仮押さえ、担当スタッフへの共有、ご案内づくりまで。"},
+ sns:{t:"LINE配信・SNS",d:"キャンペーン・空き枠のお知らせ・前日リマインドを、日本語・タイ語・英語で作って決まった時間に配信。"},
+ review:{t:"口コミ返信",d:"Google・Facebookの口コミに、書かれた言葉に合わせた返信の案を作り、確認してから公開。"}
+};
+function render(){
+ var n=counts(),v=VIEWS[state.view]||VIEWS.mail;
+ var nav='<button data-view="mail" class="'+(state.view==="mail"?"active":"")+'">'+IC.mail+'メール<span class="count '+(n.inbox?"hot":"")+'">'+(n.inbox||"")+'</span></button>'+
+  '<button data-view="desk" class="'+(state.view==="desk"?"active":"")+'">'+IC.book+'予約の受付<span class="count">'+(n.open||"")+'</span></button>'+
+  '<button data-view="sns" class="'+(state.view==="sns"?"active":"")+'">'+IC.share+'LINE配信・SNS<span class="count">'+(n.drafts||"")+'</span></button>'+
+  '<button data-view="review" class="'+(state.view==="review"?"active":"")+'">'+IC.star+'口コミ返信<span class="count">'+(n.rv||"")+'</span></button>';
+ var html='<header class="topbar"><div class="brand"><div class="brand-symbol">'+esc(BRAND.charAt(0))+'</div><div><b>'+esc(BRAND)+'</b><small>SALON WORKSPACE</small></div></div>'+
+  '<div class="crumb">ワークスペース　/　'+v.t+'</div><span class="demo-pill">DEMO<span class="long"> · 実際には送信しません</span></span>'+
+  '<button class="help" data-act="help">'+IC.help+'<span>使い方</span></button></header>'+
+  '<div class="layout"><nav class="nav" aria-label="ワークスペース"><div class="nav-label">WORKSPACE</div>'+nav+
+  '<div class="nav-bottom"><button data-act="board">'+IC.list+'予約表・空き状況</button><button data-act="reset">'+IC.reset+'デモをリセット</button>'+
+  '<div class="note">● このブラウザに自動保存<br>お客様・スタッフ・口コミはすべて架空のサンプルです</div></div></nav>'+
+  '<main class="workspace"><div class="mobile-tabs">'+nav+'<button data-act="board">予約表</button><button data-act="help">使い方</button><button data-act="reset">リセット</button></div>'+
+  '<div class="ws-head"><div><h1>'+v.t+'</h1><p>'+v.d+'</p></div><div class="head-actions">'+headActions()+'</div></div>'+
+  (state.view==="mail"?viewMail():state.view==="desk"?viewDesk():state.view==="review"?viewReview():viewSns())+'</main></div>';
+ $("#app").innerHTML=html;
+ save();
+}
+function headActions(){
+ if(state.view==="mail")return '<button class="btn-i" data-act="paste">'+IC.plus+'問い合わせを貼り付けて試す</button>';
+ if(state.view==="desk")return '<button class="btn-i" data-act="gomail">'+IC.mail+'関連メール</button>';
+ if(state.view==="review")return '<span class="tiny muted">サンプルの口コミ '+REVIEWS.length+' 件</span>';
+ return '<button class="btn-i" data-act="newpost">'+IC.plus+'配信を作る</button>';
+}
+
+/* ============================================================ view: mail */
+function viewMail(){
+ var f=state.folder,list=state.mails.filter(function(m){return m.folder===f});
+ var rows=list.map(function(m){
+  return '<button class="row '+(m.id===state.selMail?"active":"")+'" data-mail="'+m.id+'"><div class="row-top">'+(m.unread?'<span class="dot"></span>':'')+'<b>'+esc(f==="inbox"?m.from:"宛先："+(m.toName||m.addr))+'</b><time>'+esc(m.date)+'</time></div><div class="subj">'+esc(m.subject)+'</div><div class="snip">'+esc(m.body.slice(0,90))+'</div><div class="row-foot">'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join("")+(m.attach?'<span class="badge green">添付あり</span>':'')+'</div></button>';
+ }).join("")||'<div class="empty"><div><p class="tiny">'+(f==="sent"?"送信済みのメールはまだありません":f==="draft"?"下書きはありません":"受信メールはありません")+'</p></div></div>';
+ var tabs=[["inbox","受信箱"],["sent","送信済み"],["draft","下書き"]].map(function(t){var c=state.mails.filter(function(m){return m.folder===t[0]}).length;return '<button data-folder="'+t[0]+'" class="'+(f===t[0]?"active":"")+'">'+t[1]+(c?" "+c:"")+'</button>'}).join("");
+ var sel=state.mails.filter(function(m){return m.id===state.selMail&&m.folder===f})[0]||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools"><div class="tabs">'+tabs+'</div></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルメール / 外部のメール・LINEとは接続していません</div></section>'+
+  '<section class="detail">'+(sel?mailDetail(sel):'<div class="empty"><div><div class="em-i">'+IC.mail+'</div><h3>メールを選んでください</h3></div></div>')+'</section></div>';
+}
+function mailDetail(m){
+ if(m.unread){m.unread=false;setTimeout(function(){save()},0)}
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(m.subject)+'</h2><div>'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join(" ")+'</div></div>'+
+  '<div class="sender"><div class="avatar">'+esc(m.init||"?")+'</div><div><b>'+esc(m.folder==="inbox"?m.from:BRAND+" "+STAFF)+'</b><span>'+esc(m.folder==="inbox"?m.addr:"宛先："+m.addr)+'</span></div><time>'+esc(m.date)+'</time></div>'+
+  '<div class="mail-body">'+esc(m.body)+(m.tr?'<span class="trn">'+esc(m.tr)+'</span>':'')+'</div>';
+ if(m.attach)h+='<div class="actions"><span class="attach">'+IC.doc+esc(m.attach)+'</span><button class="small" data-act="viewdoc" data-case="'+m.caseId+'">開く</button></div>';
+ if(m.folder==="inbox"&&m.caseId&&C(m.caseId)){
+  var st=cs(m.caseId),k=C(m.caseId).cond;
+  if(m.kind==="confirm"){
+   var b=st.booking;
+   h+='<div class="actions"><button class="primary btn-i" data-act="confirm" data-case="'+m.caseId+'" '+(b&&b.made?"disabled":"")+'>'+IC.cal+(b&&b.made?"予約を確定済み":"予約を確定して返信を作る")+'</button><span class="tiny muted">返信から希望の日時を読み取り、確認メールと前日のLINEリマインドを作ります</span></div>';
+  }else{
+   var lab=k.type==="change"?"予約変更":"予約";
+   h+='<div class="actions"><button class="primary btn-i" data-act="todesk" data-case="'+m.caseId+'">'+IC.book+(st.extracted?lab+"の受付の続きを開く":"このメールから"+lab+"の受付を作る")+'</button><span class="tiny muted">'+(st.sent?"ご案内を送信済みです":"内容の読み取り → 空き枠の照合・仮押さえ → ご案内と返信")+'</span></div>';
+  }
+  h+=replyBox(m);
+ }
+ if(m.folder==="draft")h+=replyBox(m,true);
+ h+='</div>';
+ return h;
+}
+function docName(c){var k=c.cond,ch=k.type==="change";if(k.lang==="ja")return (ch?"ご予約変更のご案内_":"ご予約のご案内_")+k.customer.replace(/\s/g,"")+"様.pdf";return (ch?"Reschedule_":"Booking_")+String(k.customerEn||"Guest").replace(/[^A-Za-z0-9]+/g,"_")+".pdf"}
+function replyBox(m,isDraft){
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ var d=state.compose&&state.compose.mail===m.id?state.compose:null;
+ if(!d){
+  var body="",att=null,subj="Re: "+m.subject.replace(/^Re:\s*/,"");
+  if(isDraft){body=m.body;att=m.attach;subj=m.subject}
+  else if(st&&st.attached&&!st.sent&&m.kind!=="confirm"){body=replyMail(c,st);att=docName(c)}
+  d={mail:m.id,to:m.addr,subject:subj,body:body,attach:att};
+ }
+ var canInsert=st&&st.share==="ok"&&!st.sent&&m.kind!=="confirm";
+ return '<div class="reply" id="replyBox" data-attach="'+esc(d.attach||"")+'"><div class="reply-h">↩ 宛先 <input id="rTo" value="'+esc(d.to)+'" aria-label="宛先"><button class="small btn-i" data-act="insertdoc" data-mail="'+m.id+'" '+(canInsert?"":"disabled")+' title="予約の受付で作ったご案内を添付し、本文を作ります">'+IC.clip+(st&&st.attached?"ご案内を添付済み":"作成中のご案内を挿入")+'</button></div>'+
+  '<div class="reply-h" style="background:#fff">件名 <input id="rSubj" value="'+esc(d.subject)+'" aria-label="件名"></div>'+
+  '<textarea id="rBody" aria-label="本文" placeholder="'+(st&&!st.attached&&m.kind!=="confirm"?"「予約の受付」でご案内を作ると、ここに返信の本文が入ります":"本文")+'">'+esc(d.body)+'</textarea>'+
+  '<div class="reply-f">'+(d.attach?'<span class="attach">'+IC.doc+esc(d.attach)+'</span>':'<span class="tiny muted">添付なし</span>')+'<span style="flex:1"></span><button data-act="savedraft" data-mail="'+m.id+'">下書き保存</button><button class="primary btn-i" data-act="send" data-mail="'+m.id+'">'+IC.send+'送信（デモ）</button></div></div>';
+}
+
+/* ============================================================ view: desk (予約の受付) */
+function statusOf(st){return st.booking&&st.booking.confirmed?["予約確定","green"]:st.sent?["ご案内済み","green"]:st.step>=1?["対応中","amber"]:["未着手","gray"]}
+function dayTxt(k){return (k.days.length?k.days.map(function(d){return "日月火水木金土"[d]}).join("・")+"曜":"曜日未定")+(k.after?" "+k.after+"以降":"")+(k.before?" "+k.before+"まで":"")}
+function viewDesk(){
+ var list=allCases();
+ var rows=list.map(function(c,i){var st=cs(c.id),lab=statusOf(st),k=c.cond;
+  return '<button class="row '+(c.id===state.selCase?"active":"")+'" data-case="'+c.id+'"><div class="row-top"><b>'+esc(k.customer)+' 様</b><span class="badge '+lab[1]+'">'+lab[0]+'</span></div><div class="subj">'+(k.type==="change"?"変更：":"新規：")+esc(menuL(k.menus,"ja"))+'</div><div class="snip">'+esc(k.store+" / "+dayTxt(k)+" / "+({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+"で連絡")+'</div><div class="row-foot"><span class="badge gray">'+(c.custom?"貼り付けた問い合わせ":"事例"+(i+1)+" · "+esc(c.tag))+'</span></div></button>'}).join("");
+ var c=C(state.selCase)||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">予約の依頼・変更を選択</b> <span class="badge gray">'+list.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">読み取りは4事例を使ったデモ再現です（貼り付けた問い合わせは簡易読み取り）</div></section>'+
+  '<section class="detail">'+caseDetail(c)+'</section></div>';
+}
+function caseDetail(c){
+ var st=cs(c.id),k=c.cond,ch=k.type==="change";
+ var stepLab=["内容を読み取る","空き枠の照合・仮押さえ","ご案内と返信"];
+ var steps=stepLab.map(function(s,i){var cl=st.step>i+1||(i===2&&st.attached)?"done":(st.step===i+1||(st.step===0&&i===0))?"cur":"";return '<button class="step '+cl+'" data-ptab="'+["cond","slot","doc"][i]+'"><i>'+(i+1)+'</i>'+s+'</button>'}).join("");
+ var tabs=[["cond","依頼の内容"],["slot","空き枠・仮押さえ"],["doc","ご案内"],["mail","元のメール"]].map(function(t){return '<button data-ptab="'+t[0]+'" class="'+(state.ptab===t[0]?"active":"")+'">'+t[1]+'</button>'}).join("");
+ var lab=statusOf(st);
+ var h='<div class="detail-inner"><div class="p-head"><div><h2>'+(ch?"予約変更":"新規予約")+'：'+esc(k.customer)+' 様</h2><div class="meta">No. '+c.id+' · '+esc(k.store)+' · 受付 '+STAFF+'</div></div><span class="badge '+lab[1]+'">'+lab[0]+'</span></div>'+
+  '<div class="steps">'+steps+'</div><div class="ptabs">'+tabs+'</div>';
+ if(state.ptab==="mail")h+='<div class="card"><div class="mail-body" style="border:0;padding:0">'+esc(c.body)+(c.tr?'<span class="trn">'+esc(c.tr)+'</span>':'')+'</div></div>';
+ else if(!st.extracted)h+='<div class="empty"><div><div class="em-i">'+IC.spark+'</div><h3>メールから'+(ch?"予約変更のご連絡":"ご予約の依頼")+'を読み取ります</h3><p class="tiny">お客様・店舗・メニュー・希望の曜日と時間・担当の希望・連絡に使う言葉を取り出し、<br>足りない情報は「確認したいこと」にまとめます。タイ語・英語のメッセージにも対応します。</p><button class="primary btn-i" data-act="extract" data-case="'+c.id+'">'+IC.spark+'内容を読み取る</button></div></div>';
+ else if(state.ptab==="cond")h+=condTab(c,st);
+ else if(state.ptab==="slot")h+=slotTab(c,st);
+ else h+=docTab(c,st);
+ h+='</div>';
+ var picked=st.picked.map(slotByKey);
+ h+='<div class="foot-bar"><span class="sum">'+(st.extracted?"候補 "+picked.length+" 枠"+(picked[0]?"（第1候補 "+mdw(picked[0].d)+" "+picked[0].t+"）":"")+" ／ "+(st.share==="ok"?"仮押さえ・担当共有済み":st.share==="asking"?"担当に共有中…":"未仮押さえ"):"内容を読み取ってください")+'</span>'+
+  '<button class="btn-i" data-act="viewdoc" data-case="'+c.id+'" '+(st.share==="ok"?"":"disabled")+'>'+IC.doc+'ご案内プレビュー</button>'+
+  '<button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.share==="ok"&&!st.sent?"":"disabled")+'>'+IC.send+(st.sent?"送信済み":"返信へ添付")+'</button></div>';
+ return h;
+}
+function condTab(c,st){
+ var k=c.cond,ch=k.type==="change",os=ch?SF(k.staff):null;
+ var rows=[["種別",ch?"予約の変更":"新規のご予約"+(k.first?"（初めてのご来店）":"")],["お客様",k.customer+" 様"],["店舗",k.store],["メニュー",menuL(k.menus,"ja")+"（約"+menuMin(k.menus)+"分）"]];
+ if(ch)rows.push(["変更前のご予約",mdw(origD(k))+" "+k.origT+"〜　"+menuL(k.menus,"ja")+"（担当 "+(os?os.name:"")+"）"]);
+ rows.push(["希望の曜日・時間",k.days.length||k.after||k.before?dayTxt(k):""],["担当の希望",ch&&os?"いつもの担当（"+os.name+"）":k.female?"女性スタッフ":"指名なし"],["連絡に使う言葉",({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+(k.lang!=="ja"?"（ご案内・返信も"+({en:"英語",th:"タイ語"})[k.lang]+"で作ります）":"")]);
+ var h='<div class="card"><h3>'+(ch?"予約変更の受付票":"ご予約の受付票")+'</h3><table class="kv">'+rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+(r[1]?esc(r[1]):'<span class="miss">記載なし</span>')+'</td></tr>'}).join("")+'</table>'+
+  '<div class="checklist"><b>確認したいこと（返信で質問します）</b><ul>'+c.checks.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div></div>';
+ if(ch)h+='<div class="card"><h3>来店履歴</h3><table><tr><th>日付</th><th>メニュー</th><th>担当</th><th>状態</th></tr><tr><td>'+mdw(origD(k))+' '+esc(k.origT)+'</td><td>'+esc(menuL(k.menus,"ja"))+'</td><td>'+esc(os?os.name:"")+'</td><td>'+(st.booking&&st.booking.confirmed?'<span class="badge gray">変更済み</span>':'<span class="badge amber">変更の依頼あり</span>')+'</td></tr><tr><td>'+mdw(addD(NOW,-31))+'</td><td>'+esc(menuL(k.menus,"ja"))+'</td><td>'+esc(os?os.name:"")+'</td><td><span class="badge gray">来店済み</span></td></tr></table><p class="tiny muted" style="margin:8px 0 0">今回の変更は前日20時より前のため、キャンセル料はかかりません。空いた枠は「LINE配信・SNS」の空き枠のお知らせに自動で載ります。</p></div>';
+ else h+='<div class="card"><h3>顧客カルテ（自動作成）</h3><p class="tiny" style="margin:0">「'+esc(k.customer)+'」様のカルテを作り、ご希望のメニュー・連絡先・使う言葉を登録しました。施術の記録（薬剤・色番号・デザイン写真）と次回のおすすめ時期もここに残ります。</p>'+(k.first?'<p class="tiny muted" style="margin:6px 0 0">● 初回のお客様のため、料金の目安に「初回10%OFF」を入れます</p>':'')+'</div>';
+ h+='<div class="actions"><button class="primary btn-i" data-ptab="slot">'+IC.cal+'予約表の空き枠と照合する</button><span class="tiny muted">向こう2週間の予約表（スタッフ'+STAFFS.length+'名）から条件に合う枠を探します</span></div>';
+ return h;
+}
+function dblock(sl){var hue=(STORE[sl.s.store]||{hue:335}).hue;return '<div class="dblock" style="background:linear-gradient(135deg,hsl('+hue+',42%,56%),hsl('+((hue+30)%360)+',40%,38%))"><span class="dd">'+md(sl.d)+'</span><span class="dw">'+wdJ(sl.d)+'曜</span><span class="dt">'+sl.t+'〜'+sl.e+'</span></div>'}
+function staffMsg(sl,k){
+ var s=sl.s,ch=k.type==="change",who=k.customer+"様";
+ if(s.tl==="th")return {txt:"ช่าง"+s.en+" ค่ะ วัน"+mdwTh(sl.d)+" "+sl.t+"-"+sl.e+" มีลูกค้า"+(ch?"เลื่อนนัด":"ใหม่")+" 1 ท่าน ("+cuL(k,"th")+") เมนู "+menuL(k.menus,"th")+" ขอจองคิวไว้ชั่วคราวนะคะ",tr:"（訳）"+md(sl.d)+" "+sl.t+"〜"+sl.e+"に"+(ch?"予約変更の":"新規の")+"お客様（"+who+"）、"+menuL(k.menus,"ja")+"で仮押さえします。"};
+ return {txt:s.name+"さん\nお疲れさまです、"+STAFF+"です。"+mdw(sl.d)+" "+sl.t+"〜"+sl.e+"に"+(ch?"予約変更の":"新規の")+"お客様（"+who+"・"+menuL(k.menus,"ja")+"）を仮押さえしました。"+(ch?"元の"+md(origD(k))+" "+k.origT+"の枠は確定後に空けます。":"確定したらまたお知らせします。"),tr:""};
+}
+function staffReply(sl,k){
+ if(sl.s.tl==="th")return {txt:"รับทราบค่ะ ว่างค่ะ 👍",tr:"（訳）了解です。空いています。"};
+ return {txt:"了解です。"+(k.type==="change"?"前回のデザインの写真を用意しておきます。":k.menus.indexOf("color")>=0?"カラーの相談の時間も取っておきます。":"準備しておきます。"),tr:""};
+}
+function slotTab(c,st){
+ var k=c.cond,list=match(k);
+ if(!list.length)return '<div class="card"><h3>条件に合う空き枠が見つかりません</h3><p class="tiny muted">返信では、近い曜日・時間や別の店舗をご提案します。</p></div>';
+ var h='<div class="card" style="padding:12px 16px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><b style="font-size:13px">予約表から '+list.length+' 枠が条件に合いました</b><span class="tiny muted">候補に入れた枠（最大3つ）を仮押さえし、担当スタッフにLINEで共有します</span><span style="flex:1"></span><button class="small btn-i" data-act="hold" data-case="'+c.id+'" '+(st.picked.length&&st.share==="none"?"":"disabled")+'>'+IC.chat+(st.share==="none"?"仮押さえして担当に共有":"共有済み")+'</button></div></div><div class="cands">';
+ list.forEach(function(r){
+  var sl=r.sl,full=sl.busy,i=st.picked.indexOf(sl.key);
+  h+='<div class="cand '+(full?"full off":"")+'">'+dblock(sl)+'<div><div class="cand-h"><b>'+esc(sl.s.name)+'（'+esc(sl.s.role)+'）</b><span class="tiny muted">'+esc(sl.s.store)+'</span><span style="flex:1"></span>'+(i>=0?'<span class="rank">'+TX.ja.opt(i)+'</span>':'')+'</div>'+
+   '<div class="spec">'+mdw(sl.d)+' '+sl.t+'〜'+sl.e+' · '+esc(menuL(k.menus,"ja"))+' · <span class="seat" style="color:'+(full?"var(--red)":"var(--green)")+'">'+(full?"予約あり":"空き")+'</span> · 一致度 '+Math.max(1,Math.min(99,Math.round(r.s)))+'</div>'+
+   '<div class="chips">'+r.hit.map(function(x){return '<span class="chip">'+esc(x)+'</span>'}).join("")+r.miss.map(function(x){return '<span class="chip no">'+esc(x)+'</span>'}).join("")+'</div>'+
+   '<div class="owner"><label class="tiny" style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-pick="'+esc(sl.key)+'" data-case="'+c.id+'" '+(i>=0?"checked":"")+' '+(full?"disabled":"")+'>'+(full?"予約が入っているため選べません（キャンセル待ちに登録できます）":"候補に入れる")+'</label></div></div></div>';
+ });
+ h+='</div>';
+ if(st.share!=="none"){
+  h+='<div class="card"><h3>'+IC.chat+' 担当スタッフへのLINE共有</h3>';
+  st.picked.map(slotByKey).forEach(function(sl){var o=staffMsg(sl,k);h+='<div class="owner" style="flex-direction:column;border-top:0;margin-top:0"><div class="tiny muted">'+esc(sname(sl.s,"ja"))+'へ</div><div class="bubble out" style="white-space:pre-wrap">'+esc(o.txt)+(o.tr?'<span class="tr">'+esc(o.tr)+'</span>':'')+'</div>';
+   if(st.share==="ok"){var rp=staffReply(sl,k);h+='<div class="bubble in">'+esc(rp.txt)+(rp.tr?'<span class="tr">'+esc(rp.tr)+'</span>':'')+'</div>'}else h+='<div class="tiny muted">返信待ち…</div>';
+   h+='</div>'});
+  h+='</div>';
+ }
+ h+='<div class="actions"><button class="primary btn-i" data-ptab="doc" '+(st.share==="ok"?"":"disabled")+'>'+IC.doc+'ご案内を作る</button><span class="tiny muted">'+(st.share==="ok"?"仮押さえした "+st.picked.length+" 枠でご案内を作ります（"+({ja:"日本語",en:"英語",th:"タイ語"})[k.lang]+"）":"候補に入れた枠を仮押さえして、担当に共有してください")+'</span></div>';
+ return h;
+}
+function docHtml(c,st,forPrint){
+ var k=c.cond,lg=k.lang,T=TX[lg],ch=k.type==="change",sls=st.picked.map(slotByKey);
+ var h='<div class="doc" '+(forPrint?'id="printDoc"':'')+'><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h4>'+(ch?T.chT:T.nwT)+'</h4><div class="tiny muted">'+esc(brandL(lg))+' · '+esc(dl(NOW,lg))+' · '+esc(T.by)+'</div></div><div class="tiny muted" style="text-align:right">No. '+c.id+'</div></div>'+
+  '<div class="to">'+esc(c.addressee)+'</div><p class="lead">'+esc(T.lead(k))+'</p>';
+ if(ch)h+='<p style="font-size:12.5px;margin:0 0 10px"><b>'+esc(T.orig)+'：</b>'+esc(dl(origD(k),lg))+' '+esc(k.origT)+' '+esc(menuL(k.menus,lg))+'</p>';
+ h+='<div style="overflow-x:auto"><table><tr>'+T.cols.map(function(x){return '<th>'+esc(x)+'</th>'}).join("")+'</tr>'+sls.map(function(sl,i){return '<tr><td><b>'+esc(T.opt(i))+'</b></td><td>'+esc(slotLine(sl,lg))+'</td><td>'+esc(menuL(sl.menus,lg))+'</td><td>'+esc(sname(sl.s,lg))+'</td><td>'+esc(storeL(sl.s.store,lg))+'</td></tr>'}).join("")+'</table></div>';
+ var pr='<table style="margin-top:12px"><tr><th>'+esc(T.price)+'</th><th class="num">THB</th></tr>'+k.menus.map(function(m){return '<tr><td>'+esc(MENU[m][lg])+'</td><td class="num">'+fmt(MENU[m].p)+'</td></tr>'}).join("");
+ var tot=menuPrice(k.menus);if(k.first){var dc=Math.round(tot*0.1/10)*10;pr+='<tr><td>'+esc(T.first)+'</td><td class="num">−'+fmt(dc)+'</td></tr>';tot-=dc}
+ pr+='<tr class="total"><td>'+esc(T.total)+'</td><td class="num">'+fmt(tot)+'</td></tr></table>';
+ h+=pr;
+ var kv=[[T.place,addrL(k.store,lg)+((STORE[k.store]||{park:{}}).park[lg]?"／"+STORE[k.store].park[lg]:"")],[T.time,T.timeV(menuMin(k.menus))],[T.cancel,T.cancelV],[T.note,T.noteV]];
+ h+='<table class="kv" style="margin-top:12px">'+kv.map(function(r){return '<tr><th>'+esc(r[0])+'</th><td>'+esc(r[1])+'</td></tr>'}).join("")+'</table>';
+ h+='<p class="tiny muted" style="margin:10px 0 0">'+esc(T.foot)+'</p></div>';
+ return h;
+}
+function docTab(c,st){
+ if(st.share!=="ok")return '<div class="empty"><div><div class="em-i">'+IC.doc+'</div><h3>まだ仮押さえした枠がありません</h3><p class="tiny">「空き枠・仮押さえ」で枠を選び、仮押さえして担当に共有してください。</p><button data-ptab="slot">空き枠へ</button></div></div>';
+ if(st.step<3){st.step=3;setTimeout(function(){save()},0)}
+ return '<div class="card" style="background:#fdfafb">'+docHtml(c,st)+'</div><div class="actions"><button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.sent?"disabled":"")+'>'+IC.send+'ご案内を返信メールに添付</button><span class="tiny muted">メール画面に移り、ご案内付きの返信が入ります</span></div>';
+}
+
+function replyMail(c,st){
+ var k=c.cond,lg=k.lang,ch=k.type==="change",sls=st.picked.map(slotByKey),T=TX[lg],chk=c.checksMail||c.checks;
+ if(lg==="en"){
+  var s="Dear "+c.addressee.replace(/^Dear\s+/,"")+",\n\n"+(ch?"Thank you for letting us know.":"Thank you for your message.")+" This is "+STAFF_EN+" from "+BRAND_EN+".\n"+T.lead(k)+"\n\n";
+  sls.forEach(function(sl,i){s+="- "+T.opt(i)+": "+slotLine(sl,"en")+"  "+menuL(sl.menus,"en")+" with "+sl.s.en+" ("+storeL(sl.s.store,"en")+")\n"});
+  s+="\n"+(k.first?"As this is your first visit, you get 10% off. ":"")+"Prices and details are in the attached file.\n\nTo help us prepare, could you also let us know:\n";chk.forEach(function(x){s+="- "+x+"\n"});
+  return s+"\nBest regards,\n"+STAFF_EN+"\n"+BRAND_EN;
+ }
+ if(lg==="th"){
+  var t=c.addressee+"\n\nสวัสดีค่ะ "+STAFF_TH+" จาก "+BRAND_EN+" ค่ะ\n"+T.lead(k)+"\n\n";
+  sls.forEach(function(sl,i){t+="• "+T.opt(i)+": "+slotLine(sl,"th")+"  "+menuL(sl.menus,"th")+" ช่าง"+sl.s.en+" ("+storeL(sl.s.store,"th")+")\n"});
+  t+="\n"+(k.first?"ลูกค้าใหม่ลด 10% ค่ะ ":"")+"ราคาและรายละเอียดอยู่ในไฟล์แนบค่ะ\n\nรบกวนแจ้งข้อมูลต่อไปนี้ด้วยนะคะ\n";chk.forEach(function(x){t+="• "+x+"\n"});
+  return t+"\nขอบคุณค่ะ\n"+STAFF_TH+"\n"+BRAND_EN;
+ }
+ var j=c.addressee+"\n\n"+(ch?"いつもご来店いただき、ありがとうございます。":"お問い合わせいただき、ありがとうございます。")+BRAND+"の"+STAFF+"です。\n"+(ch?mdw(origD(k))+" "+k.origT+"のご予約の変更、承知しました。以下の日時をご用意できます（仮押さえしています）。":"以下の日時で、ご予約を仮押さえしました。")+"\n\n";
+ sls.forEach(function(sl,i){j+="・"+T.opt(i)+"　"+mdw(sl.d)+" "+sl.t+"〜"+sl.e+"　"+menuL(sl.menus,"ja")+"（担当 "+sl.s.name+"／"+sl.s.store+"）\n"});
+ j+="\n"+(k.first?"初めてのご来店のため、10%OFFでご案内します。料金の目安と駐車場は、添付のご案内をご覧ください。":"ご都合のよい日時をお知らせください。")+"\n\nあわせて、以下を教えていただけますと準備がしやすくなります。\n";chk.forEach(function(x){j+="・"+x+"\n"});
+ return j+"\nよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF;
+}
+function custReply(c,st){
+ var k=c.cond,lg=k.lang,sl=slotByKey(st.picked[0]);
+ if(c.custom)return genericReply(c,st);
+ if(lg==="en")return {body:"Thank you!\nOption 1 ("+slotLine(sl,"en")+") works for me. I'd like natural lashes and a simple one-color gel.\nNo contact lenses.\n\nSee you then,\nPim",tr:"（訳）ありがとうございます。第1候補（"+mdw(sl.d)+" "+sl.t+"）でお願いします。まつげは自然な感じ、ネイルは1色のシンプルなものを希望します。コンタクトはしていません。"};
+ if(lg==="th")return {body:"ขอบคุณค่ะ\nขอเป็นตัวเลือกที่ 1 วัน"+mdwTh(sl.d)+" "+sl.t+" นะคะ\nยืดผมครั้งล่าสุดประมาณ 8 เดือนก่อน อยากได้แบบธรรมชาติค่ะ\n\nศิริพร",tr:"（訳）第1候補の"+mdw(sl.d)+" "+sl.t+"でお願いします。前回の縮毛矯正は8か月ほど前です。自然な仕上がりを希望します。"};
+ if(k.type==="change")return {body:"早速ありがとうございます。\n"+mdw(sl.d)+" "+sl.t+"でお願いします。デザインは前回と同じ色で、オフもお願いします。\nよろしくお願いいたします。",tr:""};
+ return {body:"ご案内ありがとうございます。\n第1候補の"+mdw(sl.d)+" "+sl.t+"でお願いします。\n色は少し明るめのベージュ系を考えています（写真は当日お見せします）。前回のカラーは2か月前です。\nよろしくお願いいたします。",tr:""};
+}
+function genericReply(c,st){var k=c.cond,sl=slotByKey(st.picked[0]);
+ if(k.lang==="en")return {body:"Thank you! Option 1 ("+slotLine(sl,"en")+") works for me.\n\nBest regards",tr:"（訳）ありがとうございます。第1候補（"+mdw(sl.d)+" "+sl.t+"）でお願いします。"};
+ if(k.lang==="th")return {body:"ขอบคุณค่ะ ขอเป็นตัวเลือกที่ 1 วัน"+mdwTh(sl.d)+" "+sl.t+" นะคะ",tr:"（訳）ありがとうございます。第1候補の"+mdw(sl.d)+" "+sl.t+"でお願いします。"};
+ return {body:"ご案内ありがとうございます。\n第1候補の"+mdw(sl.d)+" "+sl.t+"でお願いします。\nよろしくお願いいたします。",tr:""};
+}
+function confirmMail(c,st){
+ var k=c.cond,lg=k.lang,sl=slotByKey(st.picked[0]),ch=k.type==="change";
+ if(lg==="en")return "Dear "+c.addressee.replace(/^Dear\s+/,"")+",\n\nThank you. Your booking is confirmed:\n\n- "+slotLine(sl,"en")+"  "+menuL(sl.menus,"en")+" with "+sl.s.en+"\n- "+addrL(sl.s.store,"en")+"\n\nWe will send you a reminder on LINE the day before. We look forward to seeing you!\n\n"+STAFF_EN+"\n"+BRAND_EN;
+ if(lg==="th")return c.addressee+"\n\nขอบคุณค่ะ ยืนยันการจองตามนี้ค่ะ\n\n• "+slotLine(sl,"th")+"  "+menuL(sl.menus,"th")+" ช่าง"+sl.s.en+"\n• "+addrL(sl.s.store,"th")+"\n\nเราจะส่งข้อความแจ้งเตือนทาง LINE ในวันก่อนนัดค่ะ\n\n"+STAFF_TH+"\n"+BRAND_EN;
+ return c.addressee+"\n\nご連絡ありがとうございます。以下の日時で"+(ch?"ご予約を変更しました（元の"+md(origD(k))+" "+k.origT+"のご予約は取り消しました）":"ご予約を確定しました")+"。\n\n・"+mdw(sl.d)+" "+sl.t+"〜"+sl.e+"　"+menuL(sl.menus,"ja")+"（担当 "+sl.s.name+"）\n・"+addrL(sl.s.store,"ja")+"\n\n前日にLINEで、お時間と場所をお知らせします。\n当日お会いできるのを楽しみにしております。\n\n"+BRAND+"　"+STAFF;
+}
+
+/* ============================================================ view: LINE / SNS */
+var AUD={all:"全会員（1,248名）",pp:"プロンポン店（612名）",tl:"トンロー店（398名）",sr:"シラチャ店（238名）",lapsed:"前回来店から2か月以上（174名）",one:"お客様1名（個別）"};
+var CHN={line:"LINE配信",instagram:"Instagram",facebook:"Facebook"};
+function freeSlots(store){var seen={},out=[];allSlots(7).forEach(function(s){var k=s.s.id+ymd(s.d);if(out.length<4&&s.s.store===store&&!s.busy&&!seen[k]){seen[k]=1;out.push(s)}});return out}
+function postTitle(p){
+ if(p.kind==="notice")return "臨時休業のお知らせ（"+md(ND)+"）";
+ if(p.kind==="campaign")return SEASON.ja+"キャンペーン";
+ if(p.kind==="vacancy")return "今週の空き枠："+({pp:"プロンポン店",tl:"トンロー店",sr:"シラチャ店"}[p.aud]||"プロンポン店");
+ if(p.kind==="style")return "スタイル紹介（施術例）";
+ if(p.kind==="remind"){var cc=C(p.caseId);return "前日リマインド："+(cc?cc.cond.customer+" 様":"")}
+ return "お知らせ";
+}
+function postText(p,ch,lg,v){
+ v=v||0;var tags=ch!=="line";
+ if(p.kind==="notice"){
+  if(lg==="th")return "【แจ้งวันหยุดพิเศษ】\nวัน"+mdwTh(ND)+" ร้านปิดทุกสาขา เนื่องจากอบรมพนักงาน\nลูกค้าที่จองไว้ในวันนั้น ทางร้านได้ติดต่อเลื่อนนัดเรียบร้อยแล้วค่ะ\n\n"+BRAND_EN;
+  if(lg==="en")return "[Notice] Closed on "+mdwEn(ND)+"\nAll salons will be closed for staff training.\nWe have already contacted guests with bookings on that day.\n\n"+BRAND_EN;
+  return "【臨時休業のお知らせ】\n"+mdw(ND)+"はスタッフ研修のため、全店休業いたします。\nこの日にご予約のお客様には、個別に変更のご連絡を差し上げています。\n\n"+BRAND;
+ }
+ if(p.kind==="campaign"){
+  var hk=[["受付中","残りわずか","LINE会員限定"],["Now on","Limited slots","LINE members only"],["เปิดจองแล้ว","คิวเหลือน้อย","เฉพาะสมาชิก LINE"]][lg==="ja"?0:lg==="en"?1:2][v%3];
+  var mn=MENU[SEASON.menu];
+  if(lg==="th")return "【"+SEASON.th+" "+hk+"】\n"+mn.th+" ลด 15% (ปกติ "+fmt(mn.p)+" บาท)\nทั้ง 3 สาขา พร้อมพงษ์ / ทองหล่อ / ศรีราชา\nช่างญี่ปุ่นและช่างไทย ให้คำปรึกษาได้ทั้งภาษาไทยและญี่ปุ่น\n\nจองผ่าน LINE ได้เลยค่ะ"+(tags?"\n\n#ร้านทำผมญี่ปุ่น #กรุงเทพ #ศรีราชา":"");
+  if(lg==="en")return "["+SEASON.en+" — "+hk+"]\n15% off "+mn.en.toLowerCase()+" (regular "+fmt(mn.p)+" THB)\nAt Phrom Phong, Thonglor and Sriracha.\nJapanese and Thai stylists — consult in English, Japanese or Thai.\n\nBook via LINE."+(tags?"\n\n#BangkokSalon #JapaneseSalon #Sriracha":"");
+  return "【"+SEASON.ja+" "+hk+"】\n"+mn.ja+"が15%OFF（通常 "+fmt(mn.p)+"バーツ）\nプロンポン店・トンロー店・シラチャ店で受付中です。\n日本人スタイリストが、日本と同じ薬剤・技術で仕上げます。\n\nご予約はLINEからどうぞ。"+(tags?"\n\n#バンコク美容室 #バンコク生活 #シラチャ #タイ駐在":"");
+ }
+ if(p.kind==="vacancy"){
+  var stK={pp:"プロンポン店",tl:"トンロー店",sr:"シラチャ店"}[p.aud]||"プロンポン店",fs=freeSlots(stK);
+  var lines=fs.map(function(s){return (lg==="th"?"• "+mdwTh(s.d):lg==="en"?"- "+mdwEn(s.d):"・"+mdw(s.d))+" "+s.t+"〜 "+(lg==="ja"?s.s.name:s.s.en)}).join("\n");
+  if(lg==="th")return "【คิวว่างสัปดาห์นี้ "+storeL(stK,"th")+"】\n"+lines+"\n\nตอบกลับแชทนี้เพื่อจองได้เลยค่ะ";
+  if(lg==="en")return "[Open slots this week — "+storeL(stK,"en")+"]\n"+lines+"\n\nReply to this chat to book.";
+  return "【今週の空き枠｜"+stK+"】\n"+lines+"\n\nこのトークに返信いただければ、そのままご予約できます。";
+ }
+ if(p.kind==="style"){
+  if(lg==="th")return "ผลงานล่าสุด ✂️\nทำสีเบจอ่อน + ตัดบ็อบยาวระดับไหล่\nสีสวยแม้อยู่กลางแดดเมืองไทย\n\nปรึกษาช่างได้ทาง LINE ค่ะ"+(tags?"\n\n#ทำสีผม #ร้านทำผมญี่ปุ่น":"");
+  if(lg==="en")return "Recent style ✂️\nSoft beige color + shoulder-length bob.\nA shade that stays pretty in the Thai sun.\n\nAsk our stylists on LINE."+(tags?"\n\n#BangkokHair #HairColor":"");
+  return ["スタイル紹介","施術例","今週のスタイル"][v%3]+" ✂️\n明るめベージュのカラー＋肩上ボブ。\nタイの強い日差しでも色が抜けにくい薬剤を使っています。\n\nご相談はLINEでお気軽にどうぞ。"+(tags?"\n\n#バンコク美容室 #ベージュカラー #ボブ":"");
+ }
+ if(p.kind==="remind"){
+  var cc=C(p.caseId),k=cc?cc.cond:{type:"new",customer:"",lang:"ja",menus:["cut"]},st=cc?cs(cc.id):null,sl=st&&st.picked[0]?slotByKey(st.picked[0]):allSlots(7)[0];
+  if(lg==="th")return "【แจ้งเตือนนัดพรุ่งนี้】\n"+cuL(k,"th")+"\n"+slotLine(sl,"th")+"\n"+menuL(sl.menus,"th")+" ช่าง"+sl.s.en+"\n📍 "+addrL(sl.s.store,"th")+"\nหากต้องการเลื่อนนัด ตอบกลับแชทนี้ได้เลยค่ะ";
+  if(lg==="en")return "[Reminder for tomorrow]\n"+cuL(k,"en")+"\n"+slotLine(sl,"en")+"\n"+menuL(sl.menus,"en")+" with "+sl.s.en+"\nPlace: "+addrL(sl.s.store,"en")+"\nReply here if you need to change the time.";
+  return "【明日のご予約のお知らせ】\n"+k.customer+" 様\n"+mdw(sl.d)+" "+sl.t+"〜"+sl.e+"　"+menuL(sl.menus,"ja")+"（担当 "+sl.s.name+"）\n場所："+addrL(sl.s.store,"ja")+"\n変更がある場合は、このトークにご返信ください。";
+ }
+ return "";
+}
+function slotsD(){var out=[];for(var i=0;i<14&&out.length<4;i++){var d=addD(NOW,i+1);if(d.getDay()===2||d.getDay()===5)out.push(d)}return out}
+function viewSns(){
+ var posts=state.posts;
+ var rows=posts.map(function(s){var b=s.status==="posted"?["配信済み","gray"]:s.status==="scheduled"?["予約済み","green"]:["下書き","amber"];
+  return '<button class="row '+(s.id===state.selPost?"active":"")+'" data-post="'+s.id+'"><div class="row-top"><b>'+esc(postTitle(s))+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div class="snip">'+esc(s.ch==="line"?"配信先："+AUD[s.aud||"all"]:CHN[s.ch]+"に投稿")+'</div><div class="row-foot"><span class="badge blue">'+CHN[s.ch]+'</span>'+(s.auto?'<span class="badge gray">自動作成：'+esc(s.why||"")+'</span>':'')+(s.when?'<span class="badge gray">'+esc(s.when)+'</span>':'')+'</div></button>'}).join("");
+ var s=posts.filter(function(x){return x.id===state.selPost})[0]||posts[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">配信・投稿</b> <span class="badge gray">'+posts.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">予約表やご予約の確定から、配信の下書きが自動でできます</div></section>'+
+  '<section class="detail">'+(s?postDetail(s):"")+'</section></div>';
+}
+function postDetail(s){
+ var lg=state.lang,txt=s.text||postText(s,s.ch,lg,s.v),ed=s.status==="draft",rem=s.kind==="remind",vac=s.kind==="vacancy";
+ var ch=[["line","LINE配信"],["instagram","Instagram"],["facebook","Facebook"]].map(function(x){return '<button data-ch="'+x[0]+'" class="'+(s.ch===x[0]?"on":"")+'" '+(!ed||rem?"disabled":"")+'>'+x[1]+'</button>'}).join("");
+ var lgs=[["ja","日本語"],["th","ไทย"],["en","English"]].map(function(x){return '<button data-lang="'+x[0]+'" class="'+(lg===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+ var audOpts=vac?[["pp","プロンポン"],["tl","トンロー"],["sr","シラチャ"]]:[["all","全体"],["pp","プロンポン"],["tl","トンロー"],["sr","シラチャ"],["lapsed","休眠"]];
+ var aud=(s.ch==="line"||vac)&&!rem?'<div class="seg" aria-label="配信先">'+audOpts.map(function(x){return '<button data-aud="'+x[0]+'" class="'+((s.aud||"all")===x[0]?"on":"")+'" '+(ed?"":"disabled")+'>'+x[1]+'</button>'}).join("")+'</div>':'';
+ var hue={notice:0,campaign:330,vacancy:200,remind:150,style:285}[s.kind]||330;
+ var cap={notice:"臨時休業",campaign:SEASON.ja,vacancy:"今週の空き枠",remind:"明日のご予約",style:"スタイル紹介"}[s.kind];
+ var ph='<div class="photo" style="background:linear-gradient(135deg,hsl('+hue+',42%,60%),hsl('+((hue+35)%360)+',40%,38%))">'+IC.bigsc+'<span>'+esc(cap+" · "+brandL(lg))+'</span></div>';
+ var prev=s.ch==="line"?'<div class="line-prev">'+(rem?"":ph)+'<div class="lb">'+esc(txt)+'</div></div>':'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><b>'+esc(BRAND)+'</b></div>'+ph+'<div class="tx">'+esc(txt)+'</div></div>';
+ var sl=slotsD().map(function(d){return '<option value="'+stamp(d,"12:00")+'">'+mdw(d)+' 12:00</option>'}).join("");
+ return '<div class="detail-inner"><div class="sns-grid"><div><div class="p-head"><div><h2>'+esc(postTitle(s))+'</h2><div class="meta">'+esc(s.ch==="line"?"配信先："+AUD[s.aud||"all"]:CHN[s.ch])+'</div></div></div>'+
+  '<div class="actions"><div class="seg">'+ch+'</div><div class="seg">'+lgs+'</div>'+aud+'<button class="small btn-i" data-act="regen" '+(ed?"":"disabled")+'>'+IC.spark+'文面を作り直す</button></div>'+prev+
+  '<div class="actions">'+(ed?'<select id="slot" aria-label="配信日時">'+sl+'</select><button class="primary btn-i" data-act="schedule">'+IC.cal+'この日時に予約</button><button data-act="postnow">今すぐ配信（デモ）</button>':s.status==="scheduled"?'<span class="badge green">'+esc(s.when)+' に配信予定</span><button class="small" data-act="unschedule">予約を取り消す</button>':'<span class="badge gray">'+esc(s.when)+' に配信済み</span>')+'</div></div>'+
+  '<div><div class="card" style="margin-top:0"><h3>'+IC.cal+' 配信カレンダー</h3>'+calendar()+'</div>'+
+  '<div class="card"><h3>自動運用のルール</h3>'+
+  '<label class="toggle"><input type="checkbox" data-auto="draft" '+(state.auto.draft?"checked":"")+'><span>予約の変更・キャンセルで空いた枠を「今週の空き枠」に載せて下書きする</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="weekly" '+(state.auto.weekly?"checked":"")+'><span>毎週 火・金 12:00 に、予約した配信を自動で送る</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="remind" '+(state.auto.remind?"checked":"")+'><span>前日 15:00 に、翌日ご予約のお客様へLINEでリマインドする</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="approve" '+(state.auto.approve?"checked":"")+'><span>配信の前に店長の確認を入れる</span></label>'+
+  '<p class="tiny muted" style="margin:6px 0 0">本番では、LINE・メールの予約や予約表の更新をもとに、この画面の操作なしで動きます。お客様の言葉（日本語・タイ語・英語）に合わせて送り分けます。</p></div></div></div></div>';
+}
+function calendar(){
+ var out="";
+ for(var i=-2;i<7;i++){var d=addD(NOW,i),key=md(d);
+  var its=state.posts.filter(function(s){return s.when&&s.when.split(" ")[0]===key});
+  out+='<div class="cal-day"><b>'+mdw(d)+(i===0?"　今日":"")+'</b>'+(its.length?its.map(function(s){return '<div class="it"><span class="badge '+(s.status==="posted"?"gray":"green")+'">'+esc(s.when.split(" ")[1])+'</span>'+esc(postTitle(s))+'</div>'}).join(""):'<div class="it muted">—</div>')+'</div>'}
+ return '<div class="cal">'+out+'</div>';
+}
+
+/* ============================================================ view: reviews */
+function stars(n){return '<span class="stars" aria-label="'+n+'つ星">'+"★★★★★".slice(0,n)+'<span style="color:#ddd">'+"★★★★★".slice(n)+'</span></span>'}
+function viewReview(){
+ var rows=REVIEWS.map(function(r){var s=state.rv[r.id]||{status:"new"},b=s.status==="posted"?["返信済み","gray"]:s.status==="draft"?["返信案あり","amber"]:["未返信","red"];
+  return '<button class="row '+(r.id===state.selRv?"active":"")+'" data-rv="'+r.id+'"><div class="row-top"><b>'+esc(r.who)+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div>'+stars(r.stars)+' <span class="tiny muted">'+esc(r.site)+' · '+esc(r.store)+'</span></div><div class="snip">'+esc(r.text)+'</div><div class="row-foot"><span class="badge '+(r.lang==="ja"?"gray":"blue")+'">'+({ja:"日本語",en:"英語",th:"タイ語"})[r.lang]+'</span><span class="badge gray">'+esc(r.when)+'</span></div></button>'}).join("");
+ var r=RV(state.selRv)||REVIEWS[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">口コミ</b> <span class="badge gray">'+REVIEWS.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルの口コミです / Google・Facebookとは接続していません</div></section>'+
+  '<section class="detail">'+rvDetail(r)+'</section></div>';
+}
+function rvDetail(r){
+ var s=state.rv[r.id]||(state.rv[r.id]={status:"new",text:""});
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(r.who)+' さんの口コミ</h2><div><span class="badge blue">'+esc(r.site)+'</span> <span class="badge gray">'+esc(r.store)+'</span></div></div>'+
+  '<div style="margin:0 0 10px">'+stars(r.stars)+' <span class="tiny muted">'+esc(r.when)+'</span></div><div class="rv-text">'+esc(r.text)+(r.tr?'<span class="trn">'+esc(r.tr)+'</span>':'')+'</div>';
+ if(s.status==="posted"){h+='<div class="rv-posted"><b class="tiny">'+esc(BRAND)+' からの返信（公開済み・デモ）</b>\n'+esc(s.text)+'</div></div>';return h}
+ if(s.status==="new"){h+='<div class="actions"><button class="primary btn-i" data-act="rvdraft" data-rv="'+r.id+'">'+IC.spark+'返信の案を作る</button><span class="tiny muted">口コミの言葉（'+({ja:"日本語",en:"英語",th:"タイ語"})[r.lang]+'）で、内容に合わせた返信を作ります'+(r.stars<=3?"。低めの評価のため、おわびと改善策を入れます":"")+'</span></div></div>';return h}
+ var tr=r.lang!=="ja"&&r.reply.ja?r.reply.ja:"";
+ h+='<div class="card rv-reply"><h3>返信の案（'+({ja:"日本語",en:"英語",th:"タイ語"})[r.lang]+'）</h3><textarea id="rvText" aria-label="返信の案">'+esc(s.text)+'</textarea>'+(tr?'<span class="trn">'+esc(tr)+'</span>':'')+
+  (r.stars<=3?'<div class="checklist"><b>店長への共有</b><ul><li>評価★'+r.stars+'の口コミのため、店長のLINEに内容と返信の案を送りました</li><li>改善策（10分以上遅れるときの連絡）を、スタッフの申し送りに追加しました</li></ul></div>':'')+
+  '<div class="actions"><button class="primary btn-i" data-act="rvpost" data-rv="'+r.id+'">'+IC.send+'返信を公開（デモ）</button><button data-act="rvredo" data-rv="'+r.id+'">案を作り直す</button></div></div></div>';
+ return h;
+}
+
+/* ============================================================ actions */
+function go(view){state.view=view;render();try{window.scrollTo(0,0)}catch(e){}}
+function openCase(id){state.selCase=id;var s=cs(id);state.ptab=s.extracted?(s.step>=3?"doc":s.step>=2?"slot":"cond"):"cond";go("desk")}
+function captureCompose(mailId){var to=$("#rTo"),sj=$("#rSubj"),b=$("#rBody");if(!to)return null;return {mail:mailId,to:to.value,subject:sj.value,body:b.value,attach:$("#replyBox").dataset.attach||null}}
+function addVacancyPost(caseId){
+ if(!state.auto.draft)return;var c=C(caseId);if(!c||c.cond.type!=="change")return;
+ var aud=(STORE[c.cond.store]||{aud:"pp"}).aud;
+ if(state.posts.some(function(s){return s.kind==="vacancy"&&s.aud===aud&&s.status==="draft"}))return;
+ state.posts.unshift({id:"S"+(++state.seq)+"v",kind:"vacancy",status:"draft",ch:"line",aud:aud,when:"",auto:true,why:"予約の変更から"});
+}
+function autoPick(c,st){if(st.picked.length)return;st.picked=match(c.cond).filter(function(r){return !r.sl.busy}).slice(0,2).map(function(r){return r.sl.key})}
+function hold(caseId){
+ var st=cs(caseId);if(!st.picked.length){toast("候補に入れる枠を選んでください");return}
+ st.share="asking";if(st.step<2)st.step=2;render();
+ setTimeout(function(){st.share="ok";render();toast("枠を仮押さえし、担当スタッフから返信がありました。ご案内を作れます")},1300);
+}
+function attachDoc(caseId){
+ var st=cs(caseId),c=C(caseId);if(st.share!=="ok"){toast("先に空き枠を仮押さえしてください");return}
+ var mid=state.mails.filter(function(m){return m.caseId===caseId&&m.folder==="inbox"&&m.kind!=="confirm"})[0];
+ if(!mid){toast("元のメールが見つかりません");return}
+ st.attached=true;st.step=3;
+ state.compose={mail:mid.id,to:mid.addr,subject:"Re: "+mid.subject,body:replyMail(c,st),attach:docName(c)};
+ state.folder="inbox";state.selMail=mid.id;go("mail");
+ setTimeout(function(){var r=$("#replyBox");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("ご案内を添付し、返信の本文を作りました。内容を確認して送信してください");
+}
+function sendMail(mailId){
+ var m=state.mails.filter(function(x){return x.id===mailId})[0],d=captureCompose(mailId);if(!d||!m)return;
+ if(!d.to.trim()||!d.body.trim()){toast("宛先と本文を入れてください");return}
+ var sent={id:"M"+(++state.seq)+"s",folder:"sent",from:BRAND,addr:d.to,toName:m.folder==="inbox"?m.from:m.toName,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:m.caseId,tags:[{t:"送信済み",k:"gray"}]};
+ state.mails.unshift(sent);state.compose=null;
+ if(m.folder==="draft")state.mails=state.mails.filter(function(x){return x.id!==m.id});
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ if(st&&c&&d.attach&&m.kind!=="confirm"&&!st.sent){st.sent=true;
+  setTimeout(function(){
+   var r=custReply(c,st);
+   state.mails.unshift({id:"M"+(++state.seq)+"r",folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:stamp(NOW,nowHM()),subject:"Re: "+d.subject.replace(/^Re:\s*/,""),body:r.body,tr:r.tr,caseId:c.id,kind:"confirm",tags:[{t:"日時の返信",k:"green"}],unread:true});
+   render();toast(c.from+" から返信が届きました（日時の希望）");
+  },3500);
+ }
+ if(st&&m.kind==="confirm"&&st.booking){st.booking.confirmed=true}
+ state.folder="sent";state.selMail=sent.id;render();toast("送信しました（デモのため、実際には送信していません）");
+}
+function confirmBooking(caseId,mailId){
+ var st=cs(caseId),c=C(caseId),m=state.mails.filter(function(x){return x.id===mailId})[0];if(!c||!m)return;
+ var sl=slotByKey(st.picked[0]);
+ st.booking={key:sl.key,made:true,confirmed:false};
+ if(state.auto.remind&&!state.posts.some(function(p){return p.kind==="remind"&&p.caseId===caseId}))
+  state.posts.unshift({id:"S"+(++state.seq)+"r",kind:"remind",caseId:caseId,status:"scheduled",ch:"line",aud:"one",when:stamp(addD(sl.d,-1),"15:00"),auto:true,why:"予約の確定から"});
+ if(c.cond.type==="change")addVacancyPost(caseId);
+ state.compose={mail:mailId,to:m.addr,subject:"Re: "+m.subject.replace(/^Re:\s*/,""),body:confirmMail(c,st),attach:null};
+ render();setTimeout(function(){var r2=$("#replyBox");if(r2&&r2.scrollIntoView)r2.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("予約を確定し、確認メールと前日のLINEリマインドを作りました");
+}
+function help(){
+ modal('<h3>このワークスペースの使い方</h3><p class="tiny muted">'+esc(BRAND)+'様の業務に近い形で動かせるデモです。お客様・スタッフ・口コミ・店舗はすべて架空のサンプルで、メールやLINEも実際には送信しません。</p>'+
+ '<ol><li><b>メール</b>：お客様からのご予約・変更の連絡を開き、「このメールから予約の受付を作る」を押します（タイ語・英語のメッセージも試せます）。</li><li><b>予約の受付</b>：①内容を読み取る → ②予約表の空き枠と照合し、仮押さえして担当スタッフにLINEで共有 → ③料金の目安付きのご案内を作る → 「返信へ添付」。</li><li><b>メール</b>：ご案内付きの返信を「送信（デモ）」すると、お客様から日時の返信が届きます。「予約を確定して返信を作る」で確認メールと前日のLINEリマインドまで作ります。</li><li><b>LINE配信・SNS</b>：キャンペーン・今週の空き枠・スタイル紹介を、日本語・タイ語・英語で作り、店舗ごとに配信を予約できます。</li><li><b>口コミ返信</b>：Google・Facebookの口コミに、書かれた言葉で返信の案を作ります。</li></ol>'+
+ (SERVICES.length?'<p class="tiny">想定した業務：'+SERVICES.map(esc).join("・")+'</p>':'')+
+ '<div class="cta-box"><b>このデモを、'+esc(BRAND)+'様の実際の予約表・顧客名簿・LINEで動かします。</b><br>Excel・Googleスプレッドシートの予約表、LINE公式アカウント、Gmail・Outlook、Googleビジネスプロフィールと連携できます。まずは30分、お困りの業務をお聞かせください。<br><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</div>'+
+ '<div class="actions" style="justify-content:flex-end"><button class="primary" data-close>はじめる</button></div>');
+}
+function boardModal(){
+ var bk=allCases().map(function(c){var st=cs(c.id);if(!st.booking)return "";var sl=slotByKey(st.booking.key);return '<tr><td>'+esc(c.cond.customer)+' 様</td><td>'+(c.cond.type==="change"?"変更":"新規")+'</td><td>'+mdw(sl.d)+' '+sl.t+'</td><td class="tiny">'+esc(menuL(sl.menus,"ja")+"／"+sl.s.name)+'</td><td>'+(st.booking.confirmed?'<span class="badge green">確定・連絡済み</span>':'<span class="badge amber">確認メール未送信</span>')+'</td></tr>'}).join("");
+ var days=[];for(var i=1;i<=7;i++)days.push(addD(NOW,i));
+ var grid='<div style="overflow-x:auto"><table><tr><th>スタッフ</th>'+days.map(function(d){return '<th class="tiny">'+mdw(d)+'</th>'}).join("")+'</tr>'+STAFFS.map(function(s){return '<tr><td class="tiny"><b>'+esc(s.name)+'</b><br>'+esc(s.store)+'</td>'+days.map(function(d){if(s.days.indexOf(d.getDay())<0)return '<td class="tiny muted">休み</td>';return '<td class="tiny">'+s.times.map(function(t){var b=booked(s,d,t);return '<span class="badge '+(b?"gray":"green")+'" style="margin:1px 0">'+t+(b?" 予約":" 空")+'</span>'}).join("<br>")+'</td>'}).join("")+'</tr>'}).join("")+'</table></div>';
+ modal('<h3>予約表・空き状況（サンプル スタッフ'+STAFFS.length+'名・向こう7日）</h3><p class="tiny muted">本番では、貴店のExcel・スプレッドシートの予約表や予約システムの内容をそのまま使います。</p>'+grid+
+  '<h3 style="margin-top:18px;font-size:14px">メニューと料金（サンプル）</h3><div style="overflow-x:auto"><table><tr><th>メニュー</th><th class="num">時間</th><th class="num">料金（THB）</th><th>対応スタッフ</th></tr>'+Object.keys(MENU).map(function(m){return '<tr><td>'+esc(MENU[m].ja)+'</td><td class="num">'+MENU[m].m+'分</td><td class="num">'+fmt(MENU[m].p)+'</td><td class="tiny">'+esc(STAFFS.filter(function(s){return s.tags.indexOf(m)>=0}).map(function(s){return s.name}).join("・"))+'</td></tr>'}).join("")+'</table></div>'+
+  '<h3 style="margin-top:18px;font-size:14px">受付からの予約</h3>'+(bk?'<div style="overflow-x:auto"><table><tr><th>お客様</th><th>種別</th><th>日時</th><th>メニュー／担当</th><th>状態</th></tr>'+bk+'</table></div>':'<p class="tiny muted">まだ確定した予約はありません。</p>')+
+  '<div class="actions" style="justify-content:flex-end"><button data-close>閉じる</button></div>');
+}
+function pasteModal(){
+ var bg=modal('<h3>問い合わせを貼り付けて試す</h3><p class="tiny muted">実際に届くメール・LINEに近い文面を貼り付けると、受信箱に追加して受付からご案内まで試せます（簡易読み取り・日本語／タイ語／英語）。</p><div class="paste"><textarea id="pasteText" aria-label="問い合わせの文面" placeholder="例）土曜の午前にカットとヘッドスパをお願いしたいです。プロンポン店で、女性のスタッフさんを希望します。"></textarea></div><div class="actions" style="justify-content:flex-end"><button data-close>キャンセル</button><button class="primary" id="pasteGo">受信箱に追加</button></div>');
+ $("#pasteGo",bg).onclick=function(){var t=$("#pasteText",bg).value.trim();if(!t)return;
+  var r=parse(t),id="X"+(++state.seq),from=r.cond.lang==="ja"?"お問い合わせ（貼り付け）":"Inquiry (pasted)";
+  state.custom[id]={id:id,custom:true,from:from,addr:"guest@example.com",init:"問",date:stamp(NOW,nowHM()),subject:t.split("\n")[0].slice(0,40),tag:"貼り付け",body:t,cond:r.cond,checks:r.checks,addressee:r.addressee};
+  state.mails.unshift({id:"M"+id,folder:"inbox",from:from,addr:"guest@example.com",init:"問",date:state.custom[id].date,subject:state.custom[id].subject,body:t,tags:[{t:r.cond.type==="change"?"予約の変更":"予約の依頼",k:r.cond.type==="change"?"amber":"green"},{t:"貼り付け",k:"gray"}],caseId:id,unread:true});
+  state.folder="inbox";state.selMail="M"+id;bg.remove();render();toast("受信箱に追加しました");
+ };
+}
+
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t)return;
+ var ds=t.dataset;
+ if(t.hasAttribute("data-close")||t.disabled)return;
+ if(ds.view){go(ds.view);return}
+ if(ds.folder){state.folder=ds.folder;var f=state.mails.filter(function(m){return m.folder===ds.folder})[0];state.selMail=f?f.id:null;state.compose=null;render();return}
+ if(ds.mail&&!ds.act){state.selMail=ds.mail;state.compose=null;state.mails.forEach(function(m){if(m.id===ds.mail)m.unread=false});render();return}
+ if(ds.case&&!ds.act){state.selCase=ds.case;var st0=cs(ds.case);state.ptab=st0.extracted?(st0.step>=3?"doc":st0.step>=2?"slot":"cond"):"cond";render();return}
+ if(ds.rv&&!ds.act){state.selRv=ds.rv;render();return}
+ if(ds.ptab){var sc=cs(state.selCase);if(ds.ptab!=="mail"&&ds.ptab!=="cond"&&!sc.extracted){toast("先に内容を読み取ってください");return}state.ptab=ds.ptab;if(ds.ptab==="slot"){if(sc.step<2)sc.step=2;autoPick(C(state.selCase),sc)}if(ds.ptab==="doc"&&sc.share==="ok"&&sc.step<3)sc.step=3;render();return}
+ if(ds.post){state.selPost=ds.post;render();return}
+ var sp=state.posts.filter(function(x){return x.id===state.selPost})[0];
+ if(ds.ch&&sp){sp.ch=ds.ch;sp.text=null;render();return}
+ if(ds.aud&&sp){sp.aud=ds.aud;sp.text=null;render();return}
+ if(ds.lang){state.lang=ds.lang;state.posts.forEach(function(x){if(x.status==="draft")x.text=null});render();return}
+ switch(ds.act){
+  case "help":help();break;
+  case "board":boardModal();break;
+  case "reset":var ok=true;try{ok=window.confirm("デモを最初の状態に戻しますか？")}catch(err){ok=true}if(ok){try{localStorage.removeItem(KEY)}catch(err){}state=fresh();state.seen=true;render();toast("最初の状態に戻しました")}break;
+  case "paste":pasteModal();break;
+  case "gomail":var mm=state.mails.filter(function(m){return m.caseId===state.selCase&&m.folder==="inbox"})[0];if(mm){state.folder="inbox";state.selMail=mm.id}go("mail");break;
+  case "todesk":openCase(ds.case);break;
+  case "extract":var st=cs(ds.case);t.disabled=true;t.innerHTML=IC.spark+"読み取っています…";setTimeout(function(){st.extracted=true;st.step=1;state.ptab="cond";render()},900);break;
+  case "hold":hold(ds.case);break;
+  case "viewdoc":var c2=C(ds.case),st3=cs(ds.case);if(!c2||st3.share!=="ok"){toast("先に空き枠を仮押さえしてください");break}modal(docHtml(c2,st3,true)+'<div class="actions" style="justify-content:flex-end"><button data-act="print">印刷・PDFで保存</button><button class="primary" data-close>閉じる</button></div>');break;
+  case "print":try{window.print()}catch(err){}break;
+  case "attach":attachDoc(ds.case);break;
+  case "insertdoc":var mi=state.mails.filter(function(x){return x.id===ds.mail})[0];if(mi)attachDoc(mi.caseId);break;
+  case "savedraft":var d=captureCompose(ds.mail);if(!d)break;var src=state.mails.filter(function(x){return x.id===ds.mail})[0];
+   if(src.folder==="draft"){src.body=d.body;src.subject=d.subject;src.addr=d.to;src.attach=d.attach}else{state.mails.unshift({id:"M"+(++state.seq)+"d",folder:"draft",from:BRAND,addr:d.to,toName:src.from,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:src.caseId,kind:src.kind,tags:[{t:"下書き",k:"amber"}]})}
+   state.compose=null;render();toast("下書きに保存しました");break;
+  case "send":sendMail(ds.mail);break;
+  case "confirm":confirmBooking(ds.case,state.selMail);break;
+  case "rvdraft":case "rvredo":var rr=RV(ds.rv);if(rr){t.disabled=true;setTimeout(function(){state.rv[rr.id]={status:"draft",text:rvReply(rr)};render();toast("返信の案を作りました。内容を確認して公開してください")},700)}break;
+  case "rvpost":var rp=RV(ds.rv),tx=$("#rvText");if(rp&&tx){if(!tx.value.trim()){toast("返信の本文を入れてください");break}state.rv[rp.id]={status:"posted",text:tx.value};render();toast("返信を公開しました（デモのため、実際には公開していません）")}break;
+  case "regen":if(sp){sp.v=(sp.v||0)+1;sp.text=null;render()}break;
+  case "schedule":if(sp){sp.when=$("#slot").value;sp.status="scheduled";sp.text=postText(sp,sp.ch,state.lang,sp.v);render();toast("予約しました："+sp.when+"（"+CHN[sp.ch]+"）")}break;
+  case "unschedule":if(sp){sp.status="draft";sp.when="";sp.text=null;render()}break;
+  case "postnow":if(sp){sp.status="posted";sp.when=stamp(NOW,nowHM());sp.text=postText(sp,sp.ch,state.lang,sp.v);render();toast("配信しました（デモのため、実際には配信していません）")}break;
+  case "newpost":var kinds=["campaign","vacancy","style","notice"],used=state.posts.filter(function(p){return p.status==="draft"}).map(function(p){return p.kind});var kk=kinds.filter(function(x){return used.indexOf(x)<0})[0]||"style";var nid="S"+(++state.seq)+"n";state.posts.unshift({id:nid,kind:kk,status:"draft",ch:"line",aud:kk==="vacancy"?"pp":"all",when:"",auto:false});state.selPost=nid;render();toast("配信の下書きを作りました");break;
+ }
+});
+document.addEventListener("change",function(e){
+ var t=e.target;
+ if(t.dataset&&t.dataset.pick){var st=cs(t.dataset.case),id=t.dataset.pick;
+  if(t.checked){if(st.picked.length>=3){t.checked=false;toast("候補は3つまでです");return}if(st.picked.indexOf(id)<0)st.picked.push(id)}else st.picked=st.picked.filter(function(x){return x!==id});
+  if(st.share!=="none"&&!st.sent){st.share="none";st.attached=false;toast("候補を変えたので、もう一度仮押さえしてください")}
+  render();return}
+ if(t.dataset&&t.dataset.auto){state.auto[t.dataset.auto]=t.checked;save();return}
+});
+document.addEventListener("input",function(e){
+ var t=e.target;
+ if(t.id==="rBody"||t.id==="rTo"||t.id==="rSubj"){state.compose={mail:state.selMail,to:$("#rTo").value,subject:$("#rSubj").value,body:$("#rBody").value,attach:$("#replyBox").dataset.attach||null};save()}
+ if(t.id==="rvText"&&state.rv[state.selRv]){state.rv[state.selRv].text=t.value;save()}
+});
+
+render();
+if(!state.seen){state.seen=true;save();help()}
+})();
+</script>
+</body>
+</html>
