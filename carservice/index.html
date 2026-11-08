@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>カーサービスワークスペース｜Nova Strategy</title>
+<meta name="description" content="送迎・運転手付きの車・レンタル・整備や車検の依頼メールから、料金表での見積、見積書・配車表・点検と期限の一覧の下書き、ドライバーへの連絡、SNS・LINE配信までをひとつの画面で。タイのレンタカー・自動車販売・整備会社向けの業務デモ。">
+<style>
+:root{--bg:#f6f8fa;--paper:#fff;--ink:#223731;--muted:#788680;--line:#e4eae7;--green:#16654e;--green-2:#104c3a;--green-light:#eaf5ee;--amber:#926417;--amber-light:#fff5df;--red:#b04438;--red-light:#fbeae6;--blue:#476c9f;--blue-light:#e9f0fb;--nav:176px;
+--font:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans Thai",-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font:13px/1.65 var(--font);color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;white-space:nowrap;transition:background .15s}
+button:hover:not(:disabled){background:#f0f6f2}
+button:disabled{cursor:not-allowed;opacity:.45}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #75baa2;outline-offset:2px}
+.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.primary:hover:not(:disabled){background:var(--green-2)}
+.small{font-size:11px;padding:5px 9px}
+.subtle{border:0;background:transparent}
+.muted{color:var(--muted)}.tiny{font-size:11px}
+.icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.btn-i{display:inline-flex;align-items:center;gap:7px}
+/* top */
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:22px}
+.brand{display:flex;gap:10px;align-items:center;min-width:0}
+.brand-symbol{width:31px;height:31px;background:var(--green);border-radius:9px;color:#fff;display:grid;place-items:center;font-size:16px;font-weight:700;flex-shrink:0}
+.brand b{font-size:15px;letter-spacing:.02em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.brand small{display:block;font-size:9px;line-height:1.2;letter-spacing:.16em;color:#6b7c73}
+.crumb{font-size:12px;color:#7b8b83;flex:1}
+.demo-pill{background:#f8f2df;color:#856e30;font-size:11px;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.help{border:0;background:none;display:flex;gap:6px;align-items:center;font-size:12px}
+/* layout */
+.layout{height:calc(100vh - 60px);display:grid;grid-template-columns:var(--nav) minmax(0,1fr)}
+.nav{border-right:1px solid var(--line);padding:22px 12px;background:#f3f6f3;display:flex;flex-direction:column;gap:6px}
+.nav-label{font-size:10px;letter-spacing:.12em;color:#859389;padding:0 12px 10px}
+.nav button{display:flex;align-items:center;gap:10px;text-align:left;border:0;padding:11px 12px;background:none;border-radius:8px;font-weight:500;font-size:12.5px;width:100%}
+.nav button.active{background:#dcebe1;color:#145c44}
+.nav button:hover{background:#e5eee7}
+.nav .count:empty{display:none}.nav .count{margin-left:auto;background:#fff9;border-radius:6px;padding:0 6px;font-size:10px}
+.nav .count.hot{background:var(--green);color:#fff}
+.nav-bottom{margin-top:auto;display:flex;flex-direction:column;gap:4px}
+.nav .note{font-size:9.5px;color:#829083;padding:12px 12px 0;line-height:1.6}
+.workspace{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.ws-head{min-height:72px;flex-shrink:0;display:flex;align-items:center;padding:10px 26px;justify-content:space-between;background:#fff;border-bottom:1px solid var(--line);gap:16px}
+.ws-head h1{font-size:19px;line-height:1.5;margin:0;font-weight:600}
+.ws-head p{font-size:11px;color:#7b8981;margin:2px 0 0}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:320px minmax(0,1fr)}
+.list-pane{background:#fff;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.list-tools{padding:14px 16px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:16px;padding-top:4px}
+.tabs button{border:0;background:none;padding:6px 0;border-bottom:2px solid transparent;border-radius:0;color:#829087;font-size:11.5px}
+.tabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.scroll{overflow:auto;flex:1;min-height:0}
+.row{width:100%;display:block;border:0;border-bottom:1px solid #edf0ee;border-radius:0;text-align:left;padding:15px 17px;white-space:normal;background:#fff}
+.row.active{background:#eef6f0;box-shadow:3px 0 0 var(--green) inset}
+.row:hover{background:#f5f8f5}
+.row-top{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.row-top b{font-size:11.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-top time{font-size:10px;color:#8a968f}
+.dot{width:7px;height:7px;border-radius:50%;background:#267658;flex-shrink:0}
+.row .subj{font-size:12.5px;font-weight:500;line-height:1.6;margin:2px 0}
+.row .snip{font-size:11px;color:#8c968f;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row-foot{margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:500;white-space:nowrap;line-height:1.7}
+.badge.green{background:#e5f2e9;color:#377355}.badge.amber{background:var(--amber-light);color:var(--amber)}.badge.blue{background:var(--blue-light);color:var(--blue)}.badge.gray{background:#f0f2f1;color:#7e8982}.badge.red{background:var(--red-light);color:#a65a4b}
+.list-foot{padding:10px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+.detail{min-width:0;overflow:auto;background:#fff}
+.detail-inner{padding:24px 30px 40px;max-width:980px}
+.mail-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mail-h h2{font-size:19px;margin:0 0 14px;font-weight:600;line-height:1.5}
+.sender{display:flex;gap:11px;align-items:center;margin-bottom:18px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#efe9da;color:#7a6331;display:grid;place-items:center;font-size:13px;font-weight:600;flex-shrink:0}
+.sender b{font-size:12.5px;display:block}.sender span{font-size:11px;color:var(--muted)}
+.sender time{margin-left:auto;font-size:11px;color:var(--muted)}
+.mail-body{white-space:pre-wrap;font-size:13px;line-height:1.95;border-bottom:1px solid var(--line);padding-bottom:20px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:16px 0}
+.reply{border:1px solid var(--line);border-radius:12px;margin-top:18px;overflow:hidden}
+.reply-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;background:#fafbfa;flex-wrap:wrap}
+.reply-h input{border:0;background:transparent;flex:1;min-width:160px;padding:2px}
+.reply textarea{width:100%;border:0;min-height:220px;padding:14px;resize:vertical;line-height:1.8;font-size:12.5px;background:#fff}
+.reply-f{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfa;flex-wrap:wrap}
+.attach{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green);border-radius:6px;padding:3px 9px;font-size:11px}
+.empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .em-i{width:58px;height:58px;border:1px solid var(--line);border-radius:14px;display:grid;place-items:center;margin:0 auto 14px;color:var(--green);background:#fff}
+.empty h3{color:var(--ink);font-size:16px;font-weight:500;margin:0 0 6px}
+/* proposal */
+.p-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.p-head h2{margin:0;font-size:18px;font-weight:600}
+.p-head .meta{font-size:11px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0 4px}
+.step{display:flex;gap:8px;align-items:center;font-size:11.5px;color:#8a978f;border:0;background:none;padding:6px 0;text-align:left;border-radius:0;border-top:3px solid #e5ebe7}
+.step i{font-style:normal;width:20px;height:20px;border-radius:50%;border:1px solid #cfd8d3;display:grid;place-items:center;font-size:10px;flex-shrink:0}
+.step.done{border-color:#9cc9b2;color:#3d6d57}.step.done i{background:#9cc9b2;color:#fff;border-color:#9cc9b2}
+.step.cur{border-color:var(--green);color:var(--green);font-weight:600}.step.cur i{background:var(--green);color:#fff;border-color:var(--green)}
+.ptabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:10px}
+.ptabs button{border:0;background:none;border-radius:0;padding:9px 0;border-bottom:2px solid transparent;color:#7d8a83;font-size:12px}
+.ptabs button.active{color:var(--green);border-color:var(--green);font-weight:600}
+.card{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fff;margin-top:14px}
+.card h3{font-size:13.5px;margin:0 0 10px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kv th{width:28%}
+.miss{color:var(--amber)}
+.checklist{background:var(--amber-light);border-radius:10px;padding:10px 14px;margin-top:12px;font-size:12px}
+.checklist b{color:var(--amber)}
+.checklist ul{margin:4px 0 0;padding-left:20px}
+.cands{display:grid;gap:12px;margin-top:12px}
+.cand{display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.cand.off{opacity:.55}
+.photo{border-radius:9px;min-height:96px;position:relative;overflow:hidden;display:grid;place-items:end start;padding:8px;color:#fff;font-size:10px;font-weight:600;text-shadow:0 1px 2px #0005}
+.photo svg{position:absolute;right:8px;top:8px;width:44px;height:44px;opacity:.85}
+.cand-h{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.cand-h b{font-size:13.5px}
+.cand .spec{font-size:11.5px;color:#5f6d66;margin:2px 0 6px}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{font-size:10.5px;border-radius:999px;padding:1px 8px;background:var(--green-light);color:var(--green)}
+.chip.no{background:#f3f3f1;color:#9a8f7a;text-decoration:line-through}
+.owner{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.bubble{border-radius:10px;padding:8px 11px;font-size:12px;max-width:520px;line-height:1.7}
+.bubble.out{background:#e9f6ee}
+.bubble.in{background:#f2f3f5}
+.bubble .tr{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.vac{font-size:11px;font-weight:600}
+.doc{border:1px solid var(--line);border-radius:6px;padding:28px 30px;background:#fff;box-shadow:0 6px 20px #2237310d;max-width:760px}
+.doc h4{margin:0;font-size:18px}
+.doc .to{font-size:13px;margin:14px 0 4px}
+.doc .lead{font-size:12px;color:#5d6b64;margin:0 0 14px}
+.doc-prop{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;border-top:1px solid var(--line);padding:14px 0}
+.doc-prop .photo{min-height:104px}
+.route{display:grid;gap:0;margin-top:6px}
+.route div{display:grid;grid-template-columns:62px 18px minmax(0,1fr);gap:8px;font-size:12px;align-items:start}
+.route .ln{width:2px;background:#cfe3d7;justify-self:center;height:100%}
+.route .pt{width:10px;height:10px;border-radius:50%;background:var(--green);margin:5px auto 0}
+.foot-bar{position:sticky;bottom:0;background:#fffffff2;border-top:1px solid var(--line);padding:12px 30px;display:flex;align-items:center;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.foot-bar .sum{margin-right:auto;font-size:11.5px;color:var(--muted)}
+/* sns */
+.sns-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px}
+.post-prev{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;max-width:420px}
+.post-prev .ph{display:flex;gap:9px;align-items:center;padding:10px 12px;font-size:12px}
+.post-prev .ph .avatar{width:28px;height:28px;font-size:11px;background:var(--green);color:#fff}
+.post-prev .photo{border-radius:0;min-height:200px}
+.post-prev .tx{white-space:pre-wrap;padding:12px;font-size:12.5px;line-height:1.75}
+.line-prev{background:#8cabd9;border-radius:12px;padding:14px;max-width:420px}
+.line-prev .lb{background:#fff;border-radius:14px;padding:12px;white-space:pre-wrap;font-size:12.5px;line-height:1.75}
+.line-prev .photo{border-radius:12px;margin-bottom:8px;min-height:150px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:6px 12px;font-size:11.5px}
+.seg button.on{background:var(--green);color:#fff}
+.cal{display:grid;gap:6px}
+.cal-day{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.cal-day b{font-size:11.5px}
+.cal-day .it{font-size:11px;margin-top:4px;display:flex;gap:6px;align-items:center}
+.toggle{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:6px 0}
+.toggle input{margin-top:3px;accent-color:var(--green)}
+/* misc */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#21352f;color:#fff;border-radius:10px;padding:10px 16px;font-size:12.5px;box-shadow:0 8px 24px #0003;z-index:50;max-width:92vw}
+.modal-bg{position:fixed;inset:0;background:#1d2b2680;z-index:40;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:90vh;overflow:auto;padding:22px 24px}
+.modal h3{margin:0 0 8px;font-size:17px}
+.modal ol{padding-left:20px;margin:8px 0}
+.modal li{margin:6px 0}
+.cta-box{background:var(--green-light);border:1px solid #bfdccb;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:12.5px}
+.cta-box b{color:var(--green)}
+.paste textarea{width:100%;min-height:200px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px}
+.mobile-tabs{display:none}
+@media (max-width:900px){
+  .topbar{padding:0 12px;gap:10px;height:56px}
+  .crumb,.help span{display:none}
+  .brand{flex:1}
+  .demo-pill{font-size:10px;padding:3px 6px}
+  .demo-pill .long{display:none}
+  .ws-head{flex-wrap:wrap}
+  .brand b{max-width:52vw;font-size:14px}
+  .layout{display:block;height:auto}
+  .nav{display:none}
+  .mobile-tabs{display:flex;gap:4px;background:#f3f6f3;border-bottom:1px solid var(--line);padding:6px 8px;position:sticky;top:0;z-index:5;overflow-x:auto}
+  .mobile-tabs button{border:0;background:none;padding:8px 10px;font-size:12px;border-radius:8px}
+  .mobile-tabs button.active{background:#dcebe1;color:#145c44;font-weight:600}
+  .workspace{overflow:visible}
+  .ws-head{padding:10px 14px;min-height:0}
+  .ws-head h1{font-size:16px}
+  .body{display:block}
+  .list-pane{border-right:0;border-bottom:1px solid var(--line);max-height:300px}
+  .detail{overflow:visible}
+  .detail-inner{padding:16px 14px 30px}
+  .foot-bar{padding:10px 14px}
+  .steps{grid-template-columns:1fr}
+  .cand{grid-template-columns:1fr}
+  .cand .photo{min-height:120px}
+  .doc{padding:18px 16px}
+  .doc-prop{grid-template-columns:1fr}
+  .sns-grid{grid-template-columns:1fr}
+}
+@media print{
+  body *{visibility:hidden}
+  #printDoc,#printDoc *{visibility:visible}
+  #printDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none;border:0}
+  .modal-bg{position:static;background:none}
+}
+
+</style>
+<style>
+:root{--green:#2e5c8a;--green-2:#22476c;--green-light:#e9f0f7}
+.nav button.active,.mobile-tabs button.active{background:#dbe6f2;color:#22476c}
+.nav{background:#f3f6f9}.nav button:hover{background:#e4ecf4}
+.row.active{background:#eef3f9}
+.badge.green{background:#e1eaf4;color:#2e5c8a}
+.bubble.out{background:#e6eef7}
+button:hover:not(:disabled){background:#eff4f9}
+.route .ln{background:#c9d8e8}
+.step.done{border-color:#a7bfd8;color:#2f5275}.step.done i{background:#a7bfd8;border-color:#a7bfd8}
+.cta-box{border-color:#bfd0e3}
+.qty{width:74px;border:1px solid var(--line);border-radius:6px;padding:3px 6px;text-align:right;background:#fff}
+.tbl-wrap{overflow-x:auto;max-width:100%}
+tr.off td{color:#a9b2ad}
+tr.tot td{font-weight:600}
+.doc table{font-size:12px}
+.doc+.doc{margin-top:16px}
+.trans{background:#f4f6f5;border-radius:10px;padding:10px 12px;font-size:12px;color:#5d6b64;white-space:pre-wrap;margin-top:10px;line-height:1.75}
+.jobs-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:900px){.qt tr>:nth-child(3):not([colspan]){display:none}.qt td,.qt th{padding:8px 4px}.jobs-grid{grid-template-columns:1fr}.qty{width:60px}.ws-head .head-actions button{font-size:12px;padding:6px 10px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+/* ============================================================ helpers */
+var $=function(s,r){return (r||document).querySelector(s)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]})}
+function fmt(n){return Number(n).toLocaleString("en-US",{maximumFractionDigits:2})}
+var IC={
+ mail:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+ truck:'<svg class="icon" viewBox="0 0 24 24"><path d="M2 6h12v10H2zM14 9h4l3 3.5V16h-7"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+ share:'<svg class="icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
+ list:'<svg class="icon" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>',
+ reset:'<svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ help:'<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg>',
+ spark:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+ send:'<svg class="icon" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>',
+ clip:'<svg class="icon" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg>',
+ doc:'<svg class="icon" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>',
+ plus:'<svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cal:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>',
+ chat:'<svg class="icon" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>',
+ yen:'<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/></svg>',
+ box:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"><path d="M3 15v-3l2.2-5h13.6L21 12v3z"/><path d="M3 15v3h3v-3M18 15v3h3v-3M3.5 12h17"/><circle cx="7.5" cy="13.5" r=".9"/><circle cx="16.5" cy="13.5" r=".9"/></svg>'
+};
+
+/* ============================================================ personalization (?c=&s= and #c-<hex>) */
+function fromHex(h){try{if(!h||!/^[0-9a-f]+$/i.test(h)||h.length%2)return "";var b=new Uint8Array(h.length/2);for(var i=0;i<b.length;i++)b[i]=parseInt(h.substr(i*2,2),16);return new TextDecoder("utf-8").decode(b)}catch(e){return ""}}
+var q;try{q=new URLSearchParams(location.search)}catch(e){q={get:function(){return null}}}
+var HC=(location.hash.match(/(?:^#|[&#])c-([0-9a-fA-F]+)/)||[])[1]||"";
+var COMPANY=(q.get("c")||fromHex(HC)||"").replace(/[\u0000-\u001f�]/g,"").slice(0,60).trim();
+var SERVICES=(q.get("s")||"").split(/[|,、]/).map(function(x){return x.trim().slice(0,24)}).filter(Boolean).slice(0,4);
+var BRAND=COMPANY||"サンプル・カーサービス";
+var BRAND_EN=COMPANY&&!/[぀-ヿ一-鿿]/.test(COMPANY)?COMPANY:"Sample Car Service (Thailand) Co., Ltd.";
+var STAFF="小林",STAFF_EN="Kobayashi",STAFF_TH="โคบายาชิ";
+
+/* ============================================================ dates */
+var NOW=new Date();NOW=new Date(NOW.getFullYear(),NOW.getMonth(),NOW.getDate(),new Date().getHours(),new Date().getMinutes());
+function addD(d,n){return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n)}
+function md(d){return (d.getMonth()+1)+"/"+d.getDate()}
+function wdJ(d){return "日月火水木金土"[d.getDay()]}
+function mdw(d){return md(d)+"（"+wdJ(d)+"）"}
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function mdwEn(d){return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]+", "+MON[d.getMonth()]+" "+d.getDate()}
+function thDay(d){return "วัน"+["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"][d.getDay()]+"ที่ "+d.getDate()+" "+["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][d.getMonth()]}
+function ymdJ(d){return d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日"}
+function ymdEn(d){return d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear()}
+function nextDow(dow,from){var d=addD(from||NOW,1);while(d.getDay()!==dow)d=addD(d,1);return d}
+function wk(d){while(d.getDay()===0)d=addD(d,1);return d}
+function stamp(d,h){return md(d)+" "+h}
+function nowHM(){return new Date().toTimeString().slice(0,5)}
+function dayText(d,lang){return lang==="en"?mdwEn(d):lang==="th"?thDay(d):mdw(d)}
+var Y=addD(NOW,-1);
+var VIS1=wk(addD(NOW,8)),RENT2=addD(NOW,10),END2=addD(RENT2,90),SVC3=nextDow(6),DEL4=wk(addD(NOW,6)),END4=addD(DEL4,182);
+
+/* ============================================================ rate card (fictional sample prices, THB) */
+var RATE={
+ alph:{ja:"アルファード（運転手付き・1日10時間まで）",en:"Toyota Alphard with driver (up to 10 h/day)",u:"日",ue:"day",p:4500},
+ van:{ja:"コミューター（運転手付き・1日10時間まで）",en:"Commuter van with driver (up to 10 h/day)",u:"日",ue:"day",p:3200},
+ sedan:{ja:"カムリ（運転手付き・1日10時間まで）",en:"Toyota Camry with driver (up to 10 h/day)",u:"日",ue:"day",p:3000},
+ apt:{ja:"空港送迎（スワンナプーム⇔バンコク市内）",en:"Airport transfer (Suvarnabhumi ⇔ Bangkok)",u:"回",ue:"trip",p:1500},
+ ot:{ja:"時間外（1時間ごと）",en:"Overtime (per hour)",u:"時間",ue:"hour",p:250},
+ oot:{ja:"遠方手当（チョンブリ・ラヨーン方面）",en:"Out-of-town allowance (Chonburi / Rayong)",u:"日",ue:"day",p:500},
+ toll:{ja:"高速代・燃料（目安）",en:"Tolls & fuel (estimate)",u:"日",ue:"day",p:700},
+ jpd:{ja:"日本語が分かるドライバー",en:"Japanese-speaking driver",u:"日",ue:"day",p:600},
+ monthC:{ja:"マンスリー カローラクロス（保険込）",en:"Monthly rental — Corolla Cross (insurance incl.)",u:"か月",ue:"month",p:24000},
+ monthF:{ja:"マンスリー フォーチュナー（保険込）",en:"Monthly rental — Fortuner (insurance incl.)",u:"か月",ue:"month",p:38000},
+ pick:{ja:"ピックアップ ハイラックス（保険込）",en:"Pickup truck — Hilux (insurance incl.)",u:"台・月",ue:"car-month",p:17500},
+ cdw:{ja:"免責補償（事故のときの自己負担なし）",en:"Zero-excess cover",u:"台・月",ue:"car-month",p:1500},
+ child:{ja:"チャイルドシート",en:"Child seat",u:"か月",ue:"month",p:600},
+ deliv:{ja:"車のお届け・引取り（バンコク市内）",en:"Car delivery / collection (Bangkok)",u:"回",ue:"trip",p:800},
+ far:{ja:"車のお届け・引取り（チョンブリ・ラヨーン）",en:"Car delivery / collection (Chonburi / Rayong)",u:"回",ue:"trip",p:1800},
+ logo:{ja:"社名ステッカー（左右のドア）",en:"Company logo sticker (both doors)",u:"台",ue:"car",p:1800},
+ svc:{ja:"定期点検（1万km・オイル交換込）",en:"Periodic service (10,000 km, incl. oil change)",u:"台",ue:"car",p:3800},
+ insp:{ja:"車検（ตรอ.検査）の代行",en:"Vehicle inspection (Tor Ror Or) handling",u:"台",ue:"car",p:600},
+ tax:{ja:"自動車税・強制保険（พ.ร.บ.）の更新代行（税・保険料は実費）",en:"Annual tax & compulsory insurance renewal (fees at cost)",u:"台",ue:"car",p:500},
+ brake:{ja:"ブレーキパッド交換（前・部品込）",en:"Front brake pads (parts incl.)",u:"台",ue:"car",p:2800},
+ pickc:{ja:"整備車両の引取り・納車",en:"Pickup & return for service",u:"台",ue:"car",p:500},
+ loan:{ja:"代車（1日）",en:"Courtesy car (per day)",u:"日",ue:"day",p:900}
+};
+var VAT=0.07;
+
+/* ============================================================ sample inquiries (4 cases, all fictional) */
+var CASES=[
+ {id:"C1",from:"田中 真理（サンプル精機タイランド 総務）",addr:"m.tanaka@sample-seiki.example.com",init:"田",date:stamp(Y,"18:20"),lang:"ja",doc:"ja",kind:"chauffeur",
+  subject:"日本からの出張者の送迎と運転手付きの車のお見積り（3日間）",tag:"運転手付き・送迎",short:"出張送迎_田中様",
+  body:"いつもお世話になっております。サンプル精機タイランド総務の田中です。\n\n日本の本社から役員と技術者の計3名が出張で来ます。空港の送迎と、滞在中の運転手付きの車をお願いしたいです。\n\n・"+mdw(VIS1)+" 07:30 スワンナプーム空港着 → シラチャの工場へ\n・"+mdw(addD(VIS1,1))+" 終日：シラチャのホテル → アマタシティのお客様2社 → ホテル\n・"+mdw(addD(VIS1,2))+" 午後：工場 → スワンナプーム空港（夜の便）\n・3名、スーツケース3個（ゴルフバッグはありません）\n・ドライバーは日本語が少し分かる方だと助かります\n\n社内の稟議に回すので、見積書をいただけますでしょうか。便名は決まり次第お知らせします。",
+  read:{type:"空港送迎＋運転手付きの車（3日間）",from:"スワンナプーム空港（"+mdw(VIS1)+" 07:30着）",to:"シラチャ（工場・ホテル）／アマタシティ",vol:"3名・スーツケース3個",date:mdw(VIS1)+"〜"+mdw(addD(VIS1,2))+"（3日間）",car:"アルファード（運転手付き）1台",docs:"見積書（稟議用）、配車表",extra:"日本語が少し分かるドライバー希望"},
+  items:[["alph",3],["oot",3],["toll",3],["jpd",3],["ot",2,2]],
+  checks:["便名と到着時刻（遅れたときの待機に使います）","2日目の訪問先2社の住所と、終わる時間の目安","シラチャのホテル名","お支払いの方法（月末締めの請求書払いでよいか）"],
+  addressee:"サンプル精機タイランド\n総務 田中様",extraDoc:"disp",
+  disp:[[VIS1,"07:30","スワンナプーム空港（到着ロビー3番出口）→ シラチャ工場（ピントン）","アルファード／ドライバー A"],[VIS1,"18:00","工場 → シラチャのホテル","アルファード／ドライバー A"],[addD(VIS1,1),"08:00","ホテル → アマタシティ（お客様2社）→ ホテル","アルファード／ドライバー A"],[addD(VIS1,2),"13:00","ホテル → 工場 → スワンナプーム空港","アルファード／ドライバー A"]],
+  plan:[[VIS1,"07:30","スワンナプーム空港でお迎え → シラチャの工場へ"],[addD(VIS1,1),"08:00","ホテル → アマタシティ（2社訪問）→ ホテル"],[addD(VIS1,2),"13:00","工場 → スワンナプーム空港へお送り"]],
+  accept:"お見積りありがとうございます。稟議が通りましたので、この内容でお願いします。\n便名は決まり次第お送りします。ドライバーは日本語が少し分かる方でお願いします。",
+  crew:{d:VIS1,t:"07:30",th:"【งานรับส่ง】แขกญี่ปุ่น 3 ท่าน\n📅 "+thDay(VIS1)+" 07:30\n📍 สนามบินสุวรรณภูมิ → โรงงานศรีราชา\n🚐 Alphard 1 คัน (3 วัน)\n🪧 ถือป้ายชื่อ \"SAMPLE SEIKI\" ที่ประตู 3\nกรุณาตอบรับด้วยครับ",ja:"（訳）送迎・日本からのお客様3名／"+mdw(VIS1)+" 7:30／スワンナプーム空港→シラチャの工場／アルファード1台（3日間）／到着ロビー3番出口で「SAMPLE SEIKI」の名札を持って待つ／確認の返信をお願いします"}},
+ {id:"C2",from:"山本 拓也（サンプル化学タイランド）",addr:"t.yamamoto@sample-kagaku.example.com",init:"山",date:stamp(NOW,"08:05"),lang:"ja",doc:"ja",kind:"monthly",
+  subject:"新任駐在のため、車のマンスリーレンタルについて（3か月）",tag:"マンスリーレンタル",short:"マンスリー_山本様",
+  body:"はじめてご連絡いたします。来月からバンコクに駐在するサンプル化学タイランドの山本と申します。\n\n社用車が届くまでの3か月ほど、車を借りたいと考えています。\n\n・期間："+mdw(RENT2)+"から3か月\n・車種：SUVなど、家族4人（子ども2人）が乗れる車\n・チャイルドシートを1つお願いしたいです\n・住まい：トンローのサービスアパート（そこへ届けてもらえますか）\n・免許：日本の運転免許と国際免許があります\n\n事故のときの対応や、保険の内容も教えていただけると安心です。",
+  read:{type:"マンスリーレンタル（3か月）",from:"トンローのサービスアパート（お届け）",to:"バンコク市内・週末は近郊",vol:"4名（大人2・子ども2）",date:mdw(RENT2)+"〜"+mdw(END2)+"（3か月）",car:"カローラクロス（フォーチュナーも可）",docs:"見積書、貸出の条件（日本語）",extra:"チャイルドシート1つ／日本の免許＋国際免許"},
+  items:[["monthC",3],["cdw",3,1],["child",3],["deliv",2]],
+  checks:["国際免許の有効期限と、パスポート・ビザのコピー","お届け先のアパート名と、駐車場が使えるか","保証金（1か月分）のお支払い方法","会社名義の請求書が必要か"],
+  addressee:"山本 拓也 様",
+  plan:[[addD(RENT2,-3),"","免許・パスポートの確認と、契約書のお送り"],[RENT2,"10:00","トンローのアパートへ車をお届け（使い方のご説明 20分）"],[addD(RENT2,45),"","1か月半の点検（その場で・車の交換なし）"],[END2,"","車の引取り（ご返却）"]],
+  accept:"ありがとうございます。カローラクロスでお願いします。\nお届けは"+mdw(RENT2)+"の10時で大丈夫です。免許とパスポートのコピーは明日お送りします。",
+  crew:{d:RENT2,t:"10:00",th:"【งานส่งรถ】เช่ารายเดือน คุณยามาโมโตะ\n📅 "+thDay(RENT2)+" 10:00\n📍 เซอร์วิสอพาร์ทเมนท์ ทองหล่อ\n🚙 Corolla Cross 1 คัน + คาร์ซีท 1 ตัว\n📋 เช็คสภาพรถ + ถ่ายรูปรอบคัน ก่อนส่งมอบ\nกรุณาตอบรับด้วยครับ",ja:"（訳）車のお届け・マンスリー 山本様／"+mdw(RENT2)+" 10:00／トンローのサービスアパート／カローラクロス1台＋チャイルドシート1つ／渡す前に車の状態を確認し、周りの写真を撮る／確認の返信をお願いします"}},
+ {id:"C3",from:"Nattaporn S. (HR & Admin)",addr:"nattaporn.s@sample-trading.example.com",init:"N",date:stamp(NOW,"09:36"),lang:"en",doc:"en",kind:"service",
+  subject:"Service & annual tax renewal for 4 company cars",tag:"整備・車検・英語",short:"Fleet_Service",docSubj:"Periodic service and annual renewal — 4 company cars",
+  body:"Dear team,\n\nWe have 4 company cars used by our Japanese managers. Some of them are due for service, and the annual tax and compulsory insurance (Por Ror Bor) for two cars expire soon.\n\n- Toyota Camry x2, Honda Accord x1, Toyota Fortuner x1\n- The two Camrys are over 7 years old, so they need the vehicle inspection first\n- One driver says the front brakes make a noise\n- The cars are at our office in Asoke. Can you pick them up on a Saturday?\n\nCould you send a quotation and let us know the best schedule? Our Japanese managers will check it.\n\nBest regards,\nNattaporn",
+  read:{type:"Periodic service & annual renewal (4 cars)",from:"Asoke office (pickup)",to:"Service center (Bangna)",vol:"4 cars (Camry x2, Accord, Fortuner)",date:mdwEn(SVC3)+" (Saturday pickup)",car:"Company cars",docs:"Quotation, service & due-date list (English)",extra:"Front brake noise on 1 car / 2 cars need inspection (7+ years)"},
+  items:[["svc",4],["insp",2],["tax",2],["brake",1],["pickc",4],["loan",2,2]],
+  checks:["Which car has the brake noise (plate number)","Copies of the registration books for the 2 cars to renew","Current mileage of each car","Can the drivers hand over the keys at 9:00 on Saturday?"],
+  addressee:"Ms. Nattaporn",extraDoc:"due",
+  due:[["SAMPLE-01","Toyota Camry (2017)","98,400",addD(NOW,12),true,"10,000 km service"],["SAMPLE-02","Toyota Camry (2018)","86,900",addD(NOW,24),true,"10,000 km service"],["SAMPLE-03","Honda Accord (2021)","45,800",addD(NOW,140),false,"10,000 km service + brake check"],["SAMPLE-04","Toyota Fortuner (2022)","32,100",addD(NOW,210),false,"10,000 km service"]],
+  plan:[[SVC3,"09:00","Pick up 4 cars at the Asoke office"],[SVC3,"10:30","Service, inspection and brake check (Bangna)"],[addD(SVC3,2),"","Tax & compulsory insurance renewal"],[addD(SVC3,2),"17:00","Return the cars to the Asoke office"]],
+  accept:"Thank you for the quotation.\nOur managers approved it. Please go ahead with "+mdwEn(SVC3)+".\nThe brake noise is on the Accord. I will send the registration book copies tomorrow.\n\nBest regards,\nNattaporn",
+  crew:{d:SVC3,t:"09:00",th:"【งานรับรถเข้าศูนย์】ลูกค้าบริษัท 4 คัน\n📅 "+thDay(SVC3)+" 09:00\n📍 สำนักงานอโศก → ศูนย์บริการบางนา\n🔧 เช็คระยะ 10,000 กม. 4 คัน / ตรอ. 2 คัน / ต่อภาษี+พ.ร.บ. 2 คัน\n⚠️ Accord เบรกหน้ามีเสียง ตรวจผ้าเบรก\n👷 ต้องการคนขับรถ 4 คน\nกรุณาตอบรับด้วยครับ",ja:"（訳）整備の車の引取り・法人4台／"+mdw(SVC3)+" 9:00／アソークの事務所→バンナーの整備工場／1万km点検4台・車検2台・税と強制保険の更新2台／アコードは前ブレーキに音、パッドを点検／運転する人が4名必要／確認の返信をお願いします"}},
+ {id:"C4",from:"คุณศิริพร (ฝ่ายธุรการ)",addr:"siriporn@sample-parts.example.com",init:"ศ",date:stamp(NOW,"10:48"),lang:"th",doc:"en",kind:"monthly",
+  subject:"สอบถามราคาเช่ารถกระบะรายเดือน 2 คัน (อมตะซิตี้ ชลบุรี)",tag:"長期レンタル・タイ語",short:"Pickup_Rental_Amata",docSubj:"Long-term rental — 2 pickup trucks, Amata City Chonburi",
+  body:"เรียน เจ้าหน้าที่\n\nบริษัทต้องการเช่ารถกระบะ 2 คัน สำหรับใช้ในโรงงานและส่งของให้ลูกค้า\n\n- ระยะเวลา 6 เดือน\n- โรงงานอยู่ที่นิคมฯ อมตะซิตี้ ชลบุรี\n- อยากเริ่มใช้ภายในสัปดาห์หน้า\n- ถ้ารถเสีย มีรถทดแทนให้ไหมคะ\n\nรบกวนส่งใบเสนอราคาด้วยค่ะ ผู้จัดการชาวญี่ปุ่นจะเป็นคนอนุมัติค่ะ\nขอบคุณค่ะ\nศิริพร",
+  tr:"（訳）工場の中の作業とお客様への配達に使うため、ピックアップトラックを2台借りたいです。期間は6か月。工場はチョンブリのアマタシティ工業団地。来週中から使いたい。故障したときは代わりの車がありますか。見積書をお願いします。日本人の工場長が承認します。",
+  read:{type:"長期レンタル（法人・6か月）",from:"アマタシティ工業団地（チョンブリ）へお届け",to:"工場の中の作業・お客様への配達",vol:"ピックアップ 2台",date:mdw(DEL4)+"から6か月",car:"ハイラックス（シングルキャブ）",docs:"見積書（英語）、ご利用の条件",extra:"故障したときの代車を確認したい"},
+  items:[["pick",12],["cdw",12,1],["far",2],["logo",2,2]],
+  checks:["見積書・請求書の宛名（会社名と納税者番号）","運転する方の人数と、免許のコピー","お届けの日時と、工場で受け取る場所"],
+  checksTh:["ชื่อบริษัทและเลขประจำตัวผู้เสียภาษี สำหรับออกใบเสนอราคา","จำนวนผู้ขับขี่และสำเนาใบขับขี่","วันเวลาที่สะดวกให้ส่งรถ และจุดรับรถที่โรงงาน"],
+  addressee:"คุณศิริพร",
+  plan:[[DEL4,"10:00","Deliver 2 pickups to the factory (Amata City)","ส่งรถกระบะ 2 คัน ที่โรงงาน (อมตะซิตี้)"],[addD(DEL4,90),"","Free check-up at your factory","เช็คสภาพรถฟรีที่โรงงาน"],[END4,"","Collect the cars (end of contract)","รับรถคืน (ครบสัญญา)"]],
+  accept:"ขอบคุณค่ะ ผู้จัดการอนุมัติแล้วค่ะ\nส่งรถ"+thDay(DEL4)+" 10 โมงได้เลยค่ะ",acceptTr:"（訳）ありがとうございます。工場長の承認が出ました。お届けは"+mdw(DEL4)+"の10時でお願いします。",
+  crew:{d:DEL4,t:"10:00",th:"【งานส่งรถ】เช่ารายเดือน (6 เดือน)\n📅 "+thDay(DEL4)+" 10:00\n📍 โรงงาน นิคมฯ อมตะซิตี้ ชลบุรี\n🛻 Hilux 2 คัน (คนขับ 2 คน + รถรับกลับ 1 คัน)\n📋 เช็คสภาพ + ถ่ายรูปรอบคัน + เซ็นใบส่งมอบ\nกรุณาตอบรับด้วยครับ",ja:"（訳）車のお届け・長期レンタル（6か月）／"+mdw(DEL4)+" 10:00／アマタシティの工場／ハイラックス2台（運転2名＋帰りの車1台）／状態の確認・周りの写真・受け渡し書にサイン／確認の返信をお願いします"}}
+];
+function C(id){for(var i=0;i<CASES.length;i++)if(CASES[i].id===id)return CASES[i];return state.custom[id]||null}
+
+/* ============================================================ free-text parser (pasted inquiries) */
+var AIR_RE=/空港|スワンナプーム|ドンムアン|airport|suvarnabhumi|don ?mueang|สนามบิน|สุวรรณภูมิ|ดอนเมือง/i;
+var FAR_RE=/シラチャ|アマタ|ラヨーン|パタヤ|チョンブリ|アユタヤ|sriracha|amata|rayong|pattaya|chonburi|ayutthaya|ศรีราชา|อมตะ|ระยอง|พัทยา|ชลบุรี|อยุธยา/i;
+function num(t,re){var m=t.match(re);return m?+m[1]:null}
+function parse(t){
+ var lang=/[฀-๿]/.test(t)?"th":/[぀-ヿ一-鿿]/.test(t)?"ja":"en",ja=lang==="ja",en=lang!=="ja";
+ var kind=/整備|車検|点検|修理|オイル|ブレーキ|タイヤ|自動車税|service|repair|inspection|maintenance|brake|ซ่อม|เช็คระยะ|ต่อภาษี|ตรอ|เบรก/i.test(t)?"service":/マンスリー|長期|か月|ヶ月|カ月|monthly|long[- ]term|\d+\s*months?|รายเดือน|\d+\s*เดือน/i.test(t)?"monthly":"chauffeur";
+ var air=AIR_RE.test(t),far=FAR_RE.test(t);
+ var cars=num(t,/(\d+)\s*(?:台|cars?|vehicles?|คัน)/i),days=num(t,/(\d+)\s*(?:日間|days?|วัน)/i),months=num(t,/(\d+)\s*(?:か月|ヶ月|カ月|months?|เดือน)/i),pp=num(t,/(\d+)\s*(?:名|人|people|persons?|pax|คน|ท่าน)/i);
+ var date="",m=t.match(/(\d{1,2})\s*[\/月]\s*(\d{1,2})/);if(m)date=m[1]+"/"+m[2];
+ var items=[],checks=[];
+ if(kind==="chauffeur"){
+  if(air&&!days){items=[["apt",2],["jpd",1,2]];if(far)items.push(["oot",1])}
+  else{var d=days||1,car=pp&&pp>4?"van":pp&&pp<=2?"sedan":"alph";items=[[car,d],["toll",d]];if(far)items.push(["oot",d]);items.push(["jpd",d,2],["ot",2,2])}
+  if(!pp)checks.push(ja?"人数と荷物の量":"Number of passengers and luggage");
+  if(air)checks.push(ja?"便名と到着時刻":"Flight number and arrival time");
+  checks.push(ja?"お迎え先と行き先の住所":"Pickup and drop-off addresses");
+ }else if(kind==="monthly"){
+  var mo=months||1,n=cars||1,pk=/ピックアップ|トラック|pickup|hilux|กระบะ/i.test(t);
+  items=[[pk?"pick":"monthC",pk?n*mo:mo*n],["cdw",n*mo,1],[far?"far":"deliv",2]];
+  if(/チャイルド|child|คาร์ซีท/i.test(t))items.push(["child",mo]);
+  if(!months)checks.push(ja?"借りる期間":"Rental period");
+  checks.push(ja?"運転する方の免許（国際免許）のコピー":"Copy of the driver's licence",ja?"お届け先の住所":"Delivery address");
+ }else{
+  var c2=cars||1;items=[["svc",c2],["pickc",c2]];
+  if(/車検|inspection|ตรอ/i.test(t))items.push(["insp",c2]);
+  if(/税|強制保険|tax|ภาษี|พ\.ร\.บ/i.test(t))items.push(["tax",c2]);
+  if(/ブレーキ|brake|เบรก/i.test(t))items.push(["brake",1]);
+  items.push(["loan",1,2]);
+  checks.push(ja?"車種・年式・走行距離":"Model, year and mileage",ja?"車検証（登録証）のコピー":"Copy of the registration book");
+ }
+ if(!date)checks.push(ja?"ご希望の日程":"Preferred date");
+ var d0=wk(addD(NOW,7));
+ var typeJ={chauffeur:air?"空港送迎・運転手付き":"運転手付きの車",monthly:"マンスリー・長期レンタル",service:"点検・整備・車検"}[kind];
+ var typeE={chauffeur:air?"Airport transfer / car with driver":"Car with driver",monthly:"Monthly / long-term rental",service:"Service & inspection"}[kind];
+ var plan=kind==="chauffeur"?[[d0,"08:00",en?"Pickup (car with driver)":"お迎え（運転手付き）"]].concat(days>1?[[addD(d0,days-1),"",en?"Last day of service":"最終日"]]:[])
+  :kind==="monthly"?[[d0,"10:00",en?"Car delivery":"車のお届け"],[addD(d0,30*(months||1)),"",en?"Car collection (end of rental)":"車の引取り（ご返却）"]]
+  :[[d0,"09:00",en?"Car pickup for service":"車の引取り"],[d0,"17:00",en?"Return the car":"整備後の納車"]];
+ plan.forEach(function(p){if(lang==="th")p[3]=p[2]});
+ return {lang:lang,doc:en?"en":"ja",kind:kind,
+  read:{type:ja?typeJ:typeE,from:air?(ja?"空港":"Airport"):far?(ja?"郊外（工業団地など）":"Outside Bangkok"):"",to:"",vol:pp?pp+(ja?"名":" people"):cars?cars+(ja?"台":" cars"):"",date:date||(months?months+(ja?"か月":" months"):days?days+(ja?"日間":" days"):""),car:"",docs:ja?"見積書":"Quotation",extra:""},
+  items:items,checks:checks,plan:plan};
+}
+
+/* ============================================================ state */
+var KEY="nova-car-ws-v1:"+BRAND;
+var TOPICS={
+ T1:{t:"新任駐在員向けマンスリーレンタル",hue:210,
+  hook:{ja:["【新しく赴任された方へ】","【社用車が届くまでの車に】","【マンスリーレンタルのご案内】"],th:["【เช่ารถรายเดือน】","【รถเช่าระหว่างรอรถบริษัท】","【เช่ารถระยะยาว】"],en:["New to Bangkok?","A car until your company car arrives","Monthly car rental"]},
+  body:{ja:"社用車が届くまでの1〜6か月、車をお貸しします。\n・契約も事故の対応も日本語で\n・チャイルドシート、アパートへのお届けもOK\n・日本の免許＋国際免許で運転できます\n\nLINEで「レンタル」と送るだけでお見積り。",th:"ให้เช่ารถรายเดือน 1–6 เดือน ระหว่างรอรถบริษัท\n• ทำสัญญาและดูแลอุบัติเหตุเป็นภาษาญี่ปุ่น\n• มีคาร์ซีท ส่งรถถึงที่พัก\n• ใช้ใบขับขี่ญี่ปุ่น + ใบขับขี่สากลได้\n\nพิมพ์ \"เช่ารถ\" ทางไลน์ได้เลย",en:"Monthly rental for 1–6 months while you wait for your company car.\n- Contract and accident support in Japanese\n- Child seats and delivery to your apartment\n- Drive with your Japanese + international licence\n\nSend \"rental\" on LINE for a quote."},
+  tags:{ja:"#バンコク駐在 #タイ生活 #レンタカー",th:"#เช่ารถรายเดือน #รถเช่ากรุงเทพ",en:"#BangkokCarRental #ExpatLife"}},
+ T2:{t:"出張者の送迎・運転手付き",hue:30,
+  hook:{ja:["【出張者の空港送迎】","【工場・お客様回りに運転手付きの車】","【年末年始の送迎のご予約】"],th:["【บริการรถพร้อมคนขับ】","【รับส่งสนามบิน】","【จองรถช่วงปีใหม่】"],en:["Airport transfers for business trips","Car with driver for factory visits","Book your year-end transfers"]},
+  body:{ja:"日本からの出張者の空港送迎、工場・お客様回りの運転手付きの車を手配します。\n・アルファード、カムリ、コミューター\n・シラチャ・アマタ・ラヨーンへも\n・日本語が分かるドライバーも選べます\n\n配車表は前日にLINEでお送りします。",th:"รับส่งสนามบินและรถพร้อมคนขับ สำหรับแขกจากญี่ปุ่น\n• Alphard, Camry, รถตู้ Commuter\n• ไปศรีราชา อมตะ ระยองได้\n• มีคนขับที่พูดญี่ปุ่นได้\n\nส่งตารางรถให้ทางไลน์ 1 วันก่อน",en:"Airport transfers and cars with drivers for visitors from Japan.\n- Alphard, Camry, Commuter van\n- Sriracha, Amata and Rayong\n- Japanese-speaking drivers available\n\nWe send the driver schedule on LINE the day before."},
+  tags:{ja:"#タイ出張 #空港送迎 #運転手付き",th:"#รถพร้อมคนขับ #รับส่งสนามบิน",en:"#BangkokTransfer #CarWithDriver"}},
+ T3:{t:"車検・税の更新時期のお知らせ",hue:150,
+  hook:{ja:["【車検・税の更新はお済みですか】","【点検・更新の時期のお知らせ】","【社用車の点検をまとめて】"],th:["【ต่อภาษีรถ・พ.ร.บ.】","【ถึงเวลาเช็คระยะแล้ว】","【ตรวจสภาพรถ ตรอ.】"],en:["Is your car tax due?","Time for your service","Fleet service made easy"]},
+  body:{ja:"自動車税・強制保険（พ.ร.บ.）の更新と、7年以上の車の車検（ตรอ.）を代行します。\n・1万kmごとの点検もまとめて\n・会社やご自宅まで引取り・納車\n・期限の30日前にLINEでお知らせ\n\n車検証の写真をLINEで送るだけで受付します。",th:"บริการต่อภาษีรถ พ.ร.บ. และตรวจสภาพรถ (ตรอ.) สำหรับรถอายุ 7 ปีขึ้นไป\n• เช็คระยะทุก 10,000 กม.\n• รับ-ส่งรถถึงบริษัทหรือบ้าน\n• แจ้งเตือนทางไลน์ก่อนครบกำหนด 30 วัน\n\nส่งรูปเล่มทะเบียนทางไลน์ได้เลย",en:"We handle annual car tax, compulsory insurance (Por Ror Bor) and inspection for cars over 7 years old.\n- 10,000 km services at the same time\n- Pickup and return at your office or home\n- LINE reminder 30 days before the due date\n\nJust send a photo of the registration book on LINE."},
+  tags:{ja:"#タイ車検 #自動車税 #社用車",th:"#ต่อภาษีรถ #ตรอ #เช็คระยะ",en:"#ThailandCarTax #FleetService"}}
+};
+var BASEJOBS=[{d:addD(NOW,1),t:"07:00",title:"空港送迎（スワンナプーム → スクンビット）",who:"ドライバー B・カムリ"},{d:addD(NOW,2),t:"08:00",title:"運転手付き（アユタヤの工場・日帰り）",who:"ドライバー C・コミューター"},{d:nextDow(6),t:"09:00",title:"1万km点検（法人2台・引取り）",who:"整備 バンナー工場"},{d:addD(NOW,6),t:"10:00",title:"マンスリーの返却・引取り（プロンポン）",who:"担当 小林"}];
+function fresh(){
+ var mails=CASES.map(function(c){return {id:"M"+c.id,folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:c.date,subject:c.subject,body:c.body,tr:c.tr||"",tags:[{t:"見積依頼",k:"green"},{t:c.tag,k:c.lang==="ja"?"gray":"blue"}],caseId:c.id,unread:true}});
+ mails.reverse();
+ var posts=[
+  {id:"S1",topic:"T2",status:"posted",ch:"facebook",when:stamp(addD(NOW,-2),"12:00"),auto:false},
+  {id:"S2",topic:"T1",status:"draft",ch:"line",when:"",auto:true,why:"赴任シーズン"},
+  {id:"S3",topic:"T3",status:"draft",ch:"facebook",when:"",auto:true,why:"税の期限が近い車あり"}
+ ];
+ return {view:"mail",folder:"inbox",selMail:mails[0].id,selCase:"C1",ptab:"read",cases:{},custom:{},mails:mails,posts:posts,selPost:"S2",lang:"ja",auto:{draft:true,weekly:true,approve:true},jobs:[],seq:1,seen:false};
+}
+var state;
+try{state=JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){state=null}
+if(!state||!state.mails||!state.cases)state=fresh();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function cs(id){if(!state.cases[id])state.cases[id]={step:0,read:false,items:null,attached:false,sent:false,accepted:false,confirmed:false};return state.cases[id]}
+function initItems(c){return c.items.map(function(x){return {k:x[0],q:x[1],opt:!!x[2],on:x[2]!==2}})}
+function calc(st){var sub=0;(st.items||[]).forEach(function(it){if(it.on)sub+=RATE[it.k].p*it.q});sub=Math.round(sub);var vat=Math.round(sub*VAT);return {sub:sub,vat:vat,total:sub+vat}}
+
+/* ============================================================ toast / modal */
+var toastT;
+function toast(msg){var el=$("#toast");if(!el){el=document.createElement("div");el.id="toast";el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=msg;el.style.display="block";clearTimeout(toastT);toastT=setTimeout(function(){el.style.display="none"},3200)}
+function modal(html){var bg=document.createElement("div");bg.className="modal-bg";bg.innerHTML='<div class="modal" role="dialog">'+html+'</div>';bg.addEventListener("click",function(e){if(e.target===bg||e.target.closest("[data-close]"))bg.remove()});document.body.appendChild(bg);return bg}
+
+/* ============================================================ render: shell */
+function allCases(){return CASES.concat(Object.keys(state.custom).map(function(k){return state.custom[k]}))}
+function counts(){
+ return {inbox:state.mails.filter(function(m){return m.folder==="inbox"&&m.unread}).length,
+  open:allCases().filter(function(c){return !cs(c.id).sent}).length,
+  drafts:state.posts.filter(function(p){return p.status==="draft"}).length,
+  jobs:upcoming().length};
+}
+var VIEWS={mail:{t:"メール",d:"送迎・レンタル・整備の依頼の受信から、見積書を添えた返信、予約の確定とドライバーへの連絡まで。",i:IC.mail},
+ quote:{t:"見積・配車",d:"依頼内容の読み取り、料金表からの見積、見積書・配車表・点検と期限の一覧の下書きまで。",i:IC.yen},
+ sns:{t:"SNS・LINE配信",d:"レンタルのご案内や、車検・税の更新時期のお知らせを日本語・タイ語・英語で作り、決まった時間に自動で配信。",i:IC.share},
+ jobs:{t:"案件・配車予定",d:"見積中・受注済みの案件と、これから2週間の配車・整備の予定を一覧で。",i:IC.list}};
+function navHtml(n){
+ function b(v,label,cnt,hot){return '<button data-view="'+v+'" class="'+(state.view===v?"active":"")+'">'+VIEWS[v].i+label+'<span class="count '+(hot&&cnt?"hot":"")+'">'+(cnt||"")+'</span></button>'}
+ return b("mail","メール",n.inbox,true)+b("quote","見積・配車",n.open)+b("sns","SNS・LINE配信",n.drafts)+b("jobs","案件・配車予定",n.jobs);
+}
+function render(){
+ var n=counts(),v=VIEWS[state.view]||VIEWS.mail,nav=navHtml(n);
+ var html='<header class="topbar"><div class="brand"><div class="brand-symbol">'+esc(BRAND.charAt(0))+'</div><div><b>'+esc(BRAND)+'</b><small>CAR RENTAL &amp; SERVICE WORKSPACE</small></div></div>'+
+  '<div class="crumb">ワークスペース　/　'+v.t+'</div><span class="demo-pill">DEMO<span class="long"> · 実際には送信しません</span></span>'+
+  '<button class="help" data-act="help">'+IC.help+'<span>使い方</span></button></header>'+
+  '<div class="layout"><nav class="nav"><div class="nav-label">WORKSPACE</div>'+nav+
+  '<div class="nav-bottom"><button data-act="rates">'+IC.yen+'料金表</button><button data-act="reset">'+IC.reset+'デモをリセット</button>'+
+  '<div class="note">● このブラウザに自動保存<br>会社・人名・金額はすべて架空のサンプルです</div></div></nav>'+
+  '<main class="workspace"><div class="mobile-tabs">'+nav+'<button data-act="rates">料金表</button><button data-act="reset">リセット</button><button data-act="help">使い方</button></div>'+
+  '<div class="ws-head"><div><h1>'+v.t+'</h1><p>'+v.d+'</p></div><div class="head-actions">'+headActions()+'</div></div>'+
+  (state.view==="mail"?viewMail():state.view==="quote"?viewQuote():state.view==="sns"?viewSns():viewJobs())+'</main></div>';
+ $("#app").innerHTML=html;
+ save();
+}
+function headActions(){
+ if(state.view==="mail")return '<button class="btn-i" data-act="paste">'+IC.plus+'問い合わせを貼り付けて試す</button>';
+ if(state.view==="quote")return '<button class="btn-i" data-act="gomail">'+IC.mail+'関連メール</button>';
+ if(state.view==="sns")return '<button class="btn-i" data-act="newpost">'+IC.plus+'お知らせから投稿を作る</button>';
+ return '<button class="btn-i" data-act="rates">'+IC.yen+'料金表</button>';
+}
+
+/* ============================================================ view: mail */
+function viewMail(){
+ var f=state.folder,list=state.mails.filter(function(m){return m.folder===f});
+ var rows=list.map(function(m){
+  return '<button class="row '+(m.id===state.selMail?"active":"")+'" data-mail="'+m.id+'"><div class="row-top">'+(m.unread?'<span class="dot"></span>':'')+'<b>'+esc(f==="inbox"?m.from:"宛先："+(m.toName||m.addr))+'</b><time>'+esc(m.date)+'</time></div><div class="subj">'+esc(m.subject)+'</div><div class="snip">'+esc(m.body.slice(0,90))+'</div><div class="row-foot">'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join("")+(m.attach?'<span class="badge green">添付あり</span>':'')+'</div></button>';
+ }).join("")||'<div class="empty"><div><p class="tiny">'+(f==="sent"?"送信済みのメールはまだありません":f==="draft"?"下書きはありません":"受信メールはありません")+'</p></div></div>';
+ var tabs=[["inbox","受信箱"],["sent","送信済み"],["draft","下書き"]].map(function(t){var c=state.mails.filter(function(m){return m.folder===t[0]}).length;return '<button data-folder="'+t[0]+'" class="'+(f===t[0]?"active":"")+'">'+t[1]+(c?" "+c:"")+'</button>'}).join("");
+ var sel=state.mails.filter(function(m){return m.id===state.selMail&&m.folder===f})[0]||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools"><div class="tabs">'+tabs+'</div></div><div class="scroll">'+rows+'</div><div class="list-foot">サンプルメール / 外部のメールとは接続していません</div></section>'+
+  '<section class="detail">'+(sel?mailDetail(sel):'<div class="empty"><div><div class="em-i">'+IC.mail+'</div><h3>メールを選んでください</h3></div></div>')+'</section></div>';
+}
+function mailDetail(m){
+ if(m.unread){m.unread=false;setTimeout(save,0)}
+ var h='<div class="detail-inner"><div class="mail-h"><h2>'+esc(m.subject)+'</h2><div>'+(m.tags||[]).map(function(t){return '<span class="badge '+t.k+'">'+esc(t.t)+'</span>'}).join(" ")+'</div></div>'+
+  '<div class="sender"><div class="avatar">'+esc(m.init||"?")+'</div><div><b>'+esc(m.folder==="inbox"?m.from:BRAND+" "+STAFF)+'</b><span>'+esc(m.folder==="inbox"?m.addr:"宛先："+m.addr)+'</span></div><time>'+esc(m.date)+'</time></div>'+
+  '<div class="mail-body">'+esc(m.body)+(m.tr?'<div class="trans">'+esc(m.tr)+'</div>':'')+'</div>';
+ if(m.attach)h+='<div class="actions"><span class="attach">'+IC.doc+esc(m.attach)+'</span><button class="small" data-act="viewdoc" data-case="'+m.caseId+'">開く</button></div>';
+ if(m.folder==="inbox"&&m.caseId){
+  var st=cs(m.caseId);
+  if(m.kind==="accept"){
+   h+='<div class="actions"><button class="primary btn-i" data-act="confirmjob" data-case="'+m.caseId+'" '+(st.confirmed?"disabled":"")+'>'+IC.cal+(st.confirmed?"予約を確定済み":"予約を確定して連絡を作る")+'</button><span class="tiny muted">お客様への確認メールと、ドライバー・整備スタッフへのLINE（タイ語）を作ります</span></div>';
+   if(st.crewMsg)h+=crewCard(C(m.caseId));
+  }else{
+   h+='<div class="actions"><button class="primary btn-i" data-act="toquote" data-case="'+m.caseId+'">'+IC.yen+(st.read?"見積・書類の続きを開く":"このメールから見積・書類を作る")+'</button><span class="tiny muted">'+(st.sent?"見積書を送信済みです":"依頼内容の読み取り → 料金表から見積 → 見積書・配車表・日程")+'</span></div>';
+  }
+  h+=replyBox(m);
+ }
+ if(m.folder==="draft")h+=replyBox(m,true);
+ return h+'</div>';
+}
+function crewCard(c){
+ return '<div class="card"><h3>'+IC.chat+' ドライバー・スタッフへの連絡（LINE・タイ語）</h3><div class="bubble out" style="white-space:pre-wrap">'+esc(c.crew.th)+'<span class="tr">'+esc(c.crew.ja)+'</span></div><p class="tiny muted" style="margin:8px 0 0">本番では、確定と同時にドライバー・整備スタッフのLINEグループへ送り、前日にもリマインドします（デモでは送りません）。</p></div>';
+}
+function replyBox(m,isDraft){
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ var d=state.compose&&state.compose.mail===m.id?state.compose:null;
+ if(!d){
+  var body="",att=null,subj="Re: "+m.subject.replace(/^Re:\s*/,"");
+  if(isDraft){body=m.body;att=m.attach;subj=m.subject}
+  else if(st&&st.attached&&!st.sent&&m.kind!=="accept"){body=quoteMail(c,st);att=docName(c)}
+  d={mail:m.id,to:m.addr,subject:subj,body:body,attach:att};
+ }
+ var canInsert=st&&st.read&&!st.sent&&m.kind!=="accept";
+ var trNote=c&&c.lang==="th"&&d.body&&m.kind!=="accept"&&st.attached?'<div class="trans">'+esc(quoteMailTr(c,st))+'</div>':"";
+ return '<div class="reply" id="replyBox" data-attach="'+esc(d.attach||"")+'"><div class="reply-h">↩ 宛先 <input id="rTo" value="'+esc(d.to)+'" aria-label="宛先"><button class="small btn-i" data-act="insertdoc" data-mail="'+m.id+'" '+(canInsert?"":"disabled")+' title="見積・書類で作った見積書を添付し、本文を作ります">'+IC.clip+(st&&st.attached?"見積書を添付済み":"作成中の見積書を挿入")+'</button></div>'+
+  '<div class="reply-h" style="background:#fff">件名 <input id="rSubj" value="'+esc(d.subject)+'" aria-label="件名"></div>'+
+  '<textarea id="rBody" aria-label="本文" placeholder="'+(st&&!st.attached&&m.kind!=="accept"?"「見積・書類」で見積書を作ると、ここに返信の本文が入ります":"本文")+'">'+esc(d.body)+'</textarea>'+
+  '<div class="reply-f">'+(d.attach?'<span class="attach">'+IC.doc+esc(d.attach)+'</span>':'<span class="tiny muted">添付なし</span>')+'<span style="flex:1"></span><button data-act="savedraft" data-mail="'+m.id+'">下書き保存</button><button class="primary btn-i" data-act="send" data-mail="'+m.id+'">'+IC.send+'送信（デモ）</button></div></div>'+
+  (trNote?'<p class="tiny muted" style="margin:10px 0 0">タイ語の本文の日本語訳（送る前の確認用）</p>'+trNote:"");
+}
+function docName(c){
+ var en=c.doc==="en",x=c.extraDoc;
+ return en?"Quotation_"+c.short+".pdf"+(x==="due"?", Service_Due_List.pdf":", Schedule.pdf"):"御見積書_"+c.short+".pdf"+(x==="disp"?"、配車表.pdf":x==="due"?"、点検・期限一覧.pdf":"、ご予約内容.pdf");
+}
+
+/* ============================================================ view: quote */
+var READ_LAB={ja:[["type","依頼の種類"],["from","お迎え先・お届け先"],["to","行き先・使う場所"],["vol","人数・台数"],["date","日程・期間"],["car","車種"],["docs","必要な書類"],["extra","その他"]],
+ en:[["type","Request"],["from","Pickup / delivery"],["to","Destination / use"],["vol","Passengers / cars"],["date","Date / period"],["car","Vehicle"],["docs","Documents"],["extra","Notes"]]};
+function statusOf(c){var st=cs(c.id);return st.confirmed?["受注・日程確定","green"]:st.accepted?["受注（日程確認中）","green"]:st.sent?["見積送付済み","blue"]:st.read?["見積中","amber"]:["未着手","gray"]}
+function viewQuote(){
+ var list=allCases();
+ var rows=list.map(function(c,i){var lab=statusOf(c),st=cs(c.id);
+  return '<button class="row '+(c.id===state.selCase?"active":"")+'" data-case="'+c.id+'"><div class="row-top"><b>'+esc(c.from)+'</b><span class="badge '+lab[1]+'">'+lab[0]+'</span></div><div class="subj">'+esc(c.subject)+'</div><div class="snip">'+esc((c.read.type||"")+(st.items?" / "+fmt(calc(st).total)+" B（税込）":""))+'</div><div class="row-foot"><span class="badge gray">'+(c.custom?"貼り付けた問い合わせ":"事例"+(i+1)+" · "+esc(c.tag))+'</span></div></button>'}).join("");
+ var c=C(state.selCase)||list[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">見積依頼を選択</b> <span class="badge gray">'+list.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">読み取りは4事例を使ったデモ再現です（貼り付けた問い合わせは簡易読み取り）</div></section>'+
+  '<section class="detail">'+caseDetail(c)+'</section></div>';
+}
+function caseDetail(c){
+ var st=cs(c.id);
+ var stepLab=["依頼内容を読み取る","料金表から見積をつくる","見積書・日程・書類をつくる"];
+ var steps=stepLab.map(function(s,i){var cl=st.step>i+1||(i===2&&st.attached)?"done":(st.step===i+1||(st.step===0&&i===0))?"cur":"";return '<button class="step '+cl+'" data-ptab="'+["read","quote","docs"][i]+'"><i>'+(i+1)+'</i>'+s+'</button>'}).join("");
+ var tabs=[["read","依頼内容"],["quote","見積"],["docs","見積書・日程・書類"],["mail","元のメール"]].map(function(t){return '<button data-ptab="'+t[0]+'" class="'+(state.ptab===t[0]?"active":"")+'">'+t[1]+'</button>'}).join("");
+ var lab=statusOf(c);
+ var h='<div class="detail-inner"><div class="p-head"><div><h2>'+esc(c.read.type||"見積依頼")+'</h2><div class="meta">Q-'+c.id+' · '+esc(c.from)+' · 担当 '+STAFF+'</div></div><span class="badge '+lab[1]+'">'+lab[0]+'</span></div>'+
+  '<div class="steps">'+steps+'</div><div class="ptabs">'+tabs+'</div>';
+ if(state.ptab==="mail")h+='<div class="card"><div class="mail-body" style="border:0;padding:0">'+esc(c.body)+(c.tr?'<div class="trans">'+esc(c.tr)+'</div>':'')+'</div></div>';
+ else if(!st.read)h+='<div class="empty"><div><div class="em-i">'+IC.spark+'</div><h3>メールから依頼内容を読み取ります</h3><p class="tiny">依頼の種類・お迎え先と行き先・人数や台数・日程・車種を取り出し、<br>足りない情報は「確認したいこと」にまとめます。英語・タイ語のメールも読み取れます。</p><button class="primary btn-i" data-act="extract" data-case="'+c.id+'">'+IC.spark+'依頼内容を読み取る</button></div></div>';
+ else if(state.ptab==="read")h+=readTab(c,st);
+ else if(state.ptab==="quote")h+=quoteTab(c,st);
+ else h+=docsTab(c,st);
+ h+='</div>';
+ var tt=st.items?calc(st):null;
+ h+='<div class="foot-bar"><span class="sum">'+(tt?"見積 "+st.items.filter(function(x){return x.on}).length+"項目 ／ 合計 "+fmt(tt.total)+" バーツ（税込）":"依頼内容を読み取ってください")+'</span>'+
+  '<button class="btn-i" data-act="viewdoc" data-case="'+c.id+'" '+(st.read?"":"disabled")+'>'+IC.doc+'見積書プレビュー</button>'+
+  '<button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.read&&!st.sent?"":"disabled")+'>'+IC.send+(st.sent?"送信済み":"返信へ添付")+'</button></div>';
+ return h;
+}
+function readTab(c,st){
+ var lab=READ_LAB[c.lang==="en"&&!/[぀-ヿ一-鿿]/.test(c.read.type||"")?"en":"ja"];
+ var h='<div class="card"><h3>読み取った依頼内容</h3><table class="kv">'+lab.map(function(r){var v=c.read[r[0]];return '<tr><th>'+r[1]+'</th><td>'+(v?esc(v):'<span class="miss">記載なし</span>')+'</td></tr>'}).join("")+'</table>'+
+  '<div class="checklist"><b>確認したいこと（見積メールで質問します）</b><ul>'+c.checks.map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ul></div></div>';
+ if(c.lang!=="ja")h+='<div class="card"><h3>やり取りの言語</h3><p class="tiny" style="margin:0">'+(c.lang==="en"?"英語のメールです。見積書・日程・一覧も英語で作り、返信も英語で下書きします。":"タイ語のメールです。返信はタイ語で下書きし、日本語の訳を付けて確認できるようにします。見積書は英語で作ります。")+'</p></div>';
+ return h+'<div class="actions"><button class="primary btn-i" data-ptab="quote">'+IC.yen+'料金表から見積をつくる</button><span class="tiny muted">人数・日数・台数・作業内容から、料金表の項目を自動で積み上げます</span></div>';
+}
+function quoteTab(c,st){
+ var en=c.doc==="en",tt=calc(st);
+ var rows=st.items.map(function(it,i){var r=RATE[it.k];return '<tr class="'+(it.on?"":"off")+'"><td><label style="display:flex;gap:6px;align-items:flex-start"><input type="checkbox" data-on="'+i+'" data-case="'+c.id+'" '+(it.on?"checked":"")+' aria-label="見積に含める">'+'<span>'+esc(r.ja)+(it.opt?' <span class="badge amber">オプション</span>':'')+(en?'<br><span class="tiny muted">'+esc(r.en)+'</span>':'')+'</span></label></td><td class="num"><input class="qty" type="number" min="0" step="any" value="'+it.q+'" data-qty="'+i+'" data-case="'+c.id+'" aria-label="数量"> '+esc(r.u)+'</td><td class="num">'+fmt(r.p)+'</td><td class="num">'+(it.on?fmt(Math.round(r.p*it.q)):"—")+'</td></tr>'}).join("");
+ return '<div class="card"><h3>見積（料金表から自動で積算）</h3><div class="tbl-wrap"><table class="qt"><tr><th>項目</th><th class="num">数量</th><th class="num">単価（B）</th><th class="num">金額（B）</th></tr>'+rows+
+  '<tr class="tot"><td colspan="3" class="num">小計</td><td class="num">'+fmt(tt.sub)+'</td></tr><tr><td colspan="3" class="num muted">VAT 7%</td><td class="num">'+fmt(tt.vat)+'</td></tr><tr class="tot"><td colspan="3" class="num">合計（税込）</td><td class="num">'+fmt(tt.total)+'</td></tr></table></div>'+
+  '<p class="tiny muted" style="margin:8px 0 0">数量はその場で直せます。オプションはチェックで見積に入れる／外すを切り替えます。金額はすべて架空のサンプル料金です。</p></div>'+
+  '<div class="actions"><button class="primary btn-i" data-ptab="docs">'+IC.doc+'見積書・日程・書類をつくる</button><span class="tiny muted">'+(en?"見積書と日程を英語で作ります":"見積書と日程を日本語で作ります")+(c.extraDoc==="disp"?"。配車表の下書きも作ります":c.extraDoc==="due"?"。点検・期限の一覧も作ります":"")+'</span></div>';
+}
+function quoteDoc(c,st,pid){
+ var en=c.doc==="en",tt=calc(st),qn="Q-"+String(NOW.getFullYear()).slice(2)+("0"+(NOW.getMonth()+1)).slice(-2)+("0"+NOW.getDate()).slice(-2)+"-"+c.id;
+ var rows=st.items.filter(function(x){return x.on}).map(function(it){var r=RATE[it.k];return '<tr><td>'+esc(en?r.en:r.ja)+'</td><td class="num">'+fmt(it.q)+' '+esc(en?r.ue:r.u)+'</td><td class="num">'+fmt(r.p)+'</td><td class="num">'+fmt(Math.round(r.p*it.q))+'</td></tr>'}).join("");
+ return '<div class="doc"'+(pid?' id="'+pid+'"':'')+'><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><h4>'+(en?"QUOTATION":"御見積書")+'</h4><div class="tiny muted">'+esc(en?BRAND_EN:BRAND)+' · '+(en?"Prepared by "+STAFF_EN:"担当 "+STAFF)+'</div></div><div class="tiny muted" style="text-align:right">'+qn+'<br>'+(en?ymdEn(NOW):ymdJ(NOW))+'</div></div>'+
+  '<div class="to">'+esc(c.addressee.replace(/\n/g," "))+(en?"":"")+'</div><p class="lead">'+(en?"Subject: "+esc(c.docSubj||((c.read.type||"Quotation")+" — "+(c.read.from||"")+(c.read.to?" → "+c.read.to:""))):"件名："+esc(c.read.type||"お見積り")+"（"+esc(c.read.from||"")+(c.read.to?" → "+esc(c.read.to):"")+"）")+'</p>'+
+  '<div class="tbl-wrap"><table><tr><th>'+(en?"Description":"項目")+'</th><th class="num">'+(en?"Qty":"数量")+'</th><th class="num">'+(en?"Unit price (THB)":"単価（バーツ）")+'</th><th class="num">'+(en?"Amount (THB)":"金額（バーツ）")+'</th></tr>'+rows+
+  '<tr><td colspan="3" class="num">'+(en?"Subtotal":"小計")+'</td><td class="num">'+fmt(tt.sub)+'</td></tr><tr><td colspan="3" class="num">VAT 7%</td><td class="num">'+fmt(tt.vat)+'</td></tr><tr class="tot"><td colspan="3" class="num">'+(en?"Total":"合計（税込）")+'</td><td class="num">'+fmt(tt.total)+'</td></tr></table></div>'+
+  '<p class="tiny muted" style="margin:10px 0 0">'+(en?"Valid for 30 days. Tolls, fuel, overtime and government fees are settled at actual cost. Sample document for demonstration.":"有効期限：発行日から30日。高速代・燃料・時間外・税や保険料は実績で精算します。（デモ用のサンプル書類です）")+'</p></div>';
+}
+function planDoc(c){
+ var en=c.doc==="en";
+ return '<div class="doc"><h4 style="font-size:15px">'+(en?"Work schedule (draft)":"作業日程（案）")+'</h4><div class="route">'+c.plan.map(function(p){return '<div><b>'+(en?mdwEn(p[0]):mdw(p[0]))+'</b><span class="pt"></span><span>'+(p[1]?p[1]+"　":"")+esc(p[2])+'</span></div>'}).join("")+'</div></div>';
+}
+function dispDoc(c){
+ return '<div class="doc"><h4 style="font-size:15px">配車表（下書き）</h4><p class="lead" style="margin:4px 0 10px">確定すると、ドライバーへのLINEと前日のリマインドに使います。</p><div class="tbl-wrap"><table><tr><th>日付</th><th>時間</th><th>行き先</th><th>車両・ドライバー</th></tr>'+c.disp.map(function(r){return '<tr><td>'+mdw(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td></tr>'}).join("")+'</table></div></div>';
+}
+function dueDoc(c){
+ var en=c.doc==="en";
+ return '<div class="doc"><h4 style="font-size:15px">'+(en?"Service & due-date list":"点検・期限の一覧")+'</h4><p class="lead" style="margin:4px 0 10px">'+(en?"We will remind you 30 days before each due date.":"それぞれの期限の30日前に、自動でお知らせします。")+'</p><div class="tbl-wrap"><table><tr><th>'+(en?"Plate":"ナンバー")+'</th><th>'+(en?"Model":"車種")+'</th><th class="num">'+(en?"Mileage (km)":"走行距離（km）")+'</th><th>'+(en?"Tax & insurance due":"税・強制保険の期限")+'</th><th>'+(en?"Inspection":"車検")+'</th><th>'+(en?"This time":"今回の作業")+'</th></tr>'+
+  c.due.map(function(r){var soon=(r[3]-NOW)/864e5<=30;return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td class="num">'+esc(r[2])+'</td><td>'+(en?ymdEn(r[3]):ymdJ(r[3]))+(soon?' <span class="badge amber">'+(en?"Due soon":"期限が近い")+'</span>':'')+'</td><td>'+(r[4]?(en?"Required (7+ years)":"必要（7年以上）"):"—")+'</td><td>'+esc(r[5])+'</td></tr>'}).join("")+'</table></div></div>';
+}
+function docsHtml(c,st,forPrint){
+ var h=quoteDoc(c,st,forPrint?"printDoc":"");
+ if(!forPrint){h+=planDoc(c);if(c.extraDoc==="disp")h+=dispDoc(c);if(c.extraDoc==="due")h+=dueDoc(c)}
+ return h;
+}
+function docsTab(c,st){
+ if(st.step<3){st.step=3;setTimeout(save,0)}
+ return '<div class="card" style="background:#fbfcfb">'+docsHtml(c,st)+'</div><div class="actions"><button class="primary btn-i" data-act="attach" data-case="'+c.id+'" '+(st.sent?"disabled":"")+'>'+IC.send+'見積書を返信メールに添付</button><span class="tiny muted">メール画面に移り、見積書付きの返信が入ります</span></div>';
+}
+function planLines(c,lang,bullet){return c.plan.map(function(p){return bullet+dayText(p[0],lang)+(p[1]?" "+p[1]:"")+" "+(lang==="th"&&p[3]?p[3]:p[2])}).join("\n")}
+function topItems(c,st,en){return st.items.filter(function(x){return x.on}).slice(0,4).map(function(x){return en?RATE[x.k].en:RATE[x.k].ja}).join(en?", ":"、")}
+function quoteMail(c,st){
+ var tt=calc(st);
+ if(c.lang==="en"){
+  var s=(c.custom?"Dear Sir or Madam,":"Dear "+c.addressee+",")+"\n\nThank you for your inquiry. Please find attached our quotation"+(c.extraDoc==="due"?" and a service & due-date list for each car":" and a draft schedule")+".\n\n- Total: THB "+fmt(tt.total)+" (incl. VAT)\n- Includes: "+topItems(c,st,true)+"\n- Proposed schedule:\n"+planLines(c,"en","  ")+(c.extraDoc==="due"?"\n\nWe will also remind you 30 days before each car's tax and insurance due date.":"")+"\n\nCould you also let us know:\n";
+  c.checks.forEach(function(x){s+="- "+x+"\n"});
+  return s+"\nBest regards,\n"+STAFF_EN+"\n"+BRAND_EN;
+ }
+ if(c.lang==="th"){
+  var rent=c.kind==="monthly";
+  var t="เรียน "+c.addressee+"\n\nขอบคุณที่ติดต่อมาครับ ขอส่งใบเสนอราคา"+(rent?"และเงื่อนไขการเช่า":"")+"ตามไฟล์แนบครับ\n\n■ ราคารวม: "+fmt(tt.total)+" บาท (รวม VAT)\n■ กำหนดการ\n"+planLines(c,"th","- ")+(rent?"\n\n■ รถทดแทน: หากรถเสีย เราส่งรถทดแทนให้ภายใน 24 ชั่วโมง ไม่มีค่าใช้จ่ายเพิ่มครับ":"")+"\n\nรบกวนแจ้งข้อมูลต่อไปนี้ด้วยครับ\n";
+  (c.checksTh||c.checks).forEach(function(x){t+="- "+x+"\n"});
+  return t+"\nขอบคุณครับ\n"+STAFF_TH+"\n"+BRAND_EN;
+ }
+ var j=(c.custom?"ご担当者様":c.addressee)+"\n\nお問い合わせいただき、ありがとうございます。"+BRAND+"の"+STAFF+"です。\n"+(c.read.type||"お見積り")+"のお見積りをお送りします。\n\n■ お見積り金額："+fmt(tt.total)+" バーツ（税込）\n■ 主な内容："+topItems(c,st,false)+"\n■ 日程（案）\n"+planLines(c,"ja","・")+"\n\n詳しくは添付の書類をご覧ください。"+(c.extraDoc==="disp"?"\n配車表（時間・行き先・車両）の下書きも添付しました。":c.kind==="monthly"?"\n保険は対人・対物とも含まれており、事故のときは日本語で24時間対応します。":"")+"\n\nあわせて、以下を教えていただけますでしょうか。\n";
+ c.checks.forEach(function(x){j+="・"+x+"\n"});
+ return j+"\nどうぞよろしくお願いいたします。\n\n"+BRAND+"　"+STAFF;
+}
+function quoteMailTr(c,st){
+ var tt=calc(st),rent=c.kind==="monthly";
+ return "（訳）"+c.addressee+"様\nお問い合わせありがとうございます。見積書"+(rent?"と貸出の条件":"")+"を添付します。\n■ 合計："+fmt(tt.total)+" バーツ（税込）\n■ 日程\n"+planLines(c,"ja","・")+(rent?"\n■ 代車：故障したときは24時間以内に代わりの車をお届けします（追加料金なし）":"")+"\n次の点を教えてください：\n"+c.checks.map(function(x){return "・"+x}).join("\n");
+}
+
+/* ============================================================ view: sns */
+function postText(s,lang){
+ var tp=TOPICS[s.topic],v=s.v||0,ch=s.ch;
+ return tp.hook[lang][v%3]+"\n"+tp.body[lang]+(ch==="line"?"":"\n\n"+tp.tags[lang])+(lang==="ja"?"\n— "+BRAND:lang==="en"?"\n— "+BRAND_EN:"\n— "+BRAND_EN);
+}
+function slots(){var out=[];for(var i=0;i<14&&out.length<4;i++){var d=addD(NOW,i+1);if(d.getDay()===1||d.getDay()===4)out.push(d)}return out}
+var CHN={line:"LINE配信",facebook:"Facebook",instagram:"Instagram"};
+function viewSns(){
+ var posts=state.posts;
+ var rows=posts.map(function(s){var tp=TOPICS[s.topic];var b=s.status==="posted"?["配信済み","gray"]:s.status==="scheduled"?["予約済み","green"]:["下書き","amber"];
+  return '<button class="row '+(s.id===state.selPost?"active":"")+'" data-post="'+s.id+'"><div class="row-top"><b>'+esc(tp.t)+'</b><span class="badge '+b[1]+'">'+b[0]+'</span></div><div class="snip">'+esc(tp.body.ja.split("\n")[0])+'</div><div class="row-foot"><span class="badge blue">'+CHN[s.ch]+'</span>'+(s.auto?'<span class="badge gray">自動作成：'+esc(s.why||"")+'</span>':'')+(s.when?'<span class="badge gray">'+esc(s.when)+'</span>':'')+'</div></button>'}).join("");
+ var s=posts.filter(function(x){return x.id===state.selPost})[0]||posts[0];
+ return '<div class="body"><section class="list-pane"><div class="list-tools" style="padding-bottom:10px"><b style="font-size:12px">配信するお知らせ</b> <span class="badge gray">'+posts.length+'件</span></div><div class="scroll">'+rows+'</div><div class="list-foot">季節や問い合わせの傾向から、投稿の下書きが自動でできます</div></section>'+
+  '<section class="detail">'+(s?postDetail(s):"")+'</section></div>';
+}
+function postDetail(s){
+ var tp=TOPICS[s.topic],lang=state.lang,txt=s.text||postText(s,lang);
+ var ch=[["line","LINE配信"],["facebook","Facebook"],["instagram","Instagram"]].map(function(x){return '<button data-ch="'+x[0]+'" class="'+(s.ch===x[0]?"on":"")+'" '+(s.status!=="draft"?"disabled":"")+'>'+x[1]+'</button>'}).join("");
+ var lg=[["ja","日本語"],["th","ไทย"],["en","English"]].map(function(x){return '<button data-lang="'+x[0]+'" class="'+(lang===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+ var ph='<div class="photo" style="background:linear-gradient(135deg,hsl('+tp.hue+',38%,50%),hsl('+((tp.hue+40)%360)+',42%,32%))">'+IC.box+'<span>'+esc(tp.t)+'</span></div>';
+ var prev=s.ch==="line"?'<div class="line-prev">'+ph+'<div class="lb">'+esc(txt)+'</div></div>':'<div class="post-prev"><div class="ph"><span class="avatar">'+esc(BRAND.charAt(0))+'</span><b>'+esc(BRAND)+'</b></div>'+ph+'<div class="tx">'+esc(txt)+'</div></div>';
+ var sl=slots().map(function(d){return '<option value="'+stamp(d,"12:00")+'">'+mdw(d)+' 12:00</option>'}).join("");
+ return '<div class="detail-inner"><div class="sns-grid"><div><div class="p-head"><div><h2>'+esc(tp.t)+'</h2><div class="meta">'+esc(CHN[s.ch])+(s.auto?" · 自動作成："+esc(s.why||""):"")+'</div></div></div>'+
+  '<div class="actions"><div class="seg">'+ch+'</div><div class="seg">'+lg+'</div><button class="small btn-i" data-act="regen" '+(s.status!=="draft"?"disabled":"")+'>'+IC.spark+'文面を作り直す</button></div>'+prev+
+  '<div class="actions">'+(s.status==="draft"?'<select id="slot" aria-label="配信日時">'+sl+'</select><button class="primary btn-i" data-act="schedule">'+IC.cal+'この日時に予約</button><button data-act="postnow">今すぐ配信（デモ）</button>':s.status==="scheduled"?'<span class="badge green">'+esc(s.when)+' に配信予定</span><button class="small" data-act="unschedule">予約を取り消す</button>':'<span class="badge gray">'+esc(s.when)+' に配信済み</span>')+'</div></div>'+
+  '<div><div class="card" style="margin-top:0"><h3>'+IC.cal+' 配信カレンダー</h3>'+calendar()+'</div>'+
+  '<div class="card"><h3>自動運用のルール</h3>'+
+  '<label class="toggle"><input type="checkbox" data-auto="draft" '+(state.auto.draft?"checked":"")+'><span>赴任・帰任シーズン、税や車検の期限、問い合わせの多い内容から、投稿の下書きを自動で作る（日本語・タイ語・英語）</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="weekly" '+(state.auto.weekly?"checked":"")+'><span>毎週 月・木 12:00 に、予約した投稿を自動で配信する</span></label>'+
+  '<label class="toggle"><input type="checkbox" data-auto="approve" '+(state.auto.approve?"checked":"")+'><span>配信の前に担当者の確認を入れる</span></label>'+
+  '<p class="tiny muted" style="margin:6px 0 0">本番では、LINE公式アカウント・Facebookページと連携し、この画面の操作なしで動きます。LINEで届いた「見積」は受信箱に自動で入ります。</p></div></div></div></div>';
+}
+function calendar(){
+ var out="";
+ for(var i=-2;i<7;i++){var d=addD(NOW,i);var key=md(d);
+  var its=state.posts.filter(function(s){return s.when&&s.when.split(" ")[0]===key});
+  out+='<div class="cal-day"><b>'+mdw(d)+(i===0?"　今日":"")+'</b>'+(its.length?its.map(function(s){return '<div class="it"><span class="badge '+(s.status==="posted"?"gray":"green")+'">'+s.when.split(" ")[1]+'</span>'+esc(TOPICS[s.topic].t)+'</div>'}).join(""):'<div class="it muted">—</div>')+'</div>'}
+ return '<div class="cal">'+out+'</div>';
+}
+
+/* ============================================================ view: jobs */
+function upcoming(){
+ var list=BASEJOBS.map(function(j){return {d:new Date(j.d),t:j.t,title:j.title,who:j.who,base:true}});
+ (state.jobs||[]).forEach(function(j){var c=C(j.caseId);if(!c)return;c.plan.forEach(function(p){list.push({d:new Date(p[0]),t:p[1],title:(c.custom?"":c.from.split("（")[0]+"："),sub:p[2],caseId:c.id})})});
+ var end=addD(NOW,15);
+ return list.filter(function(x){return x.d>=addD(NOW,0)&&x.d<end}).sort(function(a,b){return a.d-b.d||String(a.t).localeCompare(String(b.t))});
+}
+function viewJobs(){
+ var cases=allCases();
+ var rows=cases.map(function(c){var st=cs(c.id),lab=statusOf(c);return '<tr><td><button class="subtle" style="padding:0;text-align:left;white-space:normal" data-case-open="'+c.id+'"><b>'+esc(c.from)+'</b><br><span class="tiny muted">'+esc(c.read.type||"")+'</span></button></td><td class="num">'+(st.items?fmt(calc(st).total):"—")+'</td><td><span class="badge '+lab[1]+'">'+lab[0]+'</span></td></tr>'}).join("");
+ var up=upcoming();
+ var cal=up.length?up.map(function(x){return '<div class="cal-day"><b>'+mdw(x.d)+(x.t?"　"+x.t:"")+'</b><div class="it">'+(x.caseId?'<span class="badge green">今回の受注</span>':'<span class="badge gray">予定</span>')+esc(x.caseId?x.title+x.sub:x.title)+'</div>'+(x.who?'<div class="it muted">'+esc(x.who)+'</div>':'')+'</div>'}).join(""):'<p class="tiny muted">予定はありません</p>';
+ return '<div class="detail" style="flex:1"><div class="detail-inner"><div class="jobs-grid">'+
+  '<div class="card" style="margin-top:0"><h3>案件の状況</h3><div class="tbl-wrap"><table><tr><th>お客様・内容</th><th class="num">見積（税込B）</th><th>状況</th></tr>'+rows+'</table></div><p class="tiny muted" style="margin:8px 0 0">見積を送ったまま返事のない案件は、3日後に確認のメールを下書きします（本番の自動運用）。</p></div>'+
+  '<div class="card" style="margin-top:0"><h3>'+IC.cal+' これから2週間の配車・整備の予定</h3><div class="cal">'+cal+'</div><p class="tiny muted" style="margin:8px 0 0">メールで予約を確定すると、ここに自動で入ります。</p></div>'+
+  '</div></div></div>';
+}
+
+/* ============================================================ actions */
+function go(view){state.view=view;render();window.scrollTo(0,0)}
+function openCase(id){state.selCase=id;var s=cs(id);state.ptab=s.read?(s.step>=3?"docs":s.step>=2?"quote":"read"):"read";go("quote")}
+function captureCompose(mailId){var to=$("#rTo"),sj=$("#rSubj"),b=$("#rBody");if(!to)return null;return {mail:mailId,to:to.value,subject:sj.value,body:b.value,attach:$("#replyBox").dataset.attach||null}}
+function attachDoc(caseId){
+ var st=cs(caseId),c=C(caseId);if(!st.read)return;st.attached=true;if(st.step<3)st.step=3;
+ var mid=state.mails.filter(function(m){return m.caseId===caseId&&m.folder==="inbox"&&m.kind!=="accept"})[0];
+ state.compose={mail:mid.id,to:mid.addr,subject:"Re: "+mid.subject,body:quoteMail(c,st),attach:docName(c)};
+ state.folder="inbox";state.selMail=mid.id;go("mail");
+ setTimeout(function(){var r=$("#replyBox");if(r&&r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("見積書を添付し、返信の本文を作りました。内容を確認して送信してください");
+}
+function sendMail(mailId){
+ var m=state.mails.filter(function(x){return x.id===mailId})[0],d=captureCompose(mailId);if(!d||!m)return;
+ if(!d.to||!d.body.trim()){toast("宛先と本文を入れてください");return}
+ var sent={id:"M"+(++state.seq)+"s",folder:"sent",from:BRAND,addr:d.to,toName:m.folder==="inbox"?m.from:m.toName,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:m.caseId,tags:[{t:"送信済み",k:"gray"}]};
+ state.mails.unshift(sent);state.compose=null;
+ if(m.folder==="draft")state.mails=state.mails.filter(function(x){return x.id!==m.id});
+ var st=m.caseId?cs(m.caseId):null,c=m.caseId?C(m.caseId):null;
+ if(st&&d.attach&&m.kind!=="accept"&&!st.sent){st.sent=true;
+  setTimeout(function(){
+   st.accepted=true;
+   state.mails.unshift({id:"M"+(++state.seq)+"r",folder:"inbox",from:c.from,addr:c.addr,init:c.init,date:stamp(NOW,nowHM()),subject:"Re: "+d.subject.replace(/^Re:\s*/,""),body:c.accept||(c.lang==="en"?"Thank you for the quotation. Please go ahead.":c.lang==="th"?"ขอบคุณค่ะ ตกลงตามใบเสนอราคาค่ะ":"お見積りありがとうございます。この内容でお願いします。"),tr:c.acceptTr||(c.lang==="th"?"（訳）ありがとうございます。見積りの内容でお願いします。":""),caseId:c.id,kind:"accept",tags:[{t:"受注",k:"green"}],unread:true});
+   render();toast(c.from+" から返信が届きました（受注）");
+  },3500);
+ }
+ if(st&&m.kind==="accept"&&st.crewMsg&&!st.confirmed){st.confirmed=true;if(!state.jobs.some(function(j){return j.caseId===m.caseId}))state.jobs.push({caseId:m.caseId});
+  setTimeout(function(){toast("配車・整備の予定に登録しました（「案件・配車予定」で確認できます）")},3300)}
+ state.folder="sent";state.selMail=sent.id;render();toast("送信しました（デモのため、実際には送信していません）");
+}
+function confirmJob(caseId,mailId){
+ var st=cs(caseId),c=C(caseId),m=state.mails.filter(function(x){return x.id===mailId})[0];
+ if(!c.crew)c.crew=genericCrew(c);
+ st.crewMsg=true;
+ var lang=c.lang,t;
+ if(lang==="en")t=(c.custom?"Dear Sir or Madam,":"Dear "+c.addressee+",")+"\n\nThank you for your order. The schedule is confirmed as follows:\n"+planLines(c,"en","- ")+"\n\nOur driver or staff will contact you the day before. If anything changes, just reply to this email.\n\nBest regards,\n"+STAFF_EN+"\n"+BRAND_EN;
+ else if(lang==="th")t="เรียน "+c.addressee+"\n\nขอบคุณที่ใช้บริการครับ ยืนยันกำหนดการดังนี้\n"+planLines(c,"th","- ")+"\n\nพนักงานจะติดต่อก่อนวันนัด 1 วันครับ\n\nขอบคุณครับ\n"+STAFF_TH+"\n"+BRAND_EN;
+ else t=(c.custom?"ご担当者様":c.addressee.split("\n").pop())+"\n\nご依頼ありがとうございます。以下の日程で確定いたしました。\n\n"+planLines(c,"ja","・")+"\n\n前日に担当のドライバー・スタッフから到着時間のご連絡をいたします。変更があれば、このメールにご返信ください。\n\n"+BRAND+"　"+STAFF;
+ state.compose={mail:mailId,to:m.addr,subject:"Re: "+m.subject.replace(/^Re:\s*/,""),body:t,attach:null};
+ render();setTimeout(function(){var r2=$("#replyBox");if(r2&&r2.scrollIntoView)r2.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ toast("予約の確認メールと、ドライバー・スタッフへのLINE（タイ語）を作りました");
+}
+function genericCrew(c){var p=c.plan[c.plan.length>1?1:0];return {d:p[0],t:p[1]||"09:00",th:"【งานใหม่】\n📅 "+thDay(p[0])+" "+(p[1]||"09:00")+"\n📍 "+(c.read.from||"-")+"\n📦 "+(c.read.vol||"-")+"\nกรุณาตอบรับด้วยครับ",ja:"（訳）新しい作業／"+mdw(p[0])+" "+(p[1]||"9:00")+"／"+(c.read.from||"-")+"／"+(c.read.vol||"-")+"／確認の返信をお願いします"}}
+function help(){
+ modal('<h3>このワークスペースの使い方</h3><p class="tiny muted">'+esc(BRAND)+'様の業務に近い形で動かせるデモです。会社・人名・金額はすべて架空のサンプルで、メールやLINEも実際には送信しません。</p>'+
+ '<ol><li><b>メール</b>：出張者の送迎・マンスリーレンタル・社用車の点検と車検・長期レンタルの依頼（日本語・英語・タイ語）を開き、「このメールから見積・書類を作る」を押します。</li><li><b>見積・配車</b>：①依頼内容を読み取る → ②料金表から見積をつくる（数量はその場で修正）→ ③見積書・配車表・点検と期限の一覧 → 「返信へ添付」。</li><li><b>メール</b>：見積書付きの返信を送ると、お客様から受注の返信が届きます。「予約を確定して連絡を作る」で、確認メールとドライバー・整備スタッフへのタイ語のLINEまで作ります。</li><li><b>SNS・LINE配信</b>：赴任シーズンのレンタルや、車検・税の更新時期のお知らせを日本語・タイ語・英語で作って予約できます。</li><li><b>案件・配車予定</b>：見積中・受注済みの案件と、これから2週間の配車・整備の予定を一覧で確認できます。</li></ol>'+
+ (SERVICES.length?'<p class="tiny">想定した業務：'+SERVICES.map(esc).join("・")+'</p>':'')+
+ '<div class="cta-box"><b>このデモを、'+esc(BRAND)+'様の実際の料金表とメールで動かします。</b><br>Excel・スプレッドシートの料金表や案件表、Gmail・Outlook、LINE公式アカウントと連携できます。<br>開発費 0円 ／ 1機能 月額 5,000バーツ（税別）。まずは30分、お困りの業務をお聞かせください。<br><a href="mailto:toshiki_nagai@william-ac.com?subject=%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%B9%E3%83%9A%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%87%E3%83%A2%E3%82%92%E8%A6%8B%E3%81%BE%E3%81%97%E3%81%9F">toshiki_nagai@william-ac.com</a>（Nova Strategy Inc. 永井）</div>'+
+ '<div class="actions" style="justify-content:flex-end"><button class="primary" data-close>はじめる</button></div>');
+}
+function ratesModal(){
+ modal('<h3>料金表（サンプル）</h3><p class="tiny muted">本番では、貴社のExcel・スプレッドシートの料金表をそのまま使います。金額はすべて架空です。</p><div class="tbl-wrap"><table><tr><th>項目</th><th>単位</th><th class="num">単価（B）</th></tr>'+Object.keys(RATE).map(function(k){var r=RATE[k];return '<tr><td>'+esc(r.ja)+'<br><span class="tiny muted">'+esc(r.en)+'</span></td><td>'+esc(r.u)+'</td><td class="num">'+fmt(r.p)+'</td></tr>'}).join("")+'</table></div><div class="actions" style="justify-content:flex-end"><button data-close>閉じる</button></div>');
+}
+function pasteModal(){
+ var bg=modal('<h3>問い合わせを貼り付けて試す</h3><p class="tiny muted">実際に届くメール・LINEに近い文面を貼り付けると、受信箱に追加して見積・書類まで試せます（簡易読み取り。日本語・英語・タイ語）。</p><div class="paste"><textarea id="pasteText" aria-label="問い合わせ文" placeholder="例）日本から出張者が2名来ます。3/20 にスワンナプーム空港でお迎えして、シラチャの工場まで2日間、運転手付きの車をお願いします。"></textarea></div><div class="actions" style="justify-content:flex-end"><button data-close>キャンセル</button><button class="primary" id="pasteGo">受信箱に追加</button></div>');
+ $("#pasteGo",bg).onclick=function(){var t=$("#pasteText",bg).value.trim();if(!t)return;
+  var r=parse(t),id="X"+(++state.seq),from=r.lang==="ja"?"お問い合わせ（貼り付け）":"Inquiry (pasted)";
+  state.custom[id]={id:id,custom:true,from:from,addr:"customer@example.com",init:"問",date:stamp(NOW,nowHM()),lang:r.lang,doc:r.doc,kind:r.kind,subject:t.split("\n")[0].slice(0,40),tag:"貼り付け",short:"Inquiry_"+id,body:t,read:r.read,items:r.items,checks:r.checks,addressee:r.lang==="ja"?"ご担当者様":r.lang==="th"?"ลูกค้า":"Customer",plan:r.plan};
+  state.custom[id].plan=state.custom[id].plan.map(function(p){return [p[0].getTime?p[0].toISOString():p[0],p[1],p[2],p[3]]});
+  state.mails.unshift({id:"M"+id,folder:"inbox",from:from,addr:"customer@example.com",init:"問",date:state.custom[id].date,subject:state.custom[id].subject,body:t,tags:[{t:"見積依頼",k:"green"},{t:"貼り付け",k:"gray"}],caseId:id,unread:true});
+  fixCustom();state.folder="inbox";state.selMail="M"+id;bg.remove();render();toast("受信箱に追加しました");
+ };
+}
+/* custom cases are stored as JSON: restore Date objects in plan */
+function fixCustom(){Object.keys(state.custom).forEach(function(k){var c=state.custom[k];c.plan.forEach(function(p){if(!(p[0] instanceof Date))p[0]=new Date(p[0])})})}
+fixCustom();
+
+document.addEventListener("click",function(e){
+ var t=e.target.closest("button");if(!t)return;
+ var ds=t.dataset;
+ if(t.hasAttribute("data-close"))return;
+ if(ds.view){go(ds.view);return}
+ if(ds.caseOpen){openCase(ds.caseOpen);return}
+ if(ds.folder){state.folder=ds.folder;var f=state.mails.filter(function(m){return m.folder===ds.folder})[0];state.selMail=f?f.id:null;state.compose=null;render();return}
+ if(ds.mail&&!ds.act){state.selMail=ds.mail;state.compose=state.compose&&state.compose.mail===ds.mail?state.compose:null;state.mails.forEach(function(m){if(m.id===ds.mail)m.unread=false});render();return}
+ if(ds.case&&!ds.act){state.selCase=ds.case;var s0=cs(ds.case);state.ptab=s0.read?(s0.step>=3?"docs":s0.step>=2?"quote":"read"):"read";render();return}
+ if(ds.ptab){var s1=cs(state.selCase);if(ds.ptab!=="mail"&&ds.ptab!=="read"&&!s1.read){toast("先に依頼内容を読み取ってください");return}state.ptab=ds.ptab;if(ds.ptab==="quote"&&s1.step<2)s1.step=2;if(ds.ptab==="docs"&&s1.step<3)s1.step=3;render();return}
+ if(ds.post){state.selPost=ds.post;render();return}
+ if(ds.ch){var sp=state.posts.filter(function(x){return x.id===state.selPost})[0];sp.ch=ds.ch;sp.text=null;render();return}
+ if(ds.lang){state.lang=ds.lang;state.posts.forEach(function(x){if(x.status==="draft")x.text=null});render();return}
+ switch(ds.act){
+  case "help":help();break;
+  case "rates":ratesModal();break;
+  case "reset":if(window.confirm("デモを最初の状態に戻しますか？")){state=fresh();render();toast("最初の状態に戻しました")}break;
+  case "paste":pasteModal();break;
+  case "gomail":var mm=state.mails.filter(function(m){return m.caseId===state.selCase&&m.folder==="inbox"})[0];if(mm){state.folder="inbox";state.selMail=mm.id}go("mail");break;
+  case "toquote":openCase(ds.case);break;
+  case "extract":var st=cs(ds.case),cc=C(ds.case);t.disabled=true;t.innerHTML=IC.spark+"読み取っています…";setTimeout(function(){st.read=true;st.step=1;st.items=initItems(cc);state.ptab="read";render()},900);break;
+  case "viewdoc":var c2=C(ds.case),st3=cs(ds.case);if(!st3.read){toast("先に依頼内容を読み取ってください");break}modal(docsHtml(c2,st3,true)+'<div class="actions" style="justify-content:flex-end"><button data-act="print">印刷・PDFで保存</button><button class="primary" data-close>閉じる</button></div>');break;
+  case "print":window.print();break;
+  case "attach":attachDoc(ds.case);break;
+  case "insertdoc":var mi=state.mails.filter(function(x){return x.id===ds.mail})[0];attachDoc(mi.caseId);break;
+  case "savedraft":var d=captureCompose(ds.mail);if(!d)break;var src=state.mails.filter(function(x){return x.id===ds.mail})[0];
+   if(src.folder==="draft"){src.body=d.body;src.subject=d.subject;src.addr=d.to}else{state.mails.unshift({id:"M"+(++state.seq)+"d",folder:"draft",from:BRAND,addr:d.to,toName:src.from,init:BRAND.charAt(0),date:stamp(NOW,nowHM()),subject:d.subject,body:d.body,attach:d.attach,caseId:src.caseId,tags:[{t:"下書き",k:"amber"}]})}
+   state.compose=null;render();toast("下書きに保存しました");break;
+  case "send":sendMail(ds.mail);break;
+  case "confirmjob":confirmJob(ds.case,state.selMail);break;
+  case "regen":var sp2=state.posts.filter(function(x){return x.id===state.selPost})[0];sp2.v=(sp2.v||0)+1;sp2.text=null;render();break;
+  case "schedule":var sp3=state.posts.filter(function(x){return x.id===state.selPost})[0];sp3.when=$("#slot").value;sp3.status="scheduled";sp3.text=postText(sp3,state.lang);render();toast("予約しました："+sp3.when+"（"+CHN[sp3.ch]+"）");break;
+  case "unschedule":var sp4=state.posts.filter(function(x){return x.id===state.selPost})[0];sp4.status="draft";sp4.when="";sp4.text=null;render();break;
+  case "postnow":var sp5=state.posts.filter(function(x){return x.id===state.selPost})[0];sp5.status="posted";sp5.when=stamp(NOW,nowHM());sp5.text=postText(sp5,state.lang);render();toast("配信しました（デモのため、実際には配信していません）");break;
+  case "newpost":var keys=Object.keys(TOPICS),used=state.posts.filter(function(p){return p.status==="draft"}).map(function(p){return p.topic});var tk=keys.filter(function(k){return used.indexOf(k)<0})[0]||keys[state.seq%keys.length];var nid="S"+(++state.seq)+"n";state.posts.unshift({id:nid,topic:tk,status:"draft",ch:"instagram",when:"",auto:false});state.selPost=nid;render();break;
+ }
+});
+document.addEventListener("change",function(e){
+ var t=e.target;
+ if(t.dataset.on){var st=cs(t.dataset.case);st.items[+t.dataset.on].on=t.checked;render();return}
+ if(t.dataset.qty){var st2=cs(t.dataset.case),v=parseFloat(t.value);st2.items[+t.dataset.qty].q=isFinite(v)&&v>=0?Math.round(v*100)/100:0;render();return}
+ if(t.dataset.auto){state.auto[t.dataset.auto]=t.checked;save();return}
+});
+document.addEventListener("input",function(e){
+ var t=e.target;if(t.id==="rBody"||t.id==="rTo"||t.id==="rSubj"){state.compose={mail:state.selMail,to:$("#rTo").value,subject:$("#rSubj").value,body:$("#rBody").value,attach:$("#replyBox").dataset.attach||null};save()}
+});
+
+render();
+if(!state.seen){state.seen=true;save();help()}
+})();
+</script>
+</body>
+</html>
